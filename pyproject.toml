@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools==80.9.0", "wheel==0.45.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "enterprise-martech-ai-control-plane"
+version = "1.0.0"
+description = "Executable governance boundaries for synthetic customer systems and automation"
+requires-python = ">=3.12"
+dependencies = ["fastapi==0.115.12", "uvicorn==0.34.2", "psycopg[binary]==3.2.9", "httpx==0.28.1"]
+
+[tool.setuptools.package-data]
+controlplane = ["*.sql"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
