@@ -1,0 +1,21 @@
+{
+  "pip_check": "No broken requirements found.",
+  "wheel_sha256": "8ec7e2d2bb3b418ae5bccc8ffc6003246f734fbc76e3bba30b9b38be0b423d47",
+  "compose_version": "2.39.4",
+  "compose_binary_sha256": "6b3bccfabcdd172e1d9e15d011b54c9b5b13b93b1153148108f55e4349055955",
+  "compose_config": "passed",
+  "container_execution": "not_executed",
+  "native_demo": {
+    "job_id": "6bc2dde8-22f9-483b-ba6c-e1d5110124d0",
+    "status": "succeeded",
+    "attempts": 2,
+    "reason": "reconciled_committed_effect",
+    "receipt": {
+      "key": "6bc2dde8-22f9-483b-ba6c-e1d5110124d0",
+      "hash": "07c8c0df039771734c1e540f921a67b56805d06fe9799ecb1566fcf4e34dd509",
+      "receipt": "76b93077-d9be-47fa-9a4e-477648986032",
+      "committed_at": "2026-09-11T23:44:45.101554-04:00"
+    },
+    "remote_effects": 1
+  }
+}
