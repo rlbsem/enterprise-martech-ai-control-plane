@@ -1,0 +1,91 @@
+name: synthetic-customer-control
+
+x-api-tokens: &api-tokens '{"crm":"local-crm-token-only","consent":"local-consent-token-only","privacy":"local-privacy-token-only","scoring":"local-scoring-token-only","agent":"local-agent-token-only","approver":"local-approver-token-only","operator":"local-operator-token-only"}'
+x-app-dsn: &app-dsn postgresql://control_app:local-app-only@postgres:5432/control_demo
+x-remote-dsn: &remote-dsn postgresql://synthetic_remote:local-remote-only@postgres:5432/control_demo
+
+services:
+  postgres:
+    image: postgres:17.11
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: local-admin-only
+      POSTGRES_DB: control_demo
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./scripts/init-test-db.sql:/docker-entrypoint-initdb.d/02-test.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d control_demo"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  migrate:
+    build: .
+    command: ["python", "-m", "controlplane", "bootstrap-local"]
+    environment:
+      CONTROL_ADMIN_DSN: postgresql://postgres:local-admin-only@postgres:5432/control_demo
+      APP_DB_PASSWORD: local-app-only
+      REMOTE_DB_PASSWORD: local-remote-only
+    depends_on:
+      postgres: {condition: service_healthy}
+  api:
+    build: .
+    command: ["python", "-m", "uvicorn", "controlplane.api:app", "--host", "0.0.0.0", "--port", "8000", "--no-access-log"]
+    ports: ["127.0.0.1:8000:8000"]
+    environment:
+      CONTROL_DSN: *app-dsn
+      API_TOKENS: *api-tokens
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  remote:
+    build: .
+    command: ["python", "-m", "uvicorn", "controlplane.mock:app", "--host", "0.0.0.0", "--port", "8001", "--no-access-log"]
+    environment:
+      REMOTE_DSN: *remote-dsn
+      EXECUTOR_TOKEN: local-executor-token-only
+      INJECTOR_TOKEN: local-injector-token-only
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health')"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  worker:
+    build: .
+    profiles: ["serve"]
+    environment:
+      CONTROL_DSN: *app-dsn
+      DOWNSTREAM_URL: http://remote:8001
+      EXECUTOR_TOKEN: local-executor-token-only
+    depends_on:
+      remote: {condition: service_healthy}
+  demo:
+    build: .
+    command: ["python", "scripts/demo.py"]
+    environment:
+      CONTROL_DSN: *app-dsn
+      CONTROL_URL: http://api:8000
+      DOWNSTREAM_URL: http://remote:8001
+      API_TOKENS: *api-tokens
+      EXECUTOR_TOKEN: local-executor-token-only
+      INJECTOR_TOKEN: local-injector-token-only
+    depends_on:
+      api: {condition: service_healthy}
+      remote: {condition: service_healthy}
+  verify:
+    build: .
+    profiles: ["test"]
+    command: ["python", "scripts/verify.py", "/app/docs/evidence"]
+    environment:
+      TEST_ADMIN_DSN: postgresql://postgres:local-admin-only@postgres:5432/control_test
+    depends_on:
+      postgres: {condition: service_healthy}
+
+volumes:
+  pgdata:
