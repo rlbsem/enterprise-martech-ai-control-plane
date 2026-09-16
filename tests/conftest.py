@@ -39,7 +39,8 @@ def runtime(tmp_path_factory):
     os.environ["API_TOKENS"] = json.dumps(TOKENS)
     os.environ["EXECUTOR_TOKEN"] = "synthetic-executor-only"
     os.environ["INJECTOR_TOKEN"] = "synthetic-injector-only"
-    os.environ["REMOTE_TIMEOUT"] = "0.15"
+    # Keep ordinary CI round trips out of the timeout fault path; injected delays are 1 second.
+    os.environ["REMOTE_TIMEOUT"] = "0.5"
     with psycopg.connect(admin, autocommit=True) as c:
         for role, password in [("control_app", "local-app-only"), ("synthetic_remote", "local-remote-only")]:
             if not c.execute("SELECT 1 FROM pg_roles WHERE rolname=%s", (role,)).fetchone():
