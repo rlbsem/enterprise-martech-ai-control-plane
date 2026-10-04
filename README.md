@@ -9,29 +9,24 @@ This independent portfolio implementation by Richard Butts uses entirely synthet
 **Start with the [generated proof](docs/evidence/report.md).** It shows lifecycle regression refused, consent revoked after approval with zero messages, and a response lost after a remote commit recovered without a second business effect. The suite also kills a real worker process after the commit.
 
 ```mermaid
-flowchart LR
-  S[CRM / consent / privacy / scoring sources] --> API[Authenticated command API]
-  A[Deterministic agent: proposals only] --> API
-  H[Human approver / identity operator] --> API
-  API --> P[(PostgreSQL: customer state, provenance,
-  policy snapshots, approvals, work, audit)]
-  P --> W[Executor: recheck policy and state]
-  W -->|Stable idempotency key| R[Synthetic downstream HTTP service]
-  W -->|Reconcile uncertain result| R
-  R --> E[(Separate schema and login:
-  atomic effect + receipt)]
-
-  classDef input fill:#dbeafe,stroke:#2563eb,color:#0f172a,stroke-width:2px;
-  classDef foundation fill:#bfdbfe,stroke:#1d4ed8,color:#0f172a,stroke-width:2px;
-  classDef process fill:#93c5fd,stroke:#1e40af,color:#0f172a,stroke-width:2px;
-  classDef control fill:#60a5fa,stroke:#1e3a8a,color:#ffffff,stroke-width:2px;
-  classDef output fill:#2563eb,stroke:#1e3a8a,color:#ffffff,stroke-width:2px;
-
-  class S,A,H input;
-  class API foundation;
-  class P process;
-  class W,R control;
-  class E output;
+flowchart TB
+  S[CRM / consent / privacy / scoring] --> C
+  A[Agent and automation: proposals only] --> C
+  H[Identity operator / human approver] --> C
+  subgraph C[Governance boundary]
+    I[Canonical identity + explicit linking] --> P[Field authority + source sequence]
+    P --> N[No-Regress / consent / approval checks]
+    N --> D[(PostgreSQL: state + provenance + audit + durable work)]
+  end
+  D --> W[Executor rechecks current authorization]
+  W -->|Stable key + immutable payload| R[Synthetic HTTP adapter]
+  R --> E[(Atomic business effect + idempotency receipt)]
+  W -->|Lost response: reconcile original key first| E
+  E --> D
+  classDef durable fill:#dbeafe,stroke:#2563eb,color:#0f172a;
+  classDef guard fill:#edf7ee,stroke:#246634,color:#163b20;
+  class D,E durable;
+  class P,N,W guard;
 ```
 
 Python and explicit PostgreSQL transactions are sufficient for this bounded problem. PostgreSQL supplies uniqueness, row locks, durable work and audit protection; adding a broker would introduce another consistency boundary. FastAPI supplies closed API contracts. The downstream process exists to exercise an actual network boundary, rather than pretending that a function call proves remote recovery.
@@ -58,7 +53,7 @@ docker compose down
 
 Use a fresh container name if `control-proof` already exists. Verification uses a separate disposable `control_test` database. The demo uses `control_demo`. `down` preserves data; `down --volumes` intentionally destroys this project's local database volume.
 
-**Execution boundary:** the Python/PostgreSQL/HTTP implementation and native demonstration were executed on Windows. Docker was unavailable on the build host, so the Compose path is provided and checked structurally but is not claimed as executed. GitHub Actions includes both native integration and container-demo jobs; no remote CI success is claimed. The fully executed alternative needs Python 3.12 and an existing local PostgreSQL 17 database:
+**Execution boundary:** the Python/PostgreSQL/HTTP implementation and native demonstration were executed on Windows. Docker was unavailable on the build host, so the Compose path is provided and checked structurally but is not claimed as executed. GitHub Actions includes both native integration and container-demo jobs; [Hosted PostgreSQL and container-demo verification has passed](https://github.com/rlbsem/enterprise-martech-ai-control-plane/actions/runs/35094239650). Local execution and hosted execution are separate evidence. The fully executed alternative needs Python 3.12 and an existing local PostgreSQL 17 database:
 
 ```bash
 python -m venv .venv
