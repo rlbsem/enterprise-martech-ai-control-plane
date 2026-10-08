@@ -107,4 +107,4 @@ python scripts/validate_infra.py
 | Restore and operations | [Read-only comparison](src/controlplane/operations.py), [PITR tool](src/controlplane/restore.py), [runbook](docs/cloud-operations.md) |
 | Verification | [Generated test proof](docs/evidence/verification.json), [infrastructure checks](docs/evidence/infrastructure/verification.json), [validation guide](docs/validation.md), [GitHub Actions](https://github.com/rlbsem/enterprise-martech-ai-control-plane/actions) |
 
-Validation scope: customer data and the downstream adapter are synthetic. Evidence records actual local execution and hosted checks; Terraform and AWS SDK tests validate the deployment path without provisioning AWS resources. Live AWS failover and PITR remain environment acceptance checks.
+AWS resources have not been provisioned; live failover and PITR remain [environment acceptance checks](docs/cloud-operations.md).
