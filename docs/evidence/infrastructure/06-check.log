@@ -1,6 +1,6 @@
-2026-10-07T22:06:10-04:00	INFO	[misconfig] Misconfiguration scanning is enabled
-2026-10-07T22:06:10-04:00	INFO	[checks-client] Need to update the checks bundle
-2026-10-07T22:06:10-04:00	INFO	[checks-client] Downloading the checks bundle...
-234.65 KiB / 234.65 KiB [--------------------------------------------------------->] 100.00% ? p/s ?234.65 KiB / 234.65 KiB [-----------------------------------------------] 100.00% 1.27 MiB p/s 400ms2026-10-07T22:06:13-04:00	INFO	[terraform scanner] Scanning root module	file_path="aws"
-2026-10-07T22:06:13-04:00	INFO	[terraform scanner] Scanning root module	file_path="foundation"
-2026-10-07T22:06:13-04:00	INFO	Detected config files	num=5
+2026-10-08T15:06:53-04:00	INFO	[misconfig] Misconfiguration scanning is enabled
+2026-10-08T15:06:53-04:00	INFO	[checks-client] Need to update the checks bundle
+2026-10-08T15:06:53-04:00	INFO	[checks-client] Downloading the checks bundle...
+234.65 KiB / 234.65 KiB [--------------------------------------------------------->] 100.00% ? p/s ?234.65 KiB / 234.65 KiB [--------------------------------------------------------->] 100.00% ? p/s ?234.65 KiB / 234.65 KiB [---------------------------------------------] 100.00% 851.91 KiB p/s 500ms2026-10-08T15:06:55-04:00	INFO	[terraform scanner] Scanning root module	file_path="aws"
+2026-10-08T15:06:55-04:00	INFO	[terraform scanner] Scanning root module	file_path="foundation"
+2026-10-08T15:06:55-04:00	INFO	Detected config files	num=5

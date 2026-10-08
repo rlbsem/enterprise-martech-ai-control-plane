@@ -1,6 +1,6 @@
 # Executed control-plane proof
 
-91 tests; 0 failures; 0 skipped. Real PostgreSQL and separate HTTP server processes. Generated 2026-10-08T02:06:57.289835+00:00.
+91 tests; 0 failures; 0 skipped. Real PostgreSQL and separate HTTP server processes. Generated 2026-10-08T19:07:33.478858+00:00.
 
 | Scenario | Observed result |
 |---|---|

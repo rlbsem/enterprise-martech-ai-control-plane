@@ -35,7 +35,8 @@ def main():
     results = []
     for i, command in enumerate(commands):
         process = subprocess.run(command, cwd=ROOT, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        (args.output/f'{i:02}-check.log').write_text(process.stdout, encoding='utf-8')
+        (args.output/f'{i:02}-check.log').write_text(process.stdout.rstrip() + ('\n' if process.stdout else ''),
+                                                 encoding='utf-8', newline='\n')
         print(process.stdout)
         process.check_returncode()
         results.append({'command': [Path(command[0]).name, *command[1:]], 'exit_code': process.returncode})

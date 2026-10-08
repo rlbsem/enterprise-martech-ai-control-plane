@@ -1,5 +1,5 @@
 {
-  "executed_at": "2026-10-08T02:06:14.096173+00:00",
+  "executed_at": "2026-10-08T19:06:56.973828+00:00",
   "scope": "static analysis and mocked Terraform; no AWS API calls",
   "terraform_version": "1.13.5",
   "trivy_version": "0.75.0",
@@ -109,7 +109,7 @@
     }
   ],
   "source_sha256": {
-    "infra/aws/.terraform.lock.hcl": "0d2eb78d57708a880058b7672072e706c2eaa45cb4bd3316b62fef45d65f5623",
+    "infra/aws/.terraform.lock.hcl": "2364e1a11b99453fde1f6b25792375af322c39f40df1be0b1279c37cef50f016",
     "infra/aws/data.tf": "acc749c103774334fb7d31a46328a1e172f89b2f4cdb8e1ead821da1bd976d05",
     "infra/aws/iam.tf": "a6e9fa226b4463957c1a3c52f1294b24b4e34d8375d004790d9787dbe84e21bd",
     "infra/aws/network.tf": "829f8b6393baa18911de58f31e6872780d92bdb3dd55db9336895c6a8ad27b0e",
@@ -119,7 +119,7 @@
     "infra/aws/tests/security.tftest.hcl": "6281a05244b1de24e7108207909c5d2e4b427fc065893e445d7f092e0fefd96f",
     "infra/aws/variables.tf": "323d2610ea5b1c4d2b8da70d4821f438aaaeff51a5466f42d04ab9e67beb441f",
     "infra/aws/versions.tf": "10bb129143ad0fac36e3a9ea13dd11a25187a6fa8665d5ea6a1f10e10c71231b",
-    "infra/foundation/.terraform.lock.hcl": "0d2eb78d57708a880058b7672072e706c2eaa45cb4bd3316b62fef45d65f5623",
+    "infra/foundation/.terraform.lock.hcl": "2364e1a11b99453fde1f6b25792375af322c39f40df1be0b1279c37cef50f016",
     "infra/foundation/main.tf": "770c8ddbd175a653d5d429ebc858ee11f7893649cf7581001ba4f05e6e76d0c4",
     "infra/README.md": "c63ea6d467eafd0cf38ebd9f4083f176e3daf11989b8843e1051125615e99dbc",
     "infra/testing/README.md": "dedb00917fefe5855482b624f3727753067906ad638a94f4fecc9d0068ac399a",
