@@ -19,10 +19,13 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def source_hashes():
-    files = sorted(p for folder in ("src", "tests", "scripts", ".github") for p in (ROOT / folder).rglob("*")
-                   if p.is_file() and "__pycache__" not in p.parts and p.suffix in (".py", ".sql", ".yml"))
+    files = sorted(p for folder in ("src", "tests", "scripts", ".github", "infra", "certs")
+                   for p in (ROOT / folder).rglob("*")
+                   if p.is_file() and not {"__pycache__", ".terraform"}.intersection(p.parts)
+                   and p.suffix in (".py", ".sql", ".yml", ".tf", ".hcl", ".pem", ".json"))
     files += [ROOT / "pyproject.toml", ROOT / "requirements.lock", ROOT / "compose.yaml", ROOT / "Dockerfile"]
-    return {p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in files}
+    return {p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+            for p in files}
 
 
 def main():
@@ -44,6 +47,7 @@ def main():
         if hashes != source_hashes():
             raise RuntimeError("Source changed during validation; evidence not published")
         summary = {"executed_at": datetime.now(UTC).isoformat(), "python": platform.python_version(),
+                   "hash_format": "SHA-256 of UTF-8 source with LF newlines; portable across checkout platforms",
                    "platform": platform.platform(), "postgres": postgres,
                    "installation": "source" if installed.resolve() == (ROOT / "src/controlplane").resolve() else "installed_wheel",
                    "packages": {p: version(p) for p in ["psycopg", "fastapi", "httpx", "pytest", "hypothesis", "ruff"]},
@@ -67,7 +71,8 @@ def main():
                   f"| Eight competing workers | {cases['competing-workers']['claimed']} claim; 1 effect |",
                   f"| Worker process killed after remote commit | {cases['process-death']['final']}; 1 effect |", "",
                   "The JSON cases retain IDs, decisions and receipts. `verification.json` records source hashes and runtime versions. "
-                  "`tests.xml` records every test. No GitHub Actions success, container execution, external SaaS or cloud deployment is claimed.", ""]
+                  "`tests.xml` records every test. This record covers native execution; hosted checks are linked separately. "
+                  "AWS SDK tests use stubs and do not provision resources.", ""]
         (stage / "report.md").write_text("\n".join(report), encoding="utf-8")
         target.mkdir(parents=True, exist_ok=True)
         for p in stage.iterdir():

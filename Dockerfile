@@ -4,10 +4,12 @@ WORKDIR /app
 COPY requirements.lock pyproject.toml ./
 RUN python -m pip install --no-cache-dir -r requirements.lock
 COPY src ./src
+COPY certs ./certs
 RUN python -m pip install --no-deps --no-build-isolation .
 COPY tests ./tests
 COPY scripts ./scripts
 COPY .github ./.github
+COPY infra ./infra
 COPY compose.yaml Dockerfile ./
 RUN useradd --create-home --uid 10001 control && mkdir -p /app/docs/evidence && chown -R control:control /app
 USER control

@@ -1,0 +1,128 @@
+{
+  "executed_at": "2026-10-08T02:06:14.096173+00:00",
+  "scope": "static analysis and mocked Terraform; no AWS API calls",
+  "terraform_version": "1.13.5",
+  "trivy_version": "0.75.0",
+  "checks": [
+    {
+      "command": [
+        "terraform.exe",
+        "fmt",
+        "-check",
+        "-recursive",
+        "infra"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "terraform.exe",
+        "-chdir=infra/foundation",
+        "init",
+        "-backend=false",
+        "-input=false",
+        "-lockfile=readonly"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "terraform.exe",
+        "-chdir=infra/foundation",
+        "validate",
+        "-no-color"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "terraform.exe",
+        "-chdir=infra/aws",
+        "init",
+        "-backend=false",
+        "-input=false",
+        "-lockfile=readonly"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "terraform.exe",
+        "-chdir=infra/aws",
+        "validate",
+        "-no-color"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "terraform.exe",
+        "-chdir=infra/aws",
+        "test",
+        "-no-color"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "trivy.exe",
+        "config",
+        "--severity",
+        "HIGH,CRITICAL",
+        "--exit-code",
+        "1",
+        "--tf-vars",
+        "infra/testing/static.tfvars.json",
+        "--format",
+        "json",
+        "--output",
+        "docs\\evidence\\infrastructure\\security.json",
+        "infra"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "trivy.exe",
+        "fs",
+        "--scanners",
+        "secret",
+        "--exit-code",
+        "1",
+        "--skip-dirs",
+        "node_modules",
+        "--skip-dirs",
+        "work",
+        "--skip-dirs",
+        ".git",
+        "--skip-dirs",
+        "infra/aws/.terraform",
+        "--skip-dirs",
+        "infra/foundation/.terraform",
+        "--format",
+        "json",
+        "--output",
+        "docs\\evidence\\infrastructure\\secrets.json",
+        "."
+      ],
+      "exit_code": 0
+    }
+  ],
+  "source_sha256": {
+    "infra/aws/.terraform.lock.hcl": "0d2eb78d57708a880058b7672072e706c2eaa45cb4bd3316b62fef45d65f5623",
+    "infra/aws/data.tf": "acc749c103774334fb7d31a46328a1e172f89b2f4cdb8e1ead821da1bd976d05",
+    "infra/aws/iam.tf": "a6e9fa226b4463957c1a3c52f1294b24b4e34d8375d004790d9787dbe84e21bd",
+    "infra/aws/network.tf": "829f8b6393baa18911de58f31e6872780d92bdb3dd55db9336895c6a8ad27b0e",
+    "infra/aws/observability.tf": "ce60e1fdbdf979dac17f7296065d95140faa094d9213c34b38229428499711ee",
+    "infra/aws/outputs.tf": "dff670116d4e061ddb16c3d83e4a87b64fce030874db428d771ff45850bff9cb",
+    "infra/aws/runtime.tf": "f738acb0648722b555939bcb3924ad20bfbccac6dbf731b66650f8a6c1b46234",
+    "infra/aws/tests/security.tftest.hcl": "6281a05244b1de24e7108207909c5d2e4b427fc065893e445d7f092e0fefd96f",
+    "infra/aws/variables.tf": "323d2610ea5b1c4d2b8da70d4821f438aaaeff51a5466f42d04ab9e67beb441f",
+    "infra/aws/versions.tf": "10bb129143ad0fac36e3a9ea13dd11a25187a6fa8665d5ea6a1f10e10c71231b",
+    "infra/foundation/.terraform.lock.hcl": "0d2eb78d57708a880058b7672072e706c2eaa45cb4bd3316b62fef45d65f5623",
+    "infra/foundation/main.tf": "770c8ddbd175a653d5d429ebc858ee11f7893649cf7581001ba4f05e6e76d0c4",
+    "infra/README.md": "c63ea6d467eafd0cf38ebd9f4083f176e3daf11989b8843e1051125615e99dbc",
+    "infra/testing/README.md": "dedb00917fefe5855482b624f3727753067906ad638a94f4fecc9d0068ac399a",
+    "infra/testing/static.tfvars.json": "f5775ab332b052768281ef72d6a1de01fc4bd1d8ed3b61885b60dae816432754"
+  }
+}

@@ -1,0 +1,8 @@
+tests\security.tftest.hcl... in progress
+  run "private_encrypted_and_quiescent"... pass
+  run "reject_mutable_image"... pass
+  run "reject_untrusted_oidc"... pass
+tests\security.tftest.hcl... tearing down
+tests\security.tftest.hcl... pass
+
+Success! 3 passed, 0 failed.

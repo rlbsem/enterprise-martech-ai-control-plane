@@ -1,4 +1,4 @@
-"""Role-separated API. Bearer tokens are explicit local configuration, not production identity."""
+"""Role-separated API. Cloud tasks load scoped service credentials from Secrets Manager."""
 
 import json
 import os
@@ -10,7 +10,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from . import db, service
+from . import db, operations, service
 from .contracts import Approval, Link, Proposal, Resolution, SourceEvent
 
 
@@ -41,7 +41,21 @@ async def lifespan(app):
     yield
 
 
-app = FastAPI(title="Synthetic customer control plane", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="Enterprise customer control plane", version="1.0.0", lifespan=lifespan)
+
+
+@app.middleware("http")
+async def observe_errors(request, call_next):
+    try:
+        response = await call_next(request)
+    except Exception:
+        if os.environ.get("ENABLE_METRICS") == "1":
+            operations.emit({"ApiError": 1}, "api", os.environ["ENVIRONMENT"])
+        # Never send DSNs, SQL payloads or authentication material to runtime logs.
+        return JSONResponse(status_code=503, content={"error": "dependency_unavailable"})
+    if response.status_code >= 500 and os.environ.get("ENABLE_METRICS") == "1":
+        operations.emit({"ApiError": 1}, "api", os.environ["ENVIRONMENT"])
+    return response
 
 
 @app.exception_handler(ValueError)

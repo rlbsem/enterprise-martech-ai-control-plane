@@ -8,7 +8,7 @@ from uuid import uuid4
 import httpx
 from psycopg.types.json import Jsonb
 
-from . import db
+from . import db, operations
 from .policy import POLICY, digest
 from .service import valid_proposal
 
@@ -46,7 +46,13 @@ def finish(job, status, reason, remote_result=None, uncertain=None, delay=None):
             db.exception(c, category, job["id"], {"reason": reason, "uncertain": current["uncertain"]})
         db.audit(c, "executor", "execution_result", job["id"],
                  {"status": status, "reason": reason, "attempt": current["attempts"], "remote": remote_result})
-        return True
+    if os.environ.get("ENABLE_METRICS") == "1":
+        metrics = {"Retry": int(status == "retry"),
+                   "DependencyFailure": int(reason in ("remote_rejected", "remote_server_error",
+                                                       "reconciliation_unavailable", "remote_outcome_unknown")),
+                   "Reconciled": int(reason == "reconciled_committed_effect")}
+        operations.emit(metrics, "worker", os.environ["ENVIRONMENT"])
+    return True
 
 
 def prepare(job):
@@ -128,6 +134,10 @@ def once():
 
 
 def run():
+    last_heartbeat = 0
     while True:
+        if os.environ.get("ENABLE_METRICS") == "1" and time.monotonic() - last_heartbeat >= 30:
+            operations.emit({"WorkerPoll": 1}, "worker", os.environ["ENVIRONMENT"])
+            last_heartbeat = time.monotonic()
         if not once():
             time.sleep(0.5)

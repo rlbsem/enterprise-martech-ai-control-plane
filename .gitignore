@@ -10,3 +10,10 @@ __pycache__/
 .env
 build/
 dist/
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+release.json
+node_modules/

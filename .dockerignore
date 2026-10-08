@@ -10,3 +10,7 @@ work
 .env
 build
 dist
+**/.terraform
+**/*.tfstate*
+**/*.tfvars
+node_modules

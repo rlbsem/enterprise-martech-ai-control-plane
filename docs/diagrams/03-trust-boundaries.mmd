@@ -1,0 +1,15 @@
+flowchart TB
+  subgraph Actors["Authenticated business identities"]
+    CRM["Source owners"]
+    Agent["Agent: propose"]
+    Human["Approver / identity operator"]
+  end
+  CRM & Agent & Human --> API["API role<br/>No executor credential"]
+  API --> State[("Governed state and audit")]
+  Worker["Worker role<br/>No source-write grant"] --> State
+  Worker -->|"Executor token over HTTPS"| Remote["Downstream role"]
+  Remote --> Receipts[("Independent effects store")]
+  Verify["Read-only verifier<br/>No mutation credential"] --> State & Receipts
+  Admin["Protected one-shot migration<br/>Separate master secrets"] --> State & Receipts
+  OIDC["Repository + protected environment<br/>Short-lived release identity"] --> Revisions["Run approved task families<br/>No IAM / network administration"]
+  Revisions --> API & Worker & Verify & Admin

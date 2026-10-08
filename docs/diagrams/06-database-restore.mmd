@@ -1,0 +1,10 @@
+flowchart TD
+  Incident["Control database recovery required"] --> Freeze["Quiesce admission, workers and downstream<br/>Verify no running tasks"]
+  Freeze --> Restore["PITR into NEW control instance<br/>Retain original; keep downstream intact"]
+  Restore --> Bind["Review Terraform endpoint binding<br/>Bootstrap secret DSNs and role grants"]
+  Bind --> Compare["Read-only verifier compares ALL intents and receipts"]
+  Compare --> Result{"Any missing intent, hash mismatch<br/>or missing acknowledged receipt?"}
+  Result -->|Yes| Hold["Remain closed<br/>Recover ledger / investigate incident"]
+  Result -->|No| Proof["Fresh comparison immediately before resume"]
+  Proof --> Resume["Start downstream, API, workers, observer<br/>Recheck health and exact revision"]
+  Resume --> Reconcile["Workers reconcile existing uncertain keys<br/>Revalidate before any new dispatch"]

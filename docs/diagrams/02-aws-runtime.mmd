@@ -1,0 +1,17 @@
+flowchart TB
+  CI["Protected GitHub environment<br/>OIDC release role"] --> Tasks["Digest-bound task revisions<br/>Bootstrap · Verify · Release"]
+  Clients["Enterprise network / VPN"] --> TLS["Private ALB · HTTPS<br/>Enterprise ACM certificate"]
+  subgraph VPC["Two-AZ private VPC · No NAT · No public task IPs"]
+    TLS --> API["API Fargate service"]
+    TLS --> Remote["Downstream Fargate service"]
+    API --> CP[("Control RDS<br/>Multi-AZ · PITR")]
+    Worker["Fargate workers"] --> CP
+    Worker -->|HTTPS| TLS
+    Remote --> Receipts[("Independent downstream RDS<br/>Effects and receipts")]
+    Observer["Read-only observer / verifier"] --> CP
+    Observer --> Receipts
+    EP["Private endpoints<br/>ECR · Secrets · Logs · S3 layers"]
+    API & Worker & Remote & Observer --> EP
+  end
+  Tasks --> API & Worker & Remote & Observer
+  EP --> CW["CloudWatch<br/>Queue age · Unknown outcomes · Errors"]

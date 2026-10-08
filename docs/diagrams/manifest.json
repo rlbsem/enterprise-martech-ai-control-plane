@@ -1,0 +1,29 @@
+{
+  "renderer": "@mermaid-js/mermaid-cli 11.12.0",
+  "files": {
+    "01-control-plane.mmd": {
+      "mmd": "df92e3541fc8fe4ae8b6468901bfca2b52ba29dfe5d34141fdd22826840ddf92",
+      "svg": "a28c9cb4c330955821cc9647f6b933c26017fabc567890d8475fc26c2541d6a4"
+    },
+    "02-aws-runtime.mmd": {
+      "mmd": "1343c16a1c9176816de74d6916b494633b4c783af51b92a2f0d1accd5fa35f56",
+      "svg": "dcc76a1da59422df44bfba955b1aa81e2fd26cd457c9f9c61c8b563c58bf4c40"
+    },
+    "03-trust-boundaries.mmd": {
+      "mmd": "34e3673fb503ccf388210bacab30a29a731dc380d7a439e5edef294d3af2bd53",
+      "svg": "f394d8811a022036cd25e275642ffd7427d4709f98d3bf3c5f2445b6dd615307"
+    },
+    "04-execution.mmd": {
+      "mmd": "6c4279b0afedf2f8ff00ede5f35aa029ddb5a58bf6cac0c062d49b6692e2cfc8",
+      "svg": "b8e780f14a09f443b319212668355a3f735168f57cc6e4e0cf2f0540e68f971d"
+    },
+    "05-failure-recovery.mmd": {
+      "mmd": "512bf4ac728b1ea9e2667986bdb0322398fc1f989d88b006848ee6c6bfdf38c2",
+      "svg": "9030a901559bc0d5203e3e7c18843491fac30db4ccb9eb08b79501b41265655d"
+    },
+    "06-database-restore.mmd": {
+      "mmd": "0e73527e06a6b3740e2a1fa68c433c27e1a961578a5a8bb24f1b2e98c4ec5ef2",
+      "svg": "8e863370005d726d40872e76e0b89babcd8bfbc2019669d3020446907946b65d"
+    }
+  }
+}

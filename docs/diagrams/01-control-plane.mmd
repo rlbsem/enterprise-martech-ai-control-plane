@@ -1,0 +1,14 @@
+flowchart LR
+  Sources["CRM · Consent · Privacy · Scoring"] --> Identity["Canonical identity<br/>Reviewed source links"]
+  Identity --> Truth["Authority · Sequence · No-Regress"]
+  Truth --> State[("Customer state<br/>Provenance · Audit")]
+  Agent["AI / workflow proposals"] --> Gate["Policy · Consent · Approval"]
+  State --> Gate
+  Gate --> Work[("Durable intent and leases")]
+  Work --> Worker["Executor rechecks authority"]
+  Worker -->|"Stable effect identity"| Effects[("Downstream effect + receipt")]
+  Effects -->|"Reconcile unknown outcome"| Work
+  classDef durable fill:#e3edf7,stroke:#315c86,color:#142b44
+  classDef control fill:#e6f2eb,stroke:#306949,color:#173f2a
+  class State,Work,Effects durable
+  class Truth,Gate,Worker control
