@@ -54,7 +54,7 @@ POST this to `/exceptions/{exception_id}/resolve` as operator. Requeue is permit
 
 ## Operational visibility
 
-The example provides queryable exception/audit APIs and structured database state. It does not deploy a metrics or paging service. Useful operator queries through an administrator's local SQL session include:
+The local API provides queryable exceptions and audit history. The AWS layer adds bounded CloudWatch metrics, alarms and a read-only observer; see the [cloud runbook](cloud-operations.md). Useful queries through an administrator's local SQL session include:
 
 ```sql
 SELECT status, uncertain, count(*) FROM cp.jobs GROUP BY status, uncertain;
@@ -65,4 +65,4 @@ SELECT category, count(*) FROM cp.exceptions WHERE status='open' GROUP BY catego
 
 Watch oldest ready work, expired leases, unknown outcomes, rejection categories and retry-budget exhaustion. At production scale, convert these to measured service indicators with ownership and thresholds established from real traffic. Avoid publishing customer payloads as metric labels.
 
-The SQL migration is transactional and checksum checked. Application logins never run migrations. Backups, point-in-time restore drills, key rotation, data retention and audit export are production requirements, not automated by this repository. An owner can disable triggers or change grants, so audit protection must be supplemented by independently controlled exports for stronger tamper evidence.
+The SQL migration is transactional and checksum checked. Application logins never run migrations. Terraform configures backups and PITR; the recovery tools gate reconnection on independent receipt comparison. Rotation and restore procedures are in the [cloud runbook](cloud-operations.md). An owner can disable triggers or change grants, so independently controlled exports are needed for stronger audit tamper evidence.

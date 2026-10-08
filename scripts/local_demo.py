@@ -53,7 +53,8 @@ def main():
                 time.sleep(0.05)
             else:
                 raise RuntimeError(f"{service} health check failed")
-        subprocess.run([sys.executable, str(Path(__file__).with_name("demo.py"))], env=env, check=True)
+        script = "workload.py" if os.environ.get("CONTROL_WORKLOAD_ENTITIES") else "demo.py"
+        subprocess.run([sys.executable, str(Path(__file__).with_name(script))], env=env, check=True)
     finally:
         for p in processes:
             p.terminate()

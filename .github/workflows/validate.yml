@@ -32,6 +32,16 @@ jobs:
           python -m pip install --no-deps --no-build-isolation -e .
           python -m pip check
       - run: python scripts/verify.py work/ci-evidence
+      - name: Larger enterprise workload
+        env:
+          CONTROL_ADMIN_DSN: postgresql://postgres:local-admin-only@127.0.0.1:5432/control_workload
+          CONTROL_WORKLOAD_ENTITIES: "1000"
+          CONTROL_WORKLOAD_WORKERS: "4"
+          REMOTE_TIMEOUT: "0.5"
+          WORKLOAD_OUTPUT: work/ci-evidence/enterprise-workload.json
+        run: |
+          python -c "import os,psycopg; c=psycopg.connect(os.environ['TEST_ADMIN_DSN'],autocommit=True); c.execute('CREATE DATABASE control_workload'); c.close()"
+          python scripts/local_demo.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
@@ -44,5 +54,7 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - run: docker compose run --build --rm demo
+      - name: Verify all tests from the built image
+        run: docker compose --profile test run --rm verify
       - if: always()
         run: docker compose down --volumes

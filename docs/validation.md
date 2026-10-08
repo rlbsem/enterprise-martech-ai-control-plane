@@ -1,52 +1,51 @@
-# Validation and skeptical review
+# Validation and engineering review
 
-## Executed evidence boundary
+## Executed checks
 
-The local suite passed **68 tests, zero failures, zero skips**, against real PostgreSQL 17.11 on Windows with Python 3.12.14. One Hypothesis test additionally exercises 100 generated lifecycle cases. The tests launch independent FastAPI and synthetic downstream HTTP processes, use separate PostgreSQL logins, and kill a real worker child process after a remote commit. Network calls are actual loopback HTTP; the database is not mocked.
+The [generated verification record](evidence/verification.json) is the authority for test count, runtime, timings and source hashes. All original 68 tests remain unchanged. New tests exercise managed-secret denial, malformed role credentials, separate cloud SQL grants, rejected executor authority, bounded metrics, immutable task validation, recovery refusal and private restore requests. Tests use PostgreSQL 17 and independent HTTP processes; AWS SDK interactions are stubbed without account access.
 
-The exact runtime, timings, dependency versions, installation layout and source SHA-256 values are in [verification.json](evidence/verification.json). Individual test results are in [tests.xml](evidence/tests.xml). The [readable proof](evidence/report.md) is generated from asserted scenarios, not manually invented output.
+`scripts/verify.py` checks installed/source parity, runs Ruff and the entire suite, and refuses to publish evidence if source changes during execution. The [JUnit record](evidence/tests.xml) identifies individual tests. Portable source hashes normalize LF newlines across Windows/Linux; they include Terraform, workflows, certificates and operating tools as well as the core logic. [The scenario report](evidence/report.md) is built from executed assertions.
 
-`scripts/verify.py` checks that the installed package matches the repository source, executes lint and the complete suite, refuses to publish if source changes during validation, and only then copies staged evidence into the requested directory. The final clean-install check uses a built wheel in a second Python environment, rather than depending on an editable checkout. SQL migration package data is exercised by that installed package. `pip check` found no dependency conflicts. The native demonstration also executes against a separate retained demo database and can be repeated with new synthetic IDs.
+The [larger workload](evidence/enterprise-workload.json) is a separate measured run: 1,000 accounts, four worker processes, planned dependency faults and full-ledger comparison. It does not replace the exact consent, authority, concurrency and worker-death fixtures.
 
-PostgreSQL was an isolated temporary local runtime downloaded from the official EDB binary distribution linked by PostgreSQL's Windows downloads page. Its loopback-only bootstrap used trust authentication on the disposable build host; application schema/role permissions were still enforced by PostgreSQL. Compose uses explicit development passwords. This local bootstrap is not a production authentication example.
-
-| Category | Status |
+| Layer | Validation method |
 |---|---|
-| Governance, API, PostgreSQL integration, remote HTTP, concurrency, killed-worker recovery | Executed locally |
-| Fresh dependency installation, built-wheel execution, packaged SQL, native demo | Executed locally |
-| Compose topology, health checks, credentials and startup commands | `config --quiet` passed using official checksum-verified Compose v2.39.4; no container runtime execution claimed |
-| GitHub Actions integration and container demo jobs | Workflow supplied; not pushed or observed running for this repository |
-| Real CRM/email/LLM provider integrations | Not implemented; synthetic downstream only |
-| Cloud deployment, scale benchmarks, failover, identity provider, immutable external audit archive | Reference/known-limit material only |
+| Business invariants | Existing real PostgreSQL/HTTP tests, including 100 generated lifecycle examples |
+| Worker/process failures | Eight competing workers; stale-token fences; actual process kill after remote commit; 429/500/422 and before/after-commit timeouts |
+| Cloud database authority | Real SQL under API, worker, observer and verifier roles, including prohibited mutations and cross-schema reads |
+| Secret/IAM error behavior | Botocore Stubber responses for AccessDenied, missing secrets and KMS decryption failure; malformed authority contracts rejected |
+| Database recovery gate | Independent receipt survives local intent loss; complete comparison rejects missing intents, conflicting hashes/receipts and missing acknowledgements |
+| Release safety | No service-open calls after verifier failure; busy clusters rejected; mutable or mismatched images rejected |
+| Infrastructure | Both Terraform roots fmt/validate; mocked provider tests; [Trivy HIGH/CRITICAL configuration scan](evidence/infrastructure/security.json) |
+| Documentation | Internal Markdown targets, source/evidence bindings and credential-pattern checks; all six Mermaid sources parsed and rendered |
+| Containers and hosted CI | Separate [GitHub Actions jobs](https://github.com/rlbsem/enterprise-martech-ai-control-plane/actions) build the image, execute demo/tests, run workload and validate infrastructure/diagrams |
 
-## Review findings and corrections
+Docker is unavailable on the local Windows execution host. The container checks run in GitHub Actions; use the actual run result when assessing a particular commit. Live AWS task launches, private routing, certificate coverage, paging delivery and managed RDS failover/PITR are environment acceptance checks. No AWS resources were provisioned for this revision.
 
-| Skeptical review question | Decision or correction | Proof |
-|---|---|---|
-| Could equal email silently merge customers? | Exact email only produces review candidates; even a single match is insufficient | Identity review and ambiguity tests |
-| Are unrelated upstream sequence clocks compared? | Enforce one authoritative subject per source per customer; forbid rebinds | Uniqueness constraint and API rejection tests |
-| Can null input be interpreted as a privacy reset? | Reject explicit nulls, empty patches and type coercion | Durable malformed-contract exceptions |
-| Can a caller claim to be the consent source? | Authority derives from a configured credential; extra source/actor fields are refused | Spoofed-source and role matrix tests |
-| Can lower authority win by being newer? | Ownership precedes sequence; generic lifecycle order precedes acceptance | Concurrent source update, no-regress and source-authority tests |
-| Can approval become permanent permission? | Exact revision, policy hash and two expiries; duplicate approval cannot extend validity | Stale and expired approval tests |
-| Can replay bypass later revocation? | Reconcile existing effects first; new dispatch rechecks state, policy and approval | Both committed and uncommitted timeout cases after revocation |
-| Can a lease stop an old HTTP request? | No such claim; fence local completion and deduplicate effects remotely | Expired token test and eight simultaneous remote retransmissions |
-| Can process death lose the work or receipt? | Persist intent before HTTP; replacement reconciles original key | Actual process kill after remote commit |
-| Is a server error proof that nothing happened? | 5xx/transport failures remain uncertain; lookup precedes resend | Failure injection and retry-exhaustion tests |
-| Can retry exhaustion hide uncertainty? | Preserve uncertainty in dead work; reviewed requeue preserves the exact intent | Dead-letter recovery and stale-context requeue tests |
-| Could application SQL rewrite audit history? | Revoke mutation rights, add immutable triggers, separate migration owner; reject privileged runtime roles during migration | PostgreSQL permission and accidental owner-update tests |
-| Could a source ID or policy be rewritten to erase the explanation? | Immutable event history, immutable policy snapshots, content-checked migration | Conflict, policy snapshot/change and migration mutation tests |
-| Does a fresh package omit SQL or use different code? | Package SQL; compare installed bytes before verification; test a wheel in a fresh environment | Final installed-wheel evidence |
-| Does the documentation overstate privacy or delivery guarantees? | Explicit dispatch cutoff, in-flight limitation and provider idempotency contract | Failure and known-limits documents |
+## Review decisions
 
-The review also found a Windows console encoding failure in the evidence reporter after the tests had passed. The report now uses portable ASCII for the console table, and the entire verification command was rerun successfully. This was a delivery defect, not a failed governance assertion.
+| Question | Engineering decision |
+|---|---|
+| Could a restored database hide an already committed effect? | Compare the entire independent receipt ledger, including keys absent locally. Never generate replacement keys to make a mismatch disappear. |
+| Can a saved pass report authorize a later resume? | No. Resume validates task bindings, checks quiescence and executes a fresh verifier before opening services. |
+| Can an autoscaler or infrastructure apply reopen quarantine? | No autoscaling resource is enabled. Terraform ignores service counts; controlled release tooling owns them. |
+| Can ECS stability hide a failed release? | Check the requested task definition after stability; a circuit-breaker rollback to another revision is a failed release. |
+| Can API or monitoring compromise obtain execution credentials? | Separate IAM secret paths and SQL identities; observer sees queue only; API has no downstream token or SQL access. |
+| Can an unknown result become a fresh action after revocation? | Reconcile the old fact first. Any new dispatch rechecks current revision, policy, approval and consent. |
+| Does the deployment role own infrastructure or secret values? | No. It can operate approved task families and named services; administrators own Terraform, image publication and recovery authority. |
+| Is a database row lock equivalent to preventing a remote request? | No. Local fencing and downstream deduplication solve different problems. The in-flight consent boundary remains explicit. |
+| Is the workload a production benchmark? | No. Measured local admission/drain and a separate capacity model are presented with their exact scope. |
 
-## Benchmark inspected before implementation
+The version-1 schema and policy semantics are preserved. The cloud layer adds new login grants around that schema; it does not edit an already applied migration. The original [build record](evidence/build-checks.json) remains historical baseline evidence; its earlier wheel hash is not the cloud revision's build identifier.
 
-The public [game telemetry repository](https://github.com/rlbsem/game-telemetry-analytics-engineering) was fetched and inspected before building this system. Public main resolved during inspection to `205491319fd25c0ad107e25e0e25d2003cb2a5d6`; the downloaded main archive SHA-256 was `d3110427797253f54b67a12ba0018afa8747576db34ec279867eb4951d3e9b97`.
+## Reproduce
 
-The inspection covered its README, architecture/validation documents, Python admission implementation and negative tests, executable dbt incremental model, generated proof and GitHub Actions workflow. Its credibility comes from explicit grains and transaction boundaries, exercised replay/conflict cases, inspectable generated evidence and honest separation of local execution from cloud/orchestrator references. This project applies that evidentiary standard to transactional customer governance; it does not copy the warehouse/dbt architecture.
+```bash
+python scripts/verify.py
+python scripts/validate_infra.py
+npm ci
+python scripts/render_diagrams.py
+python scripts/repo_check.py
+```
 
-No artificial commit history, CI badge, vendor deployment, client endorsement or production experience has been added. The supplied source and evidence are the basis of the portfolio claim.
-
-The auxiliary [build checks](evidence/build-checks.json) record dependency consistency, the tested wheel hash, Compose configuration validation and the retained native demo receipt. These complement the full-suite source manifest; they do not claim that a Docker engine ran.
+Supply a dedicated `TEST_ADMIN_DSN` ending in `_test` for the first command. Set `PUPPETEER_CONFIG` to a JSON browser configuration when using an existing Chromium installation; CI renders with its isolated runner configuration. Raw infrastructure check logs and the scanner JSON are retained beside the [infrastructure verification manifest](evidence/infrastructure/verification.json).

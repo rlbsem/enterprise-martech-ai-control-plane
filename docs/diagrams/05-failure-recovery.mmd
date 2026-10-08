@@ -1,0 +1,14 @@
+flowchart TD
+  Start["Effect dispatched"] --> Outcome{"Remote outcome"}
+  Outcome -->|"429 / 5xx / timeout"| Retry["Bounded retry · Stable original key"]
+  Outcome -->|"Permanent rejection"| Dead["Durable exception · Operator review"]
+  Outcome -->|"Commit; worker dies"| Unknown["Uncertain durable intent"]
+  Unknown --> Lease["Lease expires · New token fences old worker"]
+  Lease --> Lookup["Look up original downstream receipt"]
+  Retry --> Lookup
+  Lookup --> Match{"Receipt + payload match?"}
+  Match -->|Yes| Ack["Record committed fact · No second effect"]
+  Match -->|Absent| Recheck["Recheck current authorization before resend"]
+  Match -->|Conflict| Dead
+  Recheck -->|"Revoked / expired / stale"| Block["Block dispatch"]
+  Recheck -->|Allowed| Start

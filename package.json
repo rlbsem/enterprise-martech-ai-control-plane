@@ -1,0 +1,8 @@
+{
+  "name": "enterprise-control-architecture",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Pinned documentation renderer; not part of the runtime image",
+  "devDependencies": { "@mermaid-js/mermaid-cli": "11.12.0" },
+  "scripts": { "diagrams": "python scripts/render_diagrams.py" }
+}

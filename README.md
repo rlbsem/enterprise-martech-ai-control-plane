@@ -1,48 +1,75 @@
 # Enterprise MarTech / AI Control Plane
 
-An executable governance boundary for customer data and automated actions. A CRM workflow or AI agent can propose a change; it cannot choose which source is authoritative, restore consent, approve its own marketing request, or write directly to the downstream system.
+Customer and commercial state crosses CRM, consent, scoring, revenue operations and activation systems. Each can trigger work; none should independently override authoritative truth. This control plane governs the boundary: who owns a field, which customer an event belongs to, whether a lifecycle change is valid, and whether an automated action is still authorized when it executes.
 
-**The tools can execute. The control layer determines what is actually true.**
+**Tools execute. The control layer determines what is true.**
 
-This independent portfolio implementation by Richard Butts uses entirely synthetic customer data and a synthetic downstream HTTP service. It demonstrates engineering capability, not a claimed client deployment or integration with Salesforce, HubSpot, OpenAI, or a cloud platform.
+Built for the integration demands of multi-product B2B SaaS and enterprise commercial operations: canonical identity, source provenance, No-Regress Logic, consent and approval controls, durable execution, and recovery across independent systems. AI agents submit typed proposals; they do not receive source authority or downstream execution credentials.
 
-**Start with the [generated proof](docs/evidence/report.md).** It shows lifecycle regression refused, consent revoked after approval with zero messages, and a response lost after a remote commit recovered without a second business effect. The suite also kills a real worker process after the commit.
+**Start with the [executed proof](docs/evidence/report.md), [enterprise workload results](docs/evidence/enterprise-workload.json), and [database recovery design](docs/cloud-operations.md).** The implementation includes deployable AWS infrastructure, distinct service identities, immutable releases and a fail-closed recovery gate.
 
-```mermaid
-flowchart TB
-  S[CRM / consent / privacy / scoring] --> C
-  A[Agent and automation: proposals only] --> C
-  H[Identity operator / human approver] --> C
-  subgraph C[Governance boundary]
-    I[Canonical identity + explicit linking] --> P[Field authority + source sequence]
-    P --> N[No-Regress / consent / approval checks]
-    N --> D[(PostgreSQL: state + provenance + audit + durable work)]
-  end
-  D --> W[Executor rechecks current authorization]
-  W -->|Stable key + immutable payload| R[Synthetic HTTP adapter]
-  R --> E[(Atomic business effect + idempotency receipt)]
-  W -->|Lost response: reconcile original key first| E
-  E --> D
-  classDef durable fill:#dbeafe,stroke:#2563eb,color:#0f172a;
-  classDef guard fill:#edf7ee,stroke:#246634,color:#163b20;
-  class D,E durable;
-  class P,N,W guard;
-```
+![Control-plane architecture](docs/diagrams/01-control-plane.svg)
 
-Python and explicit PostgreSQL transactions are sufficient for this bounded problem. PostgreSQL supplies uniqueness, row locks, durable work and audit protection; adding a broker would introduce another consistency boundary. FastAPI supplies closed API contracts. The downstream process exists to exercise an actual network boundary, rather than pretending that a function call proves remote recovery.
+## The invariants
 
-## Run the demonstration
+| Boundary | Enforced behavior |
+|---|---|
+| Identity | Source record IDs resolve to canonical UUIDs. Matching email creates review candidates, never an automatic merge. |
+| Authority | Field owners and source sequences determine accepted state. A later event cannot grant a source authority it does not have. |
+| No-Regress | Lifecycle advances through Lead → MQL → SQL → Opportunity → Customer; stale regression is refused. |
+| Consent and approval | Protected writes are denied. Marketing needs explicit approval bound to customer revision, policy and expiry. Current permission is checked again before dispatch. |
+| Execution | A durable intent, stable effect ID and immutable payload survive retries. Leases distribute work; tokens fence stale workers. |
+| Recovery | Unknown outcomes query the original receipt first. Restored control state is compared with the independent downstream ledger before services resume. |
+| Accountability | Decisions retain actor, source evidence, provenance and policy hash. Application roles cannot rewrite audit history. |
 
-With Docker Compose v2, from the repository root:
+## Execution and failure semantics
+
+The API validates a proposal and commits eligible work to PostgreSQL. A worker claims it, locks the customer, rechecks permission, and commits the dispatch intent **before** making an HTTP request. The downstream commits its business effect and idempotency receipt together.
+
+If the response disappears or the worker dies, the next worker looks up the same effect ID. A matching receipt establishes an existing fact; it does not authorize another action. An absent receipt requires a fresh permission check before retry. Conflicting identities, permanent rejection and exhausted retry budgets become reviewable exceptions.
+
+Delivery is **at least once with idempotent effects under the downstream adapter contract**. Consent is enforced at dispatch authorization; an independently running remote system cannot recall an already in-flight request. See [precise failure semantics](docs/failures.md) and the [execution diagram](docs/diagrams/04-execution.svg).
+
+## AWS operating architecture
+
+![Private AWS runtime](docs/diagrams/02-aws-runtime.svg)
+
+- Separate Fargate services for API, workers, downstream and a read-only observer; one-shot migration and verification tasks.
+- Immutable ECR tags and digest-qualified task revisions, bound to source commits. Protected GitHub OIDC releases use short-lived authority.
+- Two private, encrypted PostgreSQL RDS instances keep control state and downstream receipts in independent recovery domains. Multi-AZ, 14-day PITR, deletion protection and TLS are configured.
+- Private HTTPS ingress, explicit service-to-database security groups, and private ECR/Secrets/Logs endpoints. No public database, public task address or NAT dependency.
+- Secrets Manager values are created and retrieved at runtime. Terraform contains secret identifiers, never application passwords or token values.
+- CloudWatch tracks eligible-work age, unresolved outcomes, retries, reconciliations, dependency errors and worker heartbeat. Metrics have only environment/service dimensions.
+
+[Infrastructure and deployment](infra/README.md) covers foundation state, enterprise network/PKI prerequisites, IAM grants, the immutable image path and controlled releases. [Trust boundaries](docs/diagrams/03-trust-boundaries.svg) show which service can access each authority.
+
+### Recovery is a business-integrity gate
+
+A successful database restore alone is insufficient. Downstream effects can be newer than the restored local record. The operating tools drain admission and execution, restore into a **new** instance, bind its endpoint, and compare all local intents with independent receipts. Missing intents, mismatched hashes and missing acknowledged receipts keep services closed. A saved pass report cannot reopen them: resume runs a fresh verification task.
+
+[Restore and reconciliation runbook](docs/cloud-operations.md) · [Recovery diagram](docs/diagrams/06-database-restore.svg) · [Executed remote-ahead case](docs/evidence/remote-ahead-restore.json)
+
+## Workload and capacity
+
+| Validation layer | Purpose and observed result |
+|---|---|
+| Exact correctness suite | Original 68 tests retained, plus cloud authority, restore comparison and release-gate cases; real PostgreSQL and separate HTTP processes. |
+| Enterprise workload | 1,000 customer accounts, 1,000 intents, four worker processes, 1,200 attempts; 950 unique effects, 50 intended permanent rejections, 50 lost acknowledgements reconciled, zero duplicate effects. |
+| Measured local run | 19.3 seconds admission; 55.5 seconds drain; 18.0 intents/second during drain. HTTP admission p95: 63 ms. |
+| Production capacity model | Explicit connection budgets, admission-lock limits, worker concurrency, retention, failure domains and scaling decision points. |
+
+The workload has deterministic source records and fault schedules; timings and generated receipt IDs are observations. [Capacity and boundaries](docs/capacity.md) explains why a larger customer estate does not imply unbounded event throughput, and when pooling, partitioning or queue separation becomes justified.
+
+## Run and verify
+
+With Docker Compose v2:
 
 ```bash
 docker compose run --build --rm demo
 docker compose down
 ```
 
-The harness starts PostgreSQL, applies the migration, starts the API and synthetic downstream, then executes three asserted scenarios. It controls worker timing to reproduce the consent race deterministically. The agent calls use only the agent credential; the trusted demonstration harness separately supplies the human and executor roles. All sample credentials in Compose are local demonstration values. Only the API is published, on loopback port 8000. No SaaS account is required.
-
-For the complete verification, including database permissions, concurrent workers, malformed input and process death:
+The demo asserts authority protection, the consent race and lost-acknowledgement recovery. To run the full suite in a container:
 
 ```bash
 docker compose --profile test run --build --name control-proof verify
@@ -51,47 +78,33 @@ docker rm control-proof
 docker compose down
 ```
 
-Use a fresh container name if `control-proof` already exists. Verification uses a separate disposable `control_test` database. The demo uses `control_demo`. `down` preserves data; `down --volumes` intentionally destroys this project's local database volume.
-
-**Execution boundary:** the Python/PostgreSQL/HTTP implementation and native demonstration were executed on Windows. Docker was unavailable on the build host, so the Compose path is provided and checked structurally but is not claimed as executed. GitHub Actions includes both native integration and container-demo jobs; [Hosted PostgreSQL and container-demo verification has passed](https://github.com/rlbsem/enterprise-martech-ai-control-plane/actions/runs/35094239650). Local execution and hosted execution are separate evidence. The fully executed alternative needs Python 3.12 and an existing local PostgreSQL 17 database:
+For native development, use Python 3.12 and a dedicated PostgreSQL 17 instance:
 
 ```bash
 python -m venv .venv
-# Activate .venv for your shell, then:
+# Activate .venv for your shell.
 python -m pip install -r requirements.lock
 python -m pip install --no-deps --no-build-isolation -e .
-# Set CONTROL_ADMIN_DSN to a disposable database you own, e.g. control_demo.
+# CONTROL_ADMIN_DSN: a disposable demo database you own.
 python scripts/local_demo.py
-# Set TEST_ADMIN_DSN to a separate disposable database ending in _test.
+# TEST_ADMIN_DSN: a separate disposable database ending in _test.
 python scripts/verify.py
 ```
 
-[Operations](docs/operations.md) contains exact environment examples, continuous worker operation and operator recovery commands. Dependency versions are the tested lock, not a claim to use the newest packages.
+The verifier deliberately recreates its test schemas. [Local operations](docs/operations.md) supplies exact environment examples. [Workload instructions](docs/capacity.md) use a separate empty database. Infrastructure validation needs Terraform 1.13.5 and Trivy 0.75.0, **no AWS credentials**:
 
-## What the repository proves
+```bash
+python scripts/validate_infra.py
+```
 
-| Boundary | Implemented behavior | Executable evidence |
-|---|---|---|
-| Identity | Source IDs map to canonical UUIDs; matching email only produces review candidates; ambiguous candidates never merge | Identity collision, reviewed linking, forbidden rebinding and parallel admission tests |
-| Authority | Field-specific owners and per-record source sequence; higher sequence cannot grant source authority | Lower-authority, stale sequence and concurrent update tests |
-| No-Regress | Generic ordered lifecycle policy from Lead through Customer | PostgreSQL scenario plus 100 generated policy examples |
-| Agent control | Typed proposals: internal profile sync allowed, marketing requires approval, consent writes denied | Role matrix, protected-write and malformed-contract tests |
-| Approval | Exact customer revision, policy hash and expiry; checks repeat before new dispatch | Revocation, suppression, stale context, duplicate and expired approval tests |
-| Recovery | Durable leases, fenced local completion, bounded retries, reviewable dead letters | Eight workers, expired leases, 429/500/422, timeouts before/after commit, process kill |
-| Remote effects | Mutation and idempotency receipt commit together; unknown results reconcile first | Repeated and concurrent remote delivery yields one receipt; changed payload conflicts |
-| Accountability | Source body/result ledger, before/after provenance, actor and policy snapshot, dispatch/result audit | Audit contents, migration checksum, denied UPDATE/DELETE/TRUNCATE and cross-schema access tests |
+## Evidence and implementation map
 
-Delivery is **at least once with idempotent downstream effects under the demonstrated adapter contract**. A worker may send the same intent more than once. A unique remote key and immutable payload prevent duplicate effects. There is no distributed exactly-once claim.
+| Review area | Entry point |
+|---|---|
+| Governance and transactions | [Architecture](docs/architecture.md), [governance](docs/governance.md), [source](src/controlplane/service.py) |
+| Leases and reconciliation | [Worker](src/controlplane/worker.py), [failure model](docs/failures.md), [tests](tests/test_execution.py) |
+| Deployment and security | [Terraform](infra/aws), [runtime bootstrap](src/controlplane/cloud.py), [release gate](src/controlplane/release.py) |
+| Restore and operations | [Read-only comparison](src/controlplane/operations.py), [PITR tool](src/controlplane/restore.py), [runbook](docs/cloud-operations.md) |
+| Verification | [Generated test proof](docs/evidence/verification.json), [infrastructure checks](docs/evidence/infrastructure/verification.json), [validation guide](docs/validation.md), [GitHub Actions](https://github.com/rlbsem/enterprise-martech-ai-control-plane/actions) |
 
-Consent is checked at durable dispatch authorization. A revocation committed before that point blocks marketing. A request already authorized and in flight may still commit afterward; the control plane cannot recall bytes already sent to an independent system. Recovery reports a previously committed effect honestly, even if consent has since changed. See the precise [failure semantics](docs/failures.md).
-
-## Read further
-
-- [Architecture and transaction boundaries](docs/architecture.md)
-- [Identity, field ownership and agent boundary](docs/governance.md)
-- [Failures, uncertainty and recovery](docs/failures.md)
-- [Operator runbook and local setup](docs/operations.md)
-- [Validation, review findings and benchmark](docs/validation.md)
-- [Scaling and known limits](docs/limits.md)
-
-The implementation is in `src/controlplane`; the checksum-checked SQL migration is packaged beside it. Tests use a real PostgreSQL instance and separately launched HTTP processes. `scripts/verify.py` regenerates the proof and source hashes. Billing, GL reconciliation, M&A migration and revenue-integrity workflows are deliberately outside this project's customer/MarTech scope.
+Validation scope: customer data and the downstream adapter are synthetic. Evidence records actual local execution and hosted checks; Terraform and AWS SDK tests validate the deployment path without provisioning AWS resources. Live AWS failover and PITR remain environment acceptance checks.

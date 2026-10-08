@@ -7,7 +7,7 @@ name = "enterprise-martech-ai-control-plane"
 version = "1.0.0"
 description = "Executable governance boundaries for synthetic customer systems and automation"
 requires-python = ">=3.12"
-dependencies = ["fastapi==0.115.12", "uvicorn==0.34.2", "psycopg[binary]==3.2.9", "httpx==0.28.1"]
+dependencies = ["fastapi==0.115.12", "uvicorn==0.34.2", "psycopg[binary]==3.2.9", "httpx==0.28.1", "boto3==1.40.45"]
 
 [tool.setuptools.package-data]
 controlplane = ["*.sql"]

@@ -1,0 +1,20 @@
+sequenceDiagram
+  participant W as Worker
+  participant C as Control PostgreSQL
+  participant R as Downstream
+  W->>C: Claim with lease token, SKIP LOCKED
+  C-->>W: Stable intent ID and attempt
+  alt Outcome already uncertain
+    W->>R: Look up original effect ID
+    R-->>W: Receipt or authoritative absence
+  end
+  alt Matching receipt exists
+    W->>C: Fence token and acknowledge historical fact
+  else No receipt
+    W->>C: Lock customer and recheck revision, policy, approval
+    C-->>W: Commit immutable mutation and uncertainty
+    W->>R: POST same ID and same payload
+    R->>R: Atomic effect + unique receipt
+    R-->>W: Receipt and payload hash
+    W->>C: Fence token and finalize
+  end
