@@ -1,0 +1,48 @@
+name: Preview lead SVG at desktop and mobile widths (temporary)
+on:
+  push:
+    branches: [docs/control-plane-lead-readable]
+permissions:
+  contents: write
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+          cache: npm
+      - run: npm ci
+      - name: Rasterize generated SVG at README widths
+        shell: bash
+        run: |
+          node - <<'JS'
+          const fs = require('fs');
+          const puppeteer = require('puppeteer');
+          (async () => {
+            const svg = fs.readFileSync('docs/diagrams/01-control-plane.svg', 'utf8');
+            const browser = await puppeteer.launch({headless:true,args:['--no-sandbox']});
+            for (const [name,width] of [['desktop',1100],['mobile',420]]) {
+              const page = await browser.newPage({viewport:{width,height:900},deviceScaleFactor:1});
+              await page.setContent('<html><style>body{margin:0;background:#fff}.markdown-body{width:100%;max-width:760px;margin:auto}svg{display:block;width:100%;height:auto;}</style><body><div class="markdown-body">'+svg+'</div></body></html>');
+              await page.screenshot({path:'docs/diagrams/preview-'+name+'-TEMP.png',fullPage:true});
+              await page.close();
+            }
+            await browser.close();
+          })().catch(e=>{console.error(e);process.exit(1)});
+          JS
+      - name: Commit temporary previews to review branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f docs/diagrams/preview-*-TEMP.png
+          if ! git diff --cached --quiet; then
+            git commit -m "Add temporary SVG preview captures for review"
+            git push origin HEAD:docs/control-plane-lead-readable
+          fi
