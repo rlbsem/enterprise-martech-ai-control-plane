@@ -2,8 +2,8 @@
   "renderer": "@mermaid-js/mermaid-cli 11.12.0",
   "files": {
     "01-control-plane.mmd": {
-      "mmd": "962125173174568fa7dc2e2a5c6d034185980a6a324ada2b0172dcadc96509e0",
-      "svg": "d631f2e98508df9298e0a609908738426bfba73618b9b857415c1684d83c5228"
+      "mmd": "70bab75a476a66760c8b622679410e8d33385ac805394ea580f118d5e73441a0",
+      "svg": "53870770c56bd00493aef64c1ae82456d66a48be1758eaae50a1ff58e5c48f0a"
     },
     "02-aws-runtime.mmd": {
       "mmd": "1343c16a1c9176816de74d6916b494633b4c783af51b92a2f0d1accd5fa35f56",
