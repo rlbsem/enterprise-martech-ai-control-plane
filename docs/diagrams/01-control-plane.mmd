@@ -1,13 +1,22 @@
-flowchart LR
-  Sources["CRM · Consent · Privacy · Scoring"] --> Identity["Canonical identity<br/>Reviewed source links"]
-  Identity --> Truth["Authority · Sequence · No-Regress"]
-  Truth --> State[("Customer state<br/>Provenance · Audit")]
-  Agent["AI / workflow proposals"] --> Gate["Policy · Consent · Approval"]
+flowchart TB
+  subgraph TRUST["1 · Establish trusted customer state"]
+    direction LR
+    Sources["CRM · Consent · Privacy · Scoring"] --> Identity["Canonical identity<br/>Reviewed source links"]
+    Identity --> Truth["Source authority · Sequence<br/>No-Regress"]
+    Truth --> State[("Durable customer state<br/>Provenance · Audit")]
+  end
+  subgraph GOVERN["2 · Govern proposed actions"]
+    direction LR
+    Agent["Agent / workflow proposals"] --> Gate["Policy · Consent · Approval"]
+    Gate --> Work[("Durable intent<br/>Leases")]
+  end
+  subgraph EXEC["3 · Authorize execution and reconcile"]
+    direction LR
+    Worker["Executor rechecks<br/>current authority"] -->|"Stable effect identity"| Effects[("Downstream effect<br/>+ remote receipt")]
+  end
   State --> Gate
-  Gate --> Work[("Durable intent and leases")]
-  Work --> Worker["Executor rechecks authority"]
-  Worker -->|"Stable effect identity"| Effects[("Downstream effect + receipt")]
-  Effects -->|"Reconcile unknown outcome"| Work
+  Work --> Worker
+  Effects -.->|"Unknown outcome:<br/>reconcile original receipt"| Work
   classDef durable fill:#e3edf7,stroke:#315c86,color:#142b44
   classDef control fill:#e6f2eb,stroke:#306949,color:#173f2a
   class State,Work,Effects durable
