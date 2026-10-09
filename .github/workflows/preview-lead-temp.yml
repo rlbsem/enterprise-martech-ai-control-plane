@@ -1,13 +1,13 @@
-name: Preview lead SVG at desktop and mobile widths (temporary)
+name: Validate revised lead architecture with browser previews (temporary)
 on:
   push:
     branches: [docs/control-plane-lead-readable]
 permissions:
   contents: write
 jobs:
-  preview:
+  render:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
         with:
@@ -17,7 +17,30 @@ jobs:
           node-version: '22.16.0'
           cache: npm
       - run: npm ci
-      - name: Rasterize generated SVG at README widths
+      - name: Render source with repository's pinned Mermaid CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '{"args":["--no-sandbox"]}' > "$RUNNER_TEMP/puppeteer.json"
+          node node_modules/@mermaid-js/mermaid-cli/src/cli.js \
+            -i docs/diagrams/01-control-plane.mmd \
+            -o docs/diagrams/01-control-plane.svg \
+            -b white -t neutral -p "$RUNNER_TEMP/puppeteer.json"
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,re
+          p=Path('docs/diagrams')
+          svg=(p/'01-control-plane.svg').read_text()
+          w,h=map(float,re.search(r'viewBox="0 0 ([0-9.]+) ([0-9.]+)"',svg).groups())
+          print(f'SVG dimensions: {w:.1f} x {h:.1f}')
+          if w>1400 or w/h>2.8 or h>1500: raise SystemExit('Unbalanced architecture image')
+          m=json.loads((p/'manifest.json').read_text())
+          for ext in ('mmd','svg'):
+              b=(p/('01-control-plane.'+ext)).read_bytes().replace(b'\r\n',b'\n')
+              m['files']['01-control-plane.mmd'][ext]=hashlib.sha256(b).hexdigest()
+          (p/'manifest.json').write_text(json.dumps(m,indent=2)+'\n')
+          PY
+      - name: Capture responsive SVG previews at README widths
         shell: bash
         run: |
           node - <<'JS'
@@ -27,22 +50,26 @@ jobs:
             const svg = fs.readFileSync('docs/diagrams/01-control-plane.svg', 'utf8');
             const browser = await puppeteer.launch({headless:true,args:['--no-sandbox']});
             for (const [name,width] of [['desktop',1100],['mobile',420]]) {
-              const page = await browser.newPage({viewport:{width,height:900},deviceScaleFactor:1});
-              await page.setContent('<html><style>body{margin:0;background:#fff}.markdown-body{width:100%;max-width:760px;margin:auto}svg{display:block;width:100%;height:auto;}</style><body><div class="markdown-body">'+svg+'</div></body></html>');
-              await page.screenshot({path:'docs/diagrams/preview-'+name+'-TEMP.png',fullPage:true});
+              const page = await browser.newPage();
+              await page.setViewport({width,height:900,deviceScaleFactor:1});
+              const html='<html><style>body{margin:0;background:white}.markdown-body{max-width:850px;margin:auto}svg{display:block;max-width:100%;width:100%;height:auto}</style><body><div class="markdown-body">'+svg+'</div></body></html>';
+              await page.setContent(html);
+              const img = await page.$('.markdown-body');
+              await img.screenshot({path:'docs/diagrams/preview-'+name+'-TEMP.png'});
               await page.close();
             }
             await browser.close();
           })().catch(e=>{console.error(e);process.exit(1)});
           JS
-      - name: Commit temporary previews to review branch
+      - name: Commit generated SVG, manifest and temporary previews
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/diagrams/01-control-plane.svg docs/diagrams/manifest.json
           git add -f docs/diagrams/preview-*-TEMP.png
           if ! git diff --cached --quiet; then
-            git commit -m "Add temporary SVG preview captures for review"
+            git commit -m "Regenerate lead SVG and responsive review captures"
             git push origin HEAD:docs/control-plane-lead-readable
           fi
