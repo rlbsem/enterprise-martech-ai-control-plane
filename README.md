@@ -4,7 +4,7 @@ Customer and commercial state crosses CRM, consent, scoring, revenue operations 
 
 **Tools execute. The control layer determines what is true.**
 
-Built for the integration demands of multi-product B2B SaaS and enterprise commercial operations: canonical identity, source provenance, No-Regress Logic, consent and approval controls, durable execution, and recovery across independent systems. AI agents submit typed proposals; they do not receive source authority or downstream execution credentials.
+Built for integration challenges across multi-brand operators, PE-backed portfolios, multi-product B2B SaaS and enterprise commercial systems: canonical identity, source provenance, No-Regress Logic, consent and approval controls, durable execution, and recovery across independent systems. The public implementation demonstrates those architecture patterns without exposing private client systems or claiming that this exact repository ran unchanged in client production. AI agents submit typed proposals; they do not receive source authority or downstream execution credentials.
 
 **Start with the [executed proof](docs/evidence/report.md), [enterprise workload results](docs/evidence/enterprise-workload.json), and [database recovery design](docs/cloud-operations.md).** The implementation includes deployable AWS infrastructure, distinct service identities, immutable releases and a fail-closed recovery gate.
 
