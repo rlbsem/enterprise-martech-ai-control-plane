@@ -23,8 +23,6 @@ args = [
     str(svg),
     "-c",
     str(folder / "groundbreakers-mermaid.json"),
-    "-t",
-    "base",
     "-b",
     "#10101D",
 ]
