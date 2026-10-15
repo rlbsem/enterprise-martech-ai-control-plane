@@ -1,5 +1,6 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#10101D","primaryColor":"#2A2A3D","primaryTextColor":"#F0F0FF","primaryBorderColor":"#7C7CAF","lineColor":"#B8B8FF","textColor":"#F0F0FF","secondaryColor":"#181825","tertiaryColor":"#2E2E45","fontFamily":"IBM Plex Sans, Arial, sans-serif","fontSize":"15px","edgeLabelBackground":"#10101D"}}}%%
 flowchart TB
-  subgraph TRUST["1 · Establish trusted customer state"]
+  subgraph TRUST["1 · Establish trusted<br/>customer state"]
     direction LR
     Sources["CRM · Consent · Privacy · Scoring"] --> Identity["Canonical identity<br/>Reviewed source links"]
     Identity --> Truth["Source authority<br/>Sequence · No-Regress"]
@@ -17,7 +18,10 @@ flowchart TB
   end
   TRUST -->|"Trusted customer state + source versions"| GOVERN
   GOVERN -->|"Committed work + approval context"| EXEC
-  classDef durable fill:#e3edf7,stroke:#315c86,color:#142b44
-  classDef control fill:#e6f2eb,stroke:#306949,color:#173f2a
+  classDef durable fill:#2A2A3D,stroke:#B8B8FF,color:#F0F0FF,stroke-width:1.8px
+  classDef control fill:#2E2E45,stroke:#7C7CAF,color:#F0F0FF,stroke-width:1.5px
   class State,Work,Effects durable
   class Truth,Gate,Worker,Reconcile control
+  style TRUST fill:#181825,stroke:#7C7CAF,color:#F0F0FF,stroke-width:1.2px
+  style GOVERN fill:#181825,stroke:#7C7CAF,color:#F0F0FF,stroke-width:1.2px
+  style EXEC fill:#181825,stroke:#7C7CAF,color:#F0F0FF,stroke-width:1.2px
