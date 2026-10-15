@@ -1,0 +1,38 @@
+name: Generate Groundbreakers branded SVGs (temporary)
+on:
+  push:
+    branches: [visual/groundbreakers-diagram-pilot]
+    paths:
+      - docs/diagrams/*.mmd
+      - docs/diagrams/render_groundbreakers_all.py
+      - docs/diagrams/groundbreakers-mermaid.json
+permissions:
+  contents: write
+jobs:
+  diagrams:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.16.0'
+          cache: npm
+      - run: npm ci
+      - name: Render all six branded diagrams and manifest
+        run: |
+          echo '{"args":["--no-sandbox"]}' > "$RUNNER_TEMP/puppeteer.json"
+          PUPPETEER_CONFIG="$RUNNER_TEMP/puppeteer.json" python docs/diagrams/render_groundbreakers_all.py
+      - name: Commit generated SVGs and integrity manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/diagrams/*.svg docs/diagrams/manifest.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Regenerate six Groundbreakers architecture SVGs"
+            git push origin HEAD:visual/groundbreakers-diagram-pilot
+          fi

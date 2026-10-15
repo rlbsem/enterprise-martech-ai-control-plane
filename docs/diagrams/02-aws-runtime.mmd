@@ -1,3 +1,4 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#10101D","primaryColor":"#2A2A3D","primaryTextColor":"#F0F0FF","primaryBorderColor":"#7C7CAF","lineColor":"#B8B8FF","textColor":"#F0F0FF","secondaryColor":"#181825","tertiaryColor":"#2E2E45","fontFamily":"IBM Plex Sans, Arial, sans-serif","fontSize":"15px","edgeLabelBackground":"#10101D"}}}%%
 flowchart TB
   CI["Protected GitHub environment<br/>OIDC release role"] --> Tasks["Digest-bound task revisions<br/>Bootstrap · Verify · Release"]
   Clients["Enterprise network / VPN"] --> TLS["Private ALB · HTTPS<br/>Enterprise ACM certificate"]
@@ -15,3 +16,12 @@ flowchart TB
   end
   Tasks --> API & Worker & Remote & Observer
   EP --> CW["CloudWatch<br/>Queue age · Unknown outcomes · Errors"]
+  classDef outer fill:#181825,stroke:#7C7CAF,color:#F0F0FF,stroke-width:1.5px
+  classDef runtime fill:#2A2A3D,stroke:#B8B8FF,color:#F0F0FF,stroke-width:1.6px
+  classDef datastore fill:#2E2E45,stroke:#81C5B0,color:#F0F0FF,stroke-width:2px
+  classDef observe fill:#2E2E45,stroke:#E3BC7F,color:#F0F0FF,stroke-width:1.5px
+  class CI,Clients,Tasks outer
+  class TLS,API,Worker,Remote,EP runtime
+  class CP,Receipts datastore
+  class Observer,CW observe
+  style VPC fill:#181825,stroke:#7C7CAF,color:#F0F0FF,stroke-width:1.2px

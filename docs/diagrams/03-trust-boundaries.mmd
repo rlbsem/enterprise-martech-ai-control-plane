@@ -1,3 +1,4 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#10101D","primaryColor":"#2A2A3D","primaryTextColor":"#F0F0FF","primaryBorderColor":"#7C7CAF","lineColor":"#B8B8FF","textColor":"#F0F0FF","secondaryColor":"#181825","tertiaryColor":"#2E2E45","fontFamily":"IBM Plex Sans, Arial, sans-serif","fontSize":"15px","edgeLabelBackground":"#10101D"}}}%%
 flowchart TB
   subgraph Actors["Authenticated business identities"]
     CRM["Source owners"]
@@ -13,3 +14,12 @@ flowchart TB
   Admin["Protected one-shot migration<br/>Separate master secrets"] --> State & Receipts
   OIDC["Repository + protected environment<br/>Short-lived release identity"] --> Revisions["Run approved task families<br/>No IAM / network administration"]
   Revisions --> API & Worker & Verify & Admin
+  classDef identity fill:#181825,stroke:#7C7CAF,color:#F0F0FF,stroke-width:1.5px
+  classDef authority fill:#2A2A3D,stroke:#B8B8FF,color:#F0F0FF,stroke-width:1.8px
+  classDef store fill:#2E2E45,stroke:#81C5B0,color:#F0F0FF,stroke-width:2px
+  classDef protected fill:#2E2E45,stroke:#E3BC7F,color:#F0F0FF,stroke-width:1.6px
+  class CRM,Agent,Human identity
+  class API,Worker,Remote,Revisions authority
+  class State,Receipts store
+  class Verify,Admin,OIDC protected
+  style Actors fill:#181825,stroke:#7C7CAF,color:#F0F0FF,stroke-width:1.2px

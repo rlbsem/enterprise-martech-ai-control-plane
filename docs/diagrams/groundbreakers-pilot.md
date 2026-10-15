@@ -1,18 +1,28 @@
-# Groundbreakers engineering diagram pilot
+# Groundbreakers engineering diagram standard
 
-The **first** architecture SVG uses the Groundbreakers Digital colour and typography language. The other five SVGs remain in the original neutral theme until this pilot is reviewed and accepted.
+**All six architecture diagrams** use the approved Groundbreakers Digital midnight/indigo, lavender and off-white visual language. The 01 Control Plane diagram was the approved design benchmark. Semantic states remain visible through labels, arrows, shape and distinct muted border colours.
 
-**Design tokens:** midnight `#10101D`, charcoal-indigo `#181825`, graphite `#2A2A3D`, elevated slate `#2E2E45`, neutral border `#7C7CAF`, lavender `#B8B8FF`, off-white `#F0F0FF`. Later stateful diagrams may additionally use muted teal `#81C5B0` (supported), amber `#E3BC7F` (unknown) and rose `#D98EA3` (unsupported).
+| Token | Hex | Purpose |
+| --- | --- | --- |
+| Midnight | `#10101D` | SVG background |
+| Charcoal | `#181825` | Containers and boundaries |
+| Graphite | `#2A2A3D` | Execution/system nodes |
+| Elevated slate | `#2E2E45` | Controls and statuses |
+| Lavender | `#B8B8FF` | Governing controls, connections |
+| Off-white | `#F0F0FF` | Text |
+| Teal | `#81C5B0` | Verified facts/receipts |
+| Amber | `#E3BC7F` | Decisions requiring review |
+| Rose | `#D98EA3` | Exceptions/blocked activity |
 
-**Type:** JetBrains Mono for section headings where available; IBM Plex Sans for labels and explanatory text with system fallbacks. The first section heading has an intentional line break to prevent clipping while preserving its words.
+**Fonts:** JetBrains Mono for section titles where available; IBM Plex Sans for readable node text, with system fallbacks. The first heading was intentionally wrapped to prevent clipping. No colours imply additional security guarantees or verified deployments.
 
-After `npm ci`, regenerate the pilot reproducibly:
+## Regeneration
 
-```bash
-python docs/diagrams/render_groundbreakers_pilot.py
+From the repository root, after `npm ci`:
+
+```sh
+python docs/diagrams/render_groundbreakers_all.py
 python scripts/repo_check.py
 ```
 
-The repository's original `npm run diagrams` command remains the **neutral all-six renderer**. It may overwrite this pilot SVG; rerun the dedicated pilot command afterward until a portfolio-wide rollout is approved. Neither of these documentation scripts modifies executable control-plane runtime behavior.
-
-Keep all six Mermaid source files and SVGs in the repository. Do not represent coloured nodes as stronger evidence than their documented control and recovery semantics.
+The original repository-wide `npm run diagrams` script remains in place because it is part of the verified source fingerprint. It renders the old neutral CLI defaults; **use the branded renderer above for published SVGs**. Both invoke the same pinned Mermaid CLI. The branded script regenerates all six SVGs **and** their integrity hashes together, without modifying runtime or verified source files.
