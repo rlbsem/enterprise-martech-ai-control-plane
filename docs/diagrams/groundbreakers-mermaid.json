@@ -1,0 +1,28 @@
+{
+  "theme": "base",
+  "themeVariables": {
+    "background": "#10101D",
+    "primaryColor": "#2A2A3D",
+    "primaryTextColor": "#F0F0FF",
+    "primaryBorderColor": "#7C7CAF",
+    "secondaryColor": "#181825",
+    "secondaryTextColor": "#F0F0FF",
+    "tertiaryColor": "#2E2E45",
+    "tertiaryTextColor": "#F0F0FF",
+    "lineColor": "#B8B8FF",
+    "textColor": "#F0F0FF",
+    "fontFamily": "IBM Plex Sans, Arial, sans-serif",
+    "fontSize": "15px",
+    "edgeLabelBackground": "#10101D",
+    "clusterBkg": "#181825",
+    "clusterBorder": "#7C7CAF"
+  },
+  "flowchart": {
+    "htmlLabels": true,
+    "nodeSpacing": 65,
+    "rankSpacing": 75,
+    "padding": 20,
+    "curve": "basis"
+  },
+  "themeCSS": ".cluster-label {font-family:'JetBrains Mono', 'DejaVu Sans Mono', monospace; font-size:16px; font-weight:600;} .nodeLabel {font-family:'IBM Plex Sans',Arial,sans-serif;} .edgeLabel {color:#F0F0FF;}"
+}

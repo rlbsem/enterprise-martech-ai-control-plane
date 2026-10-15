@@ -1,3 +1,4 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#10101D","primaryColor":"#2A2A3D","primaryTextColor":"#F0F0FF","primaryBorderColor":"#7C7CAF","lineColor":"#B8B8FF","textColor":"#F0F0FF","secondaryColor":"#181825","tertiaryColor":"#2E2E45","fontFamily":"IBM Plex Sans, Arial, sans-serif","fontSize":"15px","edgeLabelBackground":"#10101D"}}}%%
 flowchart TD
   Start["Effect dispatched"] --> Outcome{"Remote outcome"}
   Outcome -->|"429 / 5xx / timeout"| Retry["Bounded retry · Stable original key"]
@@ -12,3 +13,11 @@ flowchart TD
   Match -->|Conflict| Dead
   Recheck -->|"Revoked / expired / stale"| Block["Block dispatch"]
   Recheck -->|Allowed| Start
+  classDef control fill:#2A2A3D,stroke:#B8B8FF,color:#F0F0FF,stroke-width:1.6px
+  classDef uncertain fill:#2E2E45,stroke:#E3BC7F,color:#F0F0FF,stroke-width:2px
+  classDef exception fill:#2E2E45,stroke:#D98EA3,color:#F0F0FF,stroke-width:2px
+  classDef verified fill:#2E2E45,stroke:#81C5B0,color:#F0F0FF,stroke-width:2px
+  class Start,Lease,Lookup,Recheck,Match control
+  class Outcome,Retry,Unknown uncertain
+  class Dead,Block exception
+  class Ack verified
