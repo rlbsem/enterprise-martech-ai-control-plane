@@ -25,4 +25,4 @@ python docs/diagrams/render_groundbreakers_all.py
 python scripts/repo_check.py
 ```
 
-The original repository-wide `npm run diagrams` script remains in place because it is part of the verified source fingerprint. It renders the old neutral CLI defaults; **use the branded renderer above for published SVGs**. Both invoke the same pinned Mermaid CLI. The branded script regenerates all six SVGs **and** their integrity hashes together, without modifying runtime or verified source files.
+The standard `npm run diagrams` command now invokes the Groundbreakers renderer, regenerating all six SVGs **and** the SHA-256 integrity manifest together. The old `scripts/render_diagrams.py` remains unchanged because it is included in the previously executed verification source fingerprint; do not use that legacy neutral renderer to publish visuals. Both use the repository's pinned Mermaid CLI.
