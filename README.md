@@ -14,6 +14,13 @@ Built for integration challenges across multi-brand operators, PE-backed portfol
 
 ![Control-plane architecture](docs/diagrams/01-control-plane.svg)
 
+## Engineering choices and tradeoffs
+
+- **I kept AI outside the authority boundary.** An agent can propose an action, but it cannot assign field ownership, override source identity or hold downstream execution credentials. Typed proposals, scoped actors and a separate executor keep business state governed even when an AI output sounds persuasive. [Transaction and trust decisions](docs/architecture.md).
+- **I chose durable intent and receiver receipts over blind retries.** An HTTP timeout cannot tell us whether the effect committed. The exact intent and effect ID are saved before dispatch; a retry first reconciles the receiver's receipt and rechecks authority if there is no matching effect. This is **at-least-once delivery with idempotent effects under the receiver contract**, not an unsupported exactly-once network guarantee. [Failure semantics](docs/failures.md).
+- **I made database recovery conditional on business-state reconciliation.** A restored control database can be older than independently committed downstream effects. The executed remote-ahead case blocks resumption instead of treating a successful database restore as sufficient. [Recovery design](docs/cloud-operations.md) · [Recorded blocked case](docs/evidence/remote-ahead-restore.json).
+- **I accepted a bounded performance tradeoff.** A global admission lock simplifies correct identity discovery in this implementation, but limits throughput. Its measured synthetic workload and the thresholds for introducing pooling or partitioning are documented; AWS infrastructure is defined but **not deployed**. [Capacity boundaries](docs/capacity.md).
+
 ## The invariants
 
 | Boundary | Enforced behavior |
