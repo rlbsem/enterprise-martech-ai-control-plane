@@ -6,6 +6,10 @@ Customer and commercial state crosses CRM, consent, scoring, revenue operations 
 
 Built for integration challenges across multi-brand operators, PE-backed portfolios, multi-product B2B SaaS and enterprise commercial systems: canonical identity, source provenance, No-Regress Logic, consent and approval controls, durable execution, and recovery across independent systems. The public implementation demonstrates those architecture patterns without exposing private client systems or claiming that this exact repository ran unchanged in client production. AI agents submit typed proposals; they do not receive source authority or downstream execution credentials.
 
+**Why this matters to a business:** A CRM update, an AI recommendation or a timed-out integration request should not be allowed to silently corrupt the customer record or trigger the same downstream action twice. This system demonstrates three concrete protections: authoritative fields cannot be overwritten by the wrong source; permission and approval are checked again before execution; and a lost response is reconciled against the receiver's actual receipt before a retry can produce another effect.
+
+**Example failure:** The receiving system commits an action, but its acknowledgment is lost. Instead of assuming failure and sending a new action, the control plane checks the stable effect ID, recognizes the existing receipt and preserves one downstream effect. After a database restore, services remain closed until recovered state agrees with independently held downstream receipts. These are tested controls in the published implementation, not claims of measured client savings.
+
 **Start with the [executed proof](docs/evidence/report.md), [enterprise workload results](docs/evidence/enterprise-workload.json), and [database recovery design](docs/cloud-operations.md).** The implementation includes deployable AWS infrastructure, distinct service identities, immutable releases and a fail-closed recovery gate.
 
 ![Control-plane architecture](docs/diagrams/01-control-plane.svg)
