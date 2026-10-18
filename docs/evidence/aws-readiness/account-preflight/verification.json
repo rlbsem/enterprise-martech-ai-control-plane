@@ -1,0 +1,123 @@
+{
+  "observed_on": "2026-10-18",
+  "source": "AWS Core plugin call_boto3 api_calls telemetry",
+  "scope": "native_read_only_account_preflight_not_application_or_PITR_acceptance",
+  "target_region": "ca-central-1",
+  "global_services_region": "us-east-1",
+  "calls": [
+    {
+      "service": "sts",
+      "operation": "GetCallerIdentity",
+      "status": "succeeded"
+    },
+    {
+      "service": "freetier",
+      "operation": "GetAccountPlanState",
+      "status": "succeeded"
+    },
+    {
+      "service": "freetier",
+      "operation": "GetFreeTierUsage",
+      "status": "succeeded"
+    },
+    {
+      "service": "ec2",
+      "operation": "DescribeRegions",
+      "status": "denied",
+      "error_code": "UnauthorizedOperation",
+      "explicit_service_control_policy_deny": true
+    },
+    {
+      "service": "rds",
+      "operation": "DescribeDBInstances",
+      "status": "denied",
+      "error_code": "AccessDenied",
+      "explicit_service_control_policy_deny": true
+    },
+    {
+      "service": "rds",
+      "operation": "DescribeDBSnapshots",
+      "status": "denied",
+      "error_code": "AccessDenied",
+      "explicit_service_control_policy_deny": true
+    },
+    {
+      "service": "ecs",
+      "operation": "ListClusters",
+      "status": "denied",
+      "error_code": "AccessDeniedException",
+      "explicit_service_control_policy_deny": true
+    },
+    {
+      "service": "ec2",
+      "operation": "DescribeVpcs",
+      "status": "denied",
+      "error_code": "UnauthorizedOperation",
+      "explicit_service_control_policy_deny": true
+    },
+    {
+      "service": "acm",
+      "operation": "ListCertificates",
+      "status": "denied",
+      "error_code": "AccessDeniedException",
+      "explicit_service_control_policy_deny": true
+    },
+    {
+      "service": "route53",
+      "operation": "ListHostedZones",
+      "status": "succeeded"
+    },
+    {
+      "service": "iam",
+      "operation": "ListOpenIDConnectProviders",
+      "status": "denied",
+      "error_code": "AccessDenied",
+      "explicit_service_control_policy_deny": true
+    },
+    {
+      "service": "secretsmanager",
+      "operation": "ListSecrets",
+      "status": "denied",
+      "error_code": "AccessDeniedException",
+      "explicit_service_control_policy_deny": true
+    },
+    {
+      "service": "kms",
+      "operation": "ListAliases",
+      "status": "denied",
+      "error_code": "AccessDeniedException",
+      "explicit_service_control_policy_deny": true
+    },
+    {
+      "service": "elbv2",
+      "operation": "DescribeLoadBalancers",
+      "status": "denied",
+      "error_code": "AccessDenied",
+      "explicit_service_control_policy_deny": true
+    }
+  ],
+  "counts": {
+    "attempted": 14,
+    "succeeded": 4,
+    "denied": 10,
+    "mutations": 0
+  },
+  "inventory_status": "incomplete_due_to_explicit_organization_policy_denials",
+  "route53_hosted_zones_observed": 0,
+  "all_regions_enumerated": false,
+  "native_application_execution": false,
+  "native_rds_execution": false,
+  "native_pitr_execution": false,
+  "public_redactions": [
+    "account_id",
+    "principal_and_policy_arns",
+    "authorization_ids",
+    "credit_balance",
+    "account_expiration",
+    "raw_private_diagnostics"
+  ],
+  "collector_notes": [
+    "An initial script was rejected before API execution for unsupported introspection syntax.",
+    "The inventory batch attempted all ten documented reads. Its result formatting failed because ClientError was unavailable in the plugin runtime despite being advertised. API telemetry independently records nine denials and one successful Route53 enumeration; these outcomes are preserved without repeating denied calls."
+  ]
+}

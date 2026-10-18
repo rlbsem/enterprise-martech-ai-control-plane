@@ -1,5 +1,11 @@
 # Minimum secure native acceptance
 
+**2026-10-18 update:** AWS Core now provides a real authenticated read-only connection.
+Account and billing checks succeeded, while resource discovery encountered explicit
+organization-policy denials. See the [sanitized native account preflight](evidence/aws-readiness/account-preflight/README.md).
+The observations below describe the earlier local-only assessment; they are not a claim
+that no AWS account exists. No resource creation or Paid-plan upgrade is authorized.
+
 Native deployment and PITR remain the next milestone. They have **not executed**.
 This assessment changes no production defaults, service topology, TLS settings or IAM
 permissions. No account setup, authentication or chargeable operation was performed.

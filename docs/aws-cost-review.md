@@ -1,5 +1,10 @@
 # Isolated AWS cost and teardown review
 
+**Free-plan boundary:** This worksheet prices the existing full Multi-AZ design, not a
+validated Free-plan deployment. The [native account preflight](evidence/aws-readiness/account-preflight/README.md)
+found resource-discovery denials and documents the narrower eligible RDS shape. No
+Paid-plan upgrade, out-of-pocket expense or resource creation is authorized.
+
 **Proposal only; not approved or executed.** USD estimates use the official public
 regional price catalogs retrieved 2026-10-18 UTC, with selected rates, publication dates
 and complete-catalog hashes in [cost-estimate.json](evidence/aws-readiness/cost-estimate.json).

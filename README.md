@@ -48,6 +48,9 @@ cover the hardened release, startup and restore boundaries. A bounded read-only 
 is ready for an authorized deployment. [Native acceptance](docs/aws-native-acceptance.md)
 and [cost/teardown review](docs/aws-cost-review.md) remain pending account access and explicit
 cost approval; these records do not claim a deployed AWS environment.
+[Native account preflight](docs/evidence/aws-readiness/account-preflight/README.md) has
+now verified the AWS Core connection, but organization-policy denials block resource
+inventory. This is separate from application execution; no deployment or PITR has run.
 The [minimal acceptance assessment](docs/aws-minimal-acceptance.md) explains which
 recovery tests can run without ACM, custom DNS, an ALB or a workstation VPN.
 
