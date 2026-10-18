@@ -1,0 +1,65 @@
+{
+  "scope": "executed_native_image_bootstrap_not_RDS_or_task_execution",
+  "approved_plans": {
+    "guard_policy_sha256": "6a4337849f113de7553854082ff52be962626e8b17e399dac2a63730945396f8",
+    "image_repository_key_sha256": "22ac18a51b96317faece4abf2e18b174746669df77ec7ae9eec3948deb17c5de"
+  },
+  "applied": {
+    "new_resources": 2,
+    "policy_updates": 1,
+    "deletes": 0,
+    "guard_deadline_extended": false
+  },
+  "image": {
+    "at": "2026-10-18T21:39:40.473879+00:00",
+    "image_manifest_digest": "sha256:85b18fbe62166a9ed3b59e240938da99074d4cefcc25967cc1f19b9f1b57da8a",
+    "source_commit": "0db0858cf9971a18a72eb5ef34a5bcfba145165d",
+    "registry_exact_manifest_readback": true,
+    "ecr_describe_digest_verified": true,
+    "blob_count": 18
+  },
+  "oci_archive_verification": {
+    "github_run": 39166856551,
+    "artifact_id": 12150544257,
+    "archive_sha256": "585c1d6757da324b10fd7c14c085906cda19b8d75bca8d3e860a9c5e3213535d",
+    "source_commit": "0db0858cf9971a18a72eb5ef34a5bcfba145165d",
+    "image_manifest_digest": "sha256:85b18fbe62166a9ed3b59e240938da99074d4cefcc25967cc1f19b9f1b57da8a",
+    "config_digest": "sha256:444ae13f97e09ed98023b446d602ef11852eb1f6310756527fef543bb572cfa6",
+    "layers_verified": 17,
+    "platform": "linux/amd64",
+    "source_label_verified": true
+  },
+  "independent_guard_checker": {
+    "request_id": "8c3b59c7-48d6-4f8c-aabb-02d201e2b836",
+    "result": {
+      "observed_at": "2026-10-18T21:40:15.919835+00:00",
+      "scope": "isolated_runtime_inventory_not_billing_bill",
+      "active_resources_absent": false,
+      "all_resources_absent": false,
+      "residuals": [
+        {
+          "kind": "repository",
+          "reference": "fc06c6430679726445121efe642daaebca69afc810e8b7fd1ebb59e4e7e69ae0",
+          "state": "present"
+        },
+        {
+          "kind": "key",
+          "reference": "09ede91665647bef7e9342da0baa4b0158f23cf0e144f56b5471e88d5fdee7c1",
+          "state": "Enabled"
+        }
+      ],
+      "billing_clearance": "requires_delayed_usage_and_guard_inventory_review"
+    },
+    "scope": "resource_inventory_not_independent_manifest_content_read"
+  },
+  "not_executed": [
+    "RDS provisioning",
+    "ECS tasks",
+    "native SQL fixture",
+    "PITR",
+    "runtime cleanup",
+    "guard retirement"
+  ],
+  "account_plan": "FREE_ACTIVE_checked_before_execution",
+  "no_CodeBuild": true
+}

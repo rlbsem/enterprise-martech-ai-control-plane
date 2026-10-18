@@ -1,6 +1,6 @@
 # Isolated Ohio native acceptance implementation
 
-**The isolated guard has deployed and passed native arming/checker checks; runtime provisioning, SQL/PITR and teardown have not executed.** See [native guard evidence](evidence/aws-readiness/guard-native/README.md).
+**The isolated guard and image bootstrap have deployed and passed native arming/checker and exact image read-back checks; database/task runtime provisioning, SQL/PITR and teardown have not executed.** See [native guard evidence](evidence/aws-readiness/guard-native/README.md).
 This lane supplements the unchanged production design. It proves only managed PostgreSQL,
 independent SQL receipts and recovery refusal if the native run succeeds. It does not prove
 live API dispatch, worker recovery, HTTPS ingress, Multi-AZ failover or a production deployment.
@@ -27,7 +27,7 @@ moving the baseline past its existing intent.
 
 ## Approval envelope
 
-Guard-only deployment and arming were authorized and executed. Runtime provisioning has not been authorized. The [updated four-hour estimate](evidence/aws-readiness/implementation/credit-estimate.json)
+Guard deployment, arming, the scoped ECR grant-retirement correction and image bootstrap were separately authorized and executed. Database/task runtime provisioning has not been authorized. The [updated four-hour estimate](evidence/aws-readiness/implementation/credit-estimate.json)
 includes **two** customer-managed keys, three micro instances at peak, four interface endpoint
 AZ units, eight aggregate quarter-vCPU/half-GB task-hours, eight secrets, at most 60 small
 CodeBuild minutes if a cloud execution bridge is used, and supporting/residual allowances.
@@ -64,7 +64,7 @@ not public environment variables in GitHub logs.
 3. Export `terraform output -json guard_manifest` privately. Independently run `armed_gate`
    through the SDK before any runtime creation. The gate must observe both active functions and
    the exact enabled schedule; no user assertion alone is accepted by the deployment wrapper.
-   Before invoking the checker, run `python scripts/native_initialize_registry.py --manifest <guard-json> --approved-sha256 <manifest-digest> --execute`. This uses the operator session, requires independently empty runtime discovery and creates only a missing encrypted registry with `IfNoneMatch=*`; existing history is preserved. It does not grant either function `ListBucket`. Before creating the KMS-encrypted ECR repository, review/apply the separate watchdog policy correction adding only `kms:RetireGrant` for this run's tagged runtime keys. AWS requires that permission to retire repository grants on deletion; the original deployed policy lacks it. Inspect effective cleanup permissions in the actual account; local IAM analysis does not
+   Before invoking the checker, run `python scripts/native_initialize_registry.py --manifest <guard-json> --approved-sha256 <manifest-digest> --execute`. This uses the operator session, requires independently empty runtime discovery and creates only a missing encrypted registry with `IfNoneMatch=*`; existing history is preserved. It does not grant either function `ListBucket`. Before creating the KMS-encrypted ECR repository, review/apply the separate watchdog policy correction adding only `kms:RetireGrant` for this run's tagged runtime keys. AWS requires that permission to retire repository grants on deletion; the original deployed policy lacked it. The separately approved correction is now applied and read back from IAM. Inspect effective cleanup permissions in the actual account; local IAM analysis does not
    prove SCP permission or Free-plan service eligibility. Stop on an unavailable service.
 4. Initialize the runtime S3 backend using the new guard bucket, Ohio and a unique `state/runtime`
    key with S3 lockfiles and the guard CMK. Do not use or alter the Canadian production backend.
