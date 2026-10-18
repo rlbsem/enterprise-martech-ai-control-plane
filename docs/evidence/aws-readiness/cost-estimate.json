@@ -1,0 +1,202 @@
+{
+  "status": "estimate_not_authorization_or_bill",
+  "region": "ca-central-1",
+  "currency": "USD",
+  "window_hours": 4,
+  "sources": [
+    {
+      "service": "AmazonRDS",
+      "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonRDS/current/ca-central-1/index.json",
+      "retrieved_at": "2026-10-18T03:00:47.717824+00:00",
+      "publication_date": "2026-10-06T22:40:50Z",
+      "sha256": "ebbfb948725e402a74fa5375e494e2d2938e80e980cd5d46d3b471073d292004"
+    },
+    {
+      "service": "AmazonECS",
+      "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonECS/current/ca-central-1/index.json",
+      "retrieved_at": "2026-10-18T03:00:45.766988+00:00",
+      "publication_date": "2026-09-11T12:44:25Z",
+      "sha256": "29c49283d323f977ec10bd47c44a7de3f83a06bb51aa48aef605c3b930077ea0"
+    },
+    {
+      "service": "AmazonVPC",
+      "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonVPC/current/ca-central-1/index.json",
+      "retrieved_at": "2026-10-18T03:00:45.762984+00:00",
+      "publication_date": "2026-10-16T22:43:21Z",
+      "sha256": "24d4b2b7b608dc6af3b63b0eb00e505e23226b5a038df71aa861bdf636520044"
+    },
+    {
+      "service": "AWSELB",
+      "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AWSELB/current/ca-central-1/index.json",
+      "retrieved_at": "2026-10-18T03:00:45.661831+00:00",
+      "publication_date": "2026-09-11T12:45:44Z",
+      "sha256": "5242efc51c9b3687c22b197ce27a388eda90902d314e5e5981ee54fdc3cc8d50"
+    },
+    {
+      "service": "AWSSecretsManager",
+      "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AWSSecretsManager/current/ca-central-1/index.json",
+      "retrieved_at": "2026-10-18T03:00:45.674831+00:00",
+      "publication_date": "2026-09-11T12:46:10Z",
+      "sha256": "9bea1ef20cb2951a28b8f8f7c6d77418070732e93b209f58dbe62352f863b507"
+    },
+    {
+      "service": "awskms",
+      "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/awskms/current/ca-central-1/index.json",
+      "retrieved_at": "2026-10-18T03:00:45.940307+00:00",
+      "publication_date": "2026-09-11T12:46:01Z",
+      "sha256": "757c417f5ff302cc74f6f3ee7b25aa2f5cb1a86347f7426723f76e18bd70a74f"
+    },
+    {
+      "service": "AmazonRoute53",
+      "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonRoute53/current/index.json",
+      "retrieved_at": "2026-10-18T03:00:45.889078+00:00",
+      "publication_date": "2026-09-11T12:45:04Z",
+      "sha256": "e2f11e8f4a44ee5c7d837e26f788a25f2528002e02cd040d889a132e68d5a975"
+    }
+  ],
+  "rates": [
+    {
+      "service": "AmazonRDS",
+      "sku": "5DSWSSKAAA2XQPQ7",
+      "description": "$0.105 per additional GB-month of backup storage exceeding free allocation running PostgreSQL",
+      "unit": "GB-Mo",
+      "usd": "0.1050000000",
+      "begin": "0",
+      "end": "Inf"
+    },
+    {
+      "service": "AmazonRDS",
+      "sku": "RA59PH7JZYAEQ3HG",
+      "description": "$0.254 per GB-month of provisioned GP3 storage for Multi-AZ deployments running PostgreSQL",
+      "unit": "GB-Mo",
+      "usd": "0.2540000000",
+      "begin": "0",
+      "end": "Inf"
+    },
+    {
+      "service": "AmazonRDS",
+      "sku": "EGN2ZCQTRB2ST8TT",
+      "description": "$ 0.141 per RDS db.t4g.medium Multi-AZ instance hour (or partial hour) running PostgreSQL",
+      "unit": "Hrs",
+      "usd": "0.1410000000",
+      "begin": "0",
+      "end": "Inf"
+    },
+    {
+      "service": "AmazonECS",
+      "sku": "AMFFWAW2YZ4NE23V",
+      "description": "AWS Fargate - vCPU  - Central (Canada)",
+      "unit": "hours",
+      "usd": "0.0445600000",
+      "begin": "0",
+      "end": "Inf"
+    },
+    {
+      "service": "AmazonECS",
+      "sku": "6VAMAU37C7C88BUA",
+      "description": "AWS Fargate - Memory  - Central (Canada)",
+      "unit": "hours",
+      "usd": "0.0048650000",
+      "begin": "0",
+      "end": "Inf"
+    },
+    {
+      "service": "AmazonVPC",
+      "sku": "3W497TYXJM5N3NE7",
+      "description": "$0.01 per GB for upto 1 PB monthly data processed by VPC Endpoints",
+      "unit": "GB",
+      "usd": "0.0100000000",
+      "begin": "0",
+      "end": "1048576"
+    },
+    {
+      "service": "AmazonVPC",
+      "sku": "YZK8AEXHY7HJD36A",
+      "description": "$0.011 per VPC Endpoint Hour",
+      "unit": "Hrs",
+      "usd": "0.0110000000",
+      "begin": "0",
+      "end": "Inf"
+    },
+    {
+      "service": "AWSELB",
+      "sku": "QMDFDZRE84T95832",
+      "description": "$0.02475 per Application LoadBalancer-hour (or partial hour)",
+      "unit": "Hrs",
+      "usd": "0.0247500000",
+      "begin": "0",
+      "end": "Inf"
+    },
+    {
+      "service": "AWSELB",
+      "sku": "4CB824Z6CRKPUBG4",
+      "description": "$0.0088 per used Application load balancer capacity unit-hour (or partial hour)",
+      "unit": "LCU-Hrs",
+      "usd": "0.0088000000",
+      "begin": "0",
+      "end": "Inf"
+    },
+    {
+      "service": "AWSSecretsManager",
+      "sku": "4H7JXWCMWMQERTVA",
+      "description": "$0.40 per Secret",
+      "unit": "Secrets",
+      "usd": "0.4000000000",
+      "begin": "0",
+      "end": "Inf"
+    },
+    {
+      "service": "AWSSecretsManager",
+      "sku": "R4NCW9PH3QNK2GVS",
+      "description": "$0.05 per 10000 API Requests",
+      "unit": "API Requests",
+      "usd": "0.0000050000",
+      "begin": "0",
+      "end": "Inf"
+    },
+    {
+      "service": "awskms",
+      "sku": "5Y7QS22JD2KZBNBG",
+      "description": "$0.03 per 10000 KMS requests in Canada (Central)",
+      "unit": "Requests",
+      "usd": "0.0000030000",
+      "begin": "0",
+      "end": "Inf"
+    },
+    {
+      "service": "awskms",
+      "sku": "4ZXH7PCQQMMPNVS7",
+      "description": "$1 per customer managed KMS key version in Canada (Central)",
+      "unit": "Keys",
+      "usd": "1.0000000000",
+      "begin": "0",
+      "end": "Inf"
+    },
+    {
+      "service": "AmazonRoute53",
+      "sku": "KVPGEJE88UW8S779",
+      "description": "$0.50 per Hosted Zone for the first 25 Hosted Zones",
+      "unit": "HostedZone",
+      "usd": "0.5000000000",
+      "begin": "0",
+      "end": "25"
+    }
+  ],
+  "assumptions": {
+    "rds_multi_az_instances": 2,
+    "rds_restore_instances_max": 1,
+    "gp3_gb_per_instance": 30,
+    "interface_endpoint_az_units": 8,
+    "persistent_tasks": 7,
+    "cpu_per_task": 0.25,
+    "gb_per_task": 0.5,
+    "alb_count": 1,
+    "lcu_allowance": 1,
+    "secrets_max": 8
+  },
+  "steady_hourly_usd": 0.519434,
+  "four_hour_base_plus_restore_usd": 2.6835,
+  "planning_allowance_usd": 15,
+  "hard_billing_cap": false,
+  "excludes": "Taxes, FX, existing connectivity/certificate costs, unexpected usage and failed teardown. Logging, metrics, API calls, residual storage and monthly minima covered only by contingency, not measured."
+}

@@ -43,6 +43,12 @@ Delivery is **at least once with idempotent effects under the downstream adapter
 
 ## AWS operating architecture
 
+**AWS readiness update:** [139 passing local tests and static infrastructure checks](docs/evidence/aws-readiness/README.md)
+cover the hardened release, startup and restore boundaries. A bounded read-only collector
+is ready for an authorized deployment. [Native acceptance](docs/aws-native-acceptance.md)
+and [cost/teardown review](docs/aws-cost-review.md) remain pending account access and explicit
+cost approval; these records do not claim a deployed AWS environment.
+
 ![Private AWS runtime](docs/diagrams/02-aws-runtime.svg)
 
 - Separate Fargate services for API, workers, downstream and a read-only observer; one-shot migration and verification tasks.
