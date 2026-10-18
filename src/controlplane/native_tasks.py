@@ -109,7 +109,7 @@ def main():
         raise ValueError("Pinned synthetic run required")
     client = boto3.client("secretsmanager", region_name="us-east-2")
     if action == "bootstrap":
-        cloud.bootstrap(client)
+        cloud.bootstrap(client, database_name="csaacceptance")
         result = {"bootstrap": "complete"}
     elif action in ("baseline", "control"):
         cloud.configure("api", client)

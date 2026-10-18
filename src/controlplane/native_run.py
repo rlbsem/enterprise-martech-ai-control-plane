@@ -18,6 +18,10 @@ def validate_manifest(m):
         raise ValueError("Ohio acceptance run required")
     if not re.fullmatch("[0-9]{12}", m["account"]):
         raise ValueError("Account pin required")
+    if m.get("backup_retention_days") != 1:
+        raise ValueError("Isolated Free-plan acceptance requires one-day automated backups")
+    if m.get("database_name") != "csaacceptance":
+        raise ValueError("Isolated acceptance database name required")
     prefix = "csa-native-" + m["run"]
     if m["control_db"] != prefix + "-control" or m["downstream_db"] != prefix + "-receipts":
         raise ValueError("Independent exact database identities required")
@@ -161,7 +165,8 @@ class NativeRun:
             or db["Engine"] != "postgres"
             or db["EngineVersion"] != "17.11"
             or db["AllocatedStorage"] != 20
-            or db["BackupRetentionPeriod"] < 14
+            or db["BackupRetentionPeriod"] != self.m["backup_retention_days"]
+            or db.get("DBName") != self.m["database_name"]
         ):
             raise RuntimeError("Private Single-AZ acceptance database not established")
         return db
@@ -226,12 +231,12 @@ class NativeRun:
         else:
             raise RuntimeError("PITR availability deadline exceeded")
         self.c["rds"].modify_db_instance(
-            DBInstanceIdentifier=target, BackupRetentionPeriod=14, ApplyImmediately=True
+            DBInstanceIdentifier=target, BackupRetentionPeriod=self.m["backup_retention_days"], ApplyImmediately=True
         )
         for _ in range(60):
             self.gate()
             observed = self.c["rds"].describe_db_instances(DBInstanceIdentifier=target)["DBInstances"][0]
-            if observed["DBInstanceStatus"] == "available" and observed.get("BackupRetentionPeriod") == 14:
+            if observed["DBInstanceStatus"] == "available" and observed.get("BackupRetentionPeriod") == self.m["backup_retention_days"]:
                 break
             time.sleep(15)
         else:

@@ -23,6 +23,8 @@ def manifest():
     return dict(
         account=account,
         region="us-east-2",
+        backup_retention_days=1,
+        database_name="csaacceptance",
         run="test2026",
         cleanup_at=(datetime.now(UTC) + timedelta(hours=2)).replace(microsecond=0).isoformat(),
         cluster=f"arn:aws:ecs:us-east-2:{account}:cluster/{prefix}",
@@ -308,7 +310,7 @@ def test_wrong_engine_cannot_be_accepted():
                 "Engine": "postgres",
                 "EngineVersion": "16.1",
                 "AllocatedStorage": 20,
-                "BackupRetentionPeriod": 14,
+                "BackupRetentionPeriod": 1,
             }
         ]
     }
@@ -320,7 +322,7 @@ def test_controller_requests_real_timestamp_restore_and_independent_negative_pro
     m = manifest()
     baseline = datetime.now(UTC) - timedelta(minutes=2)
     rds = MagicMock()
-    available = dict(DBInstanceStatus="available", BackupRetentionPeriod=14)
+    available = dict(DBInstanceStatus="available", BackupRetentionPeriod=1)
     rds.describe_db_instances.return_value = {"DBInstances": [available]}
 
     class Runner(NativeRun):
@@ -587,3 +589,28 @@ def test_registry_initialization_requires_exact_readback(monkeypatch):
     s3.get_object.side_effect = [s3.exceptions.NoSuchKey(), {"Body": io.BytesIO(b"{}")}]
     with pytest.raises(RuntimeError, match="read-back"):
         module.initialize_registry(m, session)
+
+
+@pytest.mark.parametrize("days", [0, 2, 14])
+def test_native_profile_rejects_unapproved_retention(days):
+    m = manifest()
+    m["backup_retention_days"] = days
+    with pytest.raises(ValueError, match="one-day automated backups"):
+        validate_manifest(m)
+
+
+@pytest.mark.parametrize("days,accepted", [(0, False), (1, True), (14, False)])
+def test_native_database_requires_actual_nonzero_pinned_retention(days, accepted):
+    c = {"rds": MagicMock()}
+    c["rds"].describe_db_instances.return_value = {"DBInstances": [{
+        "DBInstanceIdentifier": "db", "DBInstanceStatus": "available",
+        "DBInstanceClass": "db.t4g.micro", "MultiAZ": False,
+        "PubliclyAccessible": False, "StorageEncrypted": True,
+        "Engine": "postgres", "EngineVersion": "17.11", "AllocatedStorage": 20,
+        "BackupRetentionPeriod": days, "DBName": "csaacceptance",
+    }]}
+    if accepted:
+        assert NativeRun(manifest(), c).database("db")["BackupRetentionPeriod"] == 1
+    else:
+        with pytest.raises(RuntimeError):
+            NativeRun(manifest(), c).database("db")

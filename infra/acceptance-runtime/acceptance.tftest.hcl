@@ -27,7 +27,7 @@ variables {
 run "isolated_private_lane" {
   command = plan
   assert {
-    condition     = alltrue([for d in aws_db_instance.store : !d.multi_az && !d.publicly_accessible && d.storage_encrypted && d.instance_class == "db.t4g.micro" && d.allocated_storage == 20 && d.backup_retention_period == 14 && d.deletion_protection])
+    condition     = alltrue([for d in aws_db_instance.store : !d.multi_az && !d.publicly_accessible && d.storage_encrypted && d.instance_class == "db.t4g.micro" && d.allocated_storage == 20 && d.max_allocated_storage == 0 && d.db_name == "csaacceptance" && d.backup_retention_period == 1 && d.deletion_protection])
     error_message = "Private encrypted Single-AZ micro databases with bounded storage required."
   }
   assert {

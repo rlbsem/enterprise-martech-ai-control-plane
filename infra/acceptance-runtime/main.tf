@@ -170,8 +170,9 @@ resource "aws_db_parameter_group" "tls" {
   name   = local.name
   family = "postgres17"
   parameter {
-    name  = "rds.force_ssl"
-    value = "1"
+    name         = "rds.force_ssl"
+    value        = "1"
+    apply_method = "pending-reboot"
   }
   parameter {
     name  = "log_statement"
@@ -189,10 +190,10 @@ resource "aws_db_instance" "store" {
   engine_version                  = "17.11"
   instance_class                  = "db.t4g.micro"
   allocated_storage               = 20
-  max_allocated_storage           = 20
+  max_allocated_storage           = 0
   storage_type                    = "gp3"
   multi_az                        = false
-  db_name                         = "control"
+  db_name                         = "csaacceptance"
   username                        = "acceptance_owner"
   manage_master_user_password     = true
   master_user_secret_kms_key_id   = aws_kms_key.runtime.arn
@@ -202,7 +203,7 @@ resource "aws_db_instance" "store" {
   db_subnet_group_name            = aws_db_subnet_group.private.name
   vpc_security_group_ids          = [aws_security_group.database[each.key].id]
   parameter_group_name            = aws_db_parameter_group.tls.name
-  backup_retention_period         = 14
+  backup_retention_period         = 1
   deletion_protection             = true
   skip_final_snapshot             = true
   copy_tags_to_snapshot           = true
@@ -294,7 +295,7 @@ resource "aws_ecs_task_definition" "native" {
   }])
 }
 output "manifest" {
-  value = { account = var.account_id, region = "us-east-2", run = var.run_id, cleanup_at = var.cleanup_at,
+  value = { account = var.account_id, region = "us-east-2", run = var.run_id, cleanup_at = var.cleanup_at, backup_retention_days = 1, database_name = "csaacceptance",
     image       = "${aws_ecr_repository.image.repository_url}@${var.image_digest}", commit = var.source_commit,
     tasks       = { for k, t in aws_ecs_task_definition.native : k => t.arn }, cluster = aws_ecs_cluster.runtime.arn,
     control_db  = aws_db_instance.store["control"].identifier, downstream_db = aws_db_instance.store["receipts"].identifier,

@@ -69,7 +69,7 @@ def grants(control_dsn, remote_dsn):
         c.execute('GRANT SELECT ON remote.effects TO remote_audit')
 
 
-def bootstrap(client):
+def bootstrap(client, *, database_name="control"):
     """One-shot task: migrations and initial secret creation, idempotent on partial failure.
 
     Runtime secret values are created BEFORE applying DB passwords so restart uses the same values.
@@ -81,7 +81,7 @@ def bootstrap(client):
     dsns = {}
     for name in ('control', 'downstream'):
         master = read_secret(client, masters[name])
-        dsns[name] = make_conninfo(host=hosts[name], dbname='control', user=master['username'],
+        dsns[name] = make_conninfo(host=hosts[name], dbname=database_name, user=master['username'],
                                   password=master['password'], sslmode='verify-full',
                                   sslrootcert='/app/certs/rds-global-bundle.pem')
     passwords = {key: secrets.token_urlsafe(36) for key in ('api', 'worker', 'remote', 'audit', 'remote_audit', 'observer')}

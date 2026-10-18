@@ -1,0 +1,49 @@
+{
+  "scope": "native_provider_corrections_and_RDS_creation_accepted_not_SQL_or_PITR_success",
+  "second_rejection": {
+    "http_status": 400,
+    "code": "InvalidParameterValue",
+    "reason": "DBName control cannot be used. It is a reserved word for this engine",
+    "request_ids": [
+      "3f7374a3-f259-44a9-9ca8-79a9569896c4",
+      "ffb992e4-3216-48f2-9a7b-83d2dc3f0d2f"
+    ]
+  },
+  "corrections": {
+    "native_backup_retention_days": 1,
+    "native_database_name": "csaacceptance",
+    "allocated_storage_gb": 20,
+    "storage_autoscaling": false,
+    "force_ssl_apply_method": "pending-reboot; TLS required from initial database start",
+    "production_defaults_unchanged": true
+  },
+  "actual_observation": {
+    "at": "2026-10-18T21:51:27.969432+00:00",
+    "request_id": "c068c234-d698-4b68-969a-839af143dc1d",
+    "databases": [
+      {
+        "reference": "381fb53bc8a6ef115d42d79933776b3d0be80c75941455b0ec31d9b28f165420",
+        "status": "creating",
+        "engine_version": "17.11",
+        "backup_retention_days": 1,
+        "allocated_storage_gb": 20,
+        "storage_autoscaling_max": 0,
+        "encrypted": true,
+        "multi_az": false,
+        "publicly_accessible": false
+      },
+      {
+        "reference": "16b745efe5f1adb1b2452d0d4c3c0653fe712c2f8a0c2e754024d7988b6aa44d",
+        "status": "creating",
+        "engine_version": "17.11",
+        "backup_retention_days": 1,
+        "allocated_storage_gb": 20,
+        "storage_autoscaling_max": 0,
+        "encrypted": true,
+        "multi_az": false,
+        "publicly_accessible": false
+      }
+    ]
+  },
+  "PITR": "NOT_EXECUTED"
+}

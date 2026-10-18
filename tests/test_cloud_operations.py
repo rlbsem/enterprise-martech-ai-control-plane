@@ -231,14 +231,15 @@ def test_observer_has_only_queue_read_authority():
 
 
 @pytest.mark.parametrize('restored', [False, True])
-def test_bootstrap_reuses_partial_credentials_and_rebinds_only_hosts(monkeypatch, restored):
+@pytest.mark.parametrize('database_name', ['control', 'csaacceptance'])
+def test_bootstrap_reuses_partial_credentials_and_rebinds_only_hosts(monkeypatch, restored, database_name):
     from psycopg.conninfo import conninfo_to_dict
     client = Mock()
     host = 'restored.control.test' if restored else 'control.test'
     documents = {
         'master-control': {'username': 'owner', 'password': 'mock-owner'},
         'master-remote': {'username': 'owner', 'password': 'mock-owner'},
-        'worker': {'CONTROL_DSN': 'host=control.test dbname=control user=control_worker password=preserved',
+        'worker': {'CONTROL_DSN': f'host=control.test dbname={database_name} user=control_worker password=preserved',
                    'EXECUTOR_TOKEN': 'preserved-executor-token'},
     }
     def get(SecretId):
@@ -256,11 +257,12 @@ def test_bootstrap_reuses_partial_credentials_and_rebinds_only_hosts(monkeypatch
     monkeypatch.setattr(db, 'connect', MagicMock())
     monkeypatch.setattr(db, 'migrate', Mock())
     monkeypatch.setattr(cloud, 'grants', Mock())
-    cloud.bootstrap(client)
+    cloud.bootstrap(client, **({} if database_name == "control" else {"database_name": database_name}))
     assert documents['worker']['EXECUTOR_TOKEN'] == documents['remote']['EXECUTOR_TOKEN'] == 'preserved-executor-token'
     info = conninfo_to_dict(documents['worker']['CONTROL_DSN'])
+    assert info['dbname'] == database_name
     assert info['host'] == host and info['password'] == 'preserved' and info['sslmode'] == 'verify-full'
     assert set(documents['observer']) == {'CONTROL_DSN'}
     before = deepcopy(documents)
-    cloud.bootstrap(client)
+    cloud.bootstrap(client, **({} if database_name == "control" else {"database_name": database_name}))
     assert before == documents

@@ -1,6 +1,6 @@
 # Isolated Ohio native acceptance implementation
 
-**The isolated guard and image bootstrap have deployed and passed native arming/checker and exact image read-back checks; database/task runtime provisioning, SQL/PITR and teardown have not executed.** See [native guard evidence](evidence/aws-readiness/guard-native/README.md).
+**The isolated guard and image bootstrap have deployed and passed native arming/checker and exact image read-back checks; approved native database provisioning is in progress; SQL/PITR and teardown have not executed.** See [native guard evidence](evidence/aws-readiness/guard-native/README.md).
 This lane supplements the unchanged production design. It proves only managed PostgreSQL,
 independent SQL receipts and recovery refusal if the native run succeeds. It does not prove
 live API dispatch, worker recovery, HTTPS ingress, Multi-AZ failover or a production deployment.
@@ -9,7 +9,7 @@ live API dispatch, worker recovery, HTTPS ingress, Multi-AZ failover or a produc
 
 | Component | Implementation |
 |---|---|
-| Isolated runtime | `infra/acceptance-runtime`: two private encrypted PostgreSQL 17.11 `db.t4g.micro` instances, 20 GB gp3 each, 14-day backups, Single-AZ, deletion protection, forced TLS; separate VPC/two private subnets; four interface endpoints in the task AZ and S3 gateway; five one-off task definitions, no ECS services |
+| Isolated runtime | `infra/acceptance-runtime`: two private encrypted PostgreSQL 17.11 `db.t4g.micro` instances, 20 GB gp3 each, one-day automated backups in this isolated Free-plan lane, physical database `csaacceptance`, storage autoscaling disabled, Single-AZ, deletion protection, forced TLS; separate VPC/two private subnets; four interface endpoints in the task AZ and S3 gateway; five one-off task definitions, no ECS services |
 | Independent guard | `infra/acceptance-guard`: non-VPC cleanup Lambda and separate read-only checker Lambda, independent IAM roles/KMS key/private versioned evidence bucket, enabled one-minute Scheduler at the cleanup deadline, bounded delivery/invocation retries, encrypted failure queue and observable queue alarm |
 | Arming gate | `native_arming.py` reads STS, Free-plan state, actual Scheduler and Lambda metadata. It verifies exact namespace, account, code hash, deadline/end time, target identity, retry/DLQ configuration and independent checker role. An arming metadata check is not a claim that AWS has executed cleanup or simulated its permissions. |
 | Provisioning gate | `scripts/native_deploy.py` verifies an approved saved-plan digest, create-only root changes, manifest/plan agreement, Free-plan credit headroom and independently armed guard before runtime apply. No automatic upgrades or account-plan changes. |
@@ -27,7 +27,7 @@ moving the baseline past its existing intent.
 
 ## Approval envelope
 
-Guard deployment, arming, the scoped ECR grant-retirement correction and image bootstrap were separately authorized and executed. Database/task runtime provisioning has not been authorized. The [updated four-hour estimate](evidence/aws-readiness/implementation/credit-estimate.json)
+Guard deployment, arming, the scoped ECR grant-retirement correction and image bootstrap were separately authorized and executed. The bounded native SQL/PITR run and cleanup are now approved. The first database requests were rejected by real RDS validation; the corrected requests are provisioning, with no Paid upgrade. The [updated four-hour estimate](evidence/aws-readiness/implementation/credit-estimate.json)
 includes **two** customer-managed keys, three micro instances at peak, four interface endpoint
 AZ units, eight aggregate quarter-vCPU/half-GB task-hours, eight secrets, at most 60 small
 CodeBuild minutes if a cloud execution bridge is used, and supporting/residual allowances.
@@ -105,7 +105,7 @@ not public environment variables in GitHub logs.
 
 [Current local verification](evidence/aws-readiness/deployment-clock/local/verification.json) and [infrastructure checks](evidence/aws-readiness/deployment-clock/infrastructure/verification.json) covers actual PostgreSQL/HTTP
 regressions, new local SQL fixture tests, mocked controller/guard fault tests, pinned Terraform
-validation/mock tests and static security checks. The separate native guard record demonstrates actual arming and restricted checker execution. Native RDS/PITR, scheduled cleanup and effective runtime-deletion permissions remain unexecuted. Public evidence must contain only sanitized results and hashed
+validation/mock tests and static security checks. The separate native guard record demonstrates actual arming and restricted checker execution. Native RDS/PITR, scheduled cleanup and effective runtime-deletion permissions remain unexecuted. The first real creates were rejected because 14-day retention exceeds this account's Free-plan limit. The acceptance lane now pins the minimum nonzero one-day retention; production retention is unchanged. A zero-day configuration is rejected because it disables automated backups/PITR. Public evidence must contain only sanitized results and hashed
 resource references, never credentials, raw plans or private account/network identifiers.
 
 AWS documents that [RDS deletes its managed owner secret with the instance](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-secrets-manager.html)

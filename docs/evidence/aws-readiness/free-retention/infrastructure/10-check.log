@@ -1,0 +1,10 @@
+acceptance.tftest.hcl... in progress
+  run "independent_guard"... pass
+  run "encrypted_repository_cleanup_grants"... pass
+  run "identity_rejected"... pass
+  run "deployment_clock_starts_at_apply"... pass
+  run "retry_preserves_original_clock"... pass
+acceptance.tftest.hcl... tearing down
+acceptance.tftest.hcl... pass
+
+Success! 5 passed, 0 failed.
