@@ -26,7 +26,7 @@ Migration/verifier tasks, image pull data, inter-AZ transfer, RDS burst credits,
 Secrets Manager requests, logging, custom metrics, Container Insights, ten alarms,
 one dashboard, image storage and retained backups are additional.
 
-Request a **USD 15 planning allowance for four hours**, including contingency and
+Model a **USD 15 planning allowance for four hours**, including contingency and
 cleanup. It is **not a hard billing cap**. Start the window at the first billable creation;
 stop new experiments with at least one hour remaining for cleanup. Do not extend the
 window, add a second restore or create connectivity without renewed approval. RDS
@@ -47,6 +47,40 @@ vary with volume and region; the contingency is a budget allowance, not a measur
 Consult [CloudWatch pricing](https://aws.amazon.com/cloudwatch/pricing/) and
 [ECR pricing](https://aws.amazon.com/ecr/pricing/) before the approved window.
 Existing account spend, routes, PKI and billing visibility are currently unknown.
+
+### Itemized four-hour planning worksheet
+
+These allowances clarify the earlier subtotal. They are assumptions, not actual usage.
+The optional cleanup runner is outside the existing runtime inventory and must be
+included in a final approved plan. No runner or subscription has been created.
+
+| Item | USD for four hours |
+|---|---:|
+| Two existing-design Multi-AZ RDS instances | 1.1280 |
+| Their 60 GB gp3 storage, prorated using 730 hours/month | 0.0835 |
+| One additional Multi-AZ PITR instance and 30 GB for the full window | 0.6058 |
+| Eight interface-endpoint AZ units | 0.3520 |
+| Seven persistent Fargate tasks | 0.3800 |
+| Private ALB with one LCU allowance | 0.1342 |
+| Two aggregate utility task-hours | 0.0272 |
+| Up to eight secrets and two KMS keys, prorated before requests | 0.0285 |
+| Hosted zone, conservatively one full month | 0.5000 |
+| Logs/metrics/dashboard/alarm allowance | 1.5000 |
+| Transfer, image/backend storage and API-request allowance | 0.5000 |
+| Cloud-side cleanup compute allowance | 0.5000 |
+| **Planning subtotal, rounded** | **5.74** |
+| **Remaining contingency within USD 15** | **9.26** |
+
+The cleanup compute allowance can cover a short small CodeBuild job; the
+[official example rate](https://aws.amazon.com/codebuild/pricing/) is USD 0.005/minute.
+This is a planning reference, not a verified regional quote for an already-selected
+runner. Scheduler, build logs, private artifacts and backend costs also require final
+account-specific review. No Free Tier deductions apply to this worksheet.
+
+The [minimal acceptance assessment](aws-minimal-acceptance.md) distinguishes the
+database/PITR lane from the full HTTPS application. A database-only lane can omit ACM,
+custom DNS, ALB and workstation VPN. This worksheet prices the current full design;
+it must not be presented as the final cost of an unimplemented smaller deployment.
 
 ## Teardown must be approved with creation
 
@@ -80,5 +114,7 @@ Keep a private inventory from the reviewed plan, including out-of-state PITR ins
    failed cleanup prevent a guarantee that the planning allowance will never be exceeded.
 
 **Current cost status: no AWS resource operations executed by this work.** An authorized
-temporary SDK profile, existing private connectivity/certificate and explicit approval of
-the window, allowance and teardown disposition are required before native execution.
+temporary SDK profile and explicit approval of the final lane, window, allowance and
+teardown disposition are required before native execution. Certificate and connectivity
+requirements depend on the selected lane. No credentials or cost approval are requested
+at this offline readiness stage.

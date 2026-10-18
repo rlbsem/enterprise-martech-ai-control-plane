@@ -1,5 +1,10 @@
 # Native AWS acceptance
 
+This procedure describes the **full private HTTPS application** lane. See the
+[minimal acceptance assessment](aws-minimal-acceptance.md) for a narrower native
+database/PITR lane that does not inherently require ACM, custom DNS, ALB or a VPN.
+No account authentication or chargeable operation is requested during offline readiness.
+
 **Current boundary: AWS readiness, not native AWS acceptance.** The current local
 regression and infrastructure records are in [aws-readiness](evidence/aws-readiness/README.md).
 No AWS credentials were available during this readiness work. No AWS environment

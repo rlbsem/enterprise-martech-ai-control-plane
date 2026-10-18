@@ -1,0 +1,45 @@
+{
+  "SchemaVersion": 2,
+  "Trivy": {
+    "Version": "0.75.0"
+  },
+  "ReportID": "01a14d14-04da-71ff-a15c-6e9e4e1b6b8f",
+  "CreatedAt": "2026-10-17T23:35:20.0261309-04:00",
+  "ArtifactName": "infra",
+  "ArtifactType": "filesystem",
+  "Results": [
+    {
+      "Target": "aws",
+      "Class": "config",
+      "Type": "terraform",
+      "MisconfSummary": {
+        "Successes": 44,
+        "Failures": 0
+      }
+    },
+    {
+      "Target": "aws/data.tf",
+      "Class": "config",
+      "Type": "terraform"
+    },
+    {
+      "Target": "aws/network.tf",
+      "Class": "config",
+      "Type": "terraform"
+    },
+    {
+      "Target": "foundation",
+      "Class": "config",
+      "Type": "terraform",
+      "MisconfSummary": {
+        "Successes": 24,
+        "Failures": 0
+      }
+    },
+    {
+      "Target": "foundation/main.tf",
+      "Class": "config",
+      "Type": "terraform"
+    }
+  ]
+}
