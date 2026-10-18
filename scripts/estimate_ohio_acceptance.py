@@ -31,7 +31,7 @@ def estimate(document, hours=4):
         'eight_aggregate_quarter_cpu_half_gb_task_hours': 8 * (
             Decimal('0.25') * rates['fargate_vcpu_hour'] + Decimal('0.5') * rates['fargate_gb_hour']),
         'eight_secrets': 8 * h / month * rates['secret_month'],
-        'one_kms_key': h / month * rates['kms_key_month'],
+        'two_kms_keys': 2 * h / month * rates['kms_key_month'],
         'sixty_codebuild_cleanup_and_image_build_minutes': 60 * rates['codebuild_minute'],
         'logs_allowance_not_metered': Decimal('0.50'),
         'storage_transfer_and_request_allowance_not_metered': Decimal('0.25'),

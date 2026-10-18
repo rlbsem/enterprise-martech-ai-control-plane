@@ -1,0 +1,787 @@
+{
+  "scope": "offline_mocked_resource_envelope_not_live_plan_or_deployed_inventory",
+  "production_roots_changed": false,
+  "native_execution": "not_executed",
+  "roots": {
+    "runtime": {
+      "tests": {
+        "status": "pass",
+        "passed": 3,
+        "failed": 0,
+        "errored": 0,
+        "skipped": 0
+      },
+      "resource_count": 85,
+      "resources": [
+        {
+          "address": "aws_cloudwatch_log_group.database[\"control\"]",
+          "type": "aws_cloudwatch_log_group",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_cloudwatch_log_group.database[\"receipts\"]",
+          "type": "aws_cloudwatch_log_group",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_cloudwatch_log_group.database[\"restore\"]",
+          "type": "aws_cloudwatch_log_group",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_cloudwatch_log_group.task[\"baseline\"]",
+          "type": "aws_cloudwatch_log_group",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_cloudwatch_log_group.task[\"bootstrap\"]",
+          "type": "aws_cloudwatch_log_group",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_cloudwatch_log_group.task[\"control\"]",
+          "type": "aws_cloudwatch_log_group",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_cloudwatch_log_group.task[\"receipt\"]",
+          "type": "aws_cloudwatch_log_group",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_cloudwatch_log_group.task[\"verify\"]",
+          "type": "aws_cloudwatch_log_group",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_db_instance.store[\"control\"]",
+          "type": "aws_db_instance",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_db_instance.store[\"receipts\"]",
+          "type": "aws_db_instance",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_db_parameter_group.tls",
+          "type": "aws_db_parameter_group",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_db_subnet_group.private",
+          "type": "aws_db_subnet_group",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_ecr_repository.image",
+          "type": "aws_ecr_repository",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_ecs_cluster.runtime",
+          "type": "aws_ecs_cluster",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_ecs_task_definition.native[\"baseline\"]",
+          "type": "aws_ecs_task_definition",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_ecs_task_definition.native[\"bootstrap\"]",
+          "type": "aws_ecs_task_definition",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_ecs_task_definition.native[\"control\"]",
+          "type": "aws_ecs_task_definition",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_ecs_task_definition.native[\"receipt\"]",
+          "type": "aws_ecs_task_definition",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_ecs_task_definition.native[\"verify\"]",
+          "type": "aws_ecs_task_definition",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_iam_role.execution",
+          "type": "aws_iam_role",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_iam_role.task[\"baseline\"]",
+          "type": "aws_iam_role",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_iam_role.task[\"bootstrap\"]",
+          "type": "aws_iam_role",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_iam_role.task[\"control\"]",
+          "type": "aws_iam_role",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_iam_role.task[\"receipt\"]",
+          "type": "aws_iam_role",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_iam_role.task[\"verify\"]",
+          "type": "aws_iam_role",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_iam_role_policy.execution",
+          "type": "aws_iam_role_policy",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_iam_role_policy.task[\"baseline\"]",
+          "type": "aws_iam_role_policy",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_iam_role_policy.task[\"bootstrap\"]",
+          "type": "aws_iam_role_policy",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_iam_role_policy.task[\"control\"]",
+          "type": "aws_iam_role_policy",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_iam_role_policy.task[\"receipt\"]",
+          "type": "aws_iam_role_policy",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_iam_role_policy.task[\"verify\"]",
+          "type": "aws_iam_role_policy",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_kms_key.runtime",
+          "type": "aws_kms_key",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_route_table.private",
+          "type": "aws_route_table",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_route_table_association.private[0]",
+          "type": "aws_route_table_association",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_route_table_association.private[1]",
+          "type": "aws_route_table_association",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_secretsmanager_secret.runtime[\"api\"]",
+          "type": "aws_secretsmanager_secret",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_secretsmanager_secret.runtime[\"observer\"]",
+          "type": "aws_secretsmanager_secret",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_secretsmanager_secret.runtime[\"remote\"]",
+          "type": "aws_secretsmanager_secret",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_secretsmanager_secret.runtime[\"verifier\"]",
+          "type": "aws_secretsmanager_secret",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_secretsmanager_secret.runtime[\"worker\"]",
+          "type": "aws_secretsmanager_secret",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_security_group.database[\"control\"]",
+          "type": "aws_security_group",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_security_group.database[\"receipts\"]",
+          "type": "aws_security_group",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_security_group.endpoint",
+          "type": "aws_security_group",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_security_group.task[\"baseline\"]",
+          "type": "aws_security_group",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_security_group.task[\"bootstrap\"]",
+          "type": "aws_security_group",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_security_group.task[\"control\"]",
+          "type": "aws_security_group",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_security_group.task[\"receipt\"]",
+          "type": "aws_security_group",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_security_group.task[\"verify\"]",
+          "type": "aws_security_group",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_subnet.private[0]",
+          "type": "aws_subnet",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_subnet.private[1]",
+          "type": "aws_subnet",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc.runtime",
+          "type": "aws_vpc",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_endpoint.interface[\"ecr.api\"]",
+          "type": "aws_vpc_endpoint",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_endpoint.interface[\"ecr.dkr\"]",
+          "type": "aws_vpc_endpoint",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_endpoint.interface[\"logs\"]",
+          "type": "aws_vpc_endpoint",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_endpoint.interface[\"secretsmanager\"]",
+          "type": "aws_vpc_endpoint",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_endpoint.s3",
+          "type": "aws_vpc_endpoint",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_egress_rule.db[\"baseline_control\"]",
+          "type": "aws_vpc_security_group_egress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_egress_rule.db[\"bootstrap_control\"]",
+          "type": "aws_vpc_security_group_egress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_egress_rule.db[\"bootstrap_receipts\"]",
+          "type": "aws_vpc_security_group_egress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_egress_rule.db[\"control_control\"]",
+          "type": "aws_vpc_security_group_egress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_egress_rule.db[\"receipt_receipts\"]",
+          "type": "aws_vpc_security_group_egress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_egress_rule.db[\"verify_control\"]",
+          "type": "aws_vpc_security_group_egress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_egress_rule.db[\"verify_receipts\"]",
+          "type": "aws_vpc_security_group_egress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_egress_rule.endpoint[\"baseline\"]",
+          "type": "aws_vpc_security_group_egress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_egress_rule.endpoint[\"bootstrap\"]",
+          "type": "aws_vpc_security_group_egress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_egress_rule.endpoint[\"control\"]",
+          "type": "aws_vpc_security_group_egress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_egress_rule.endpoint[\"receipt\"]",
+          "type": "aws_vpc_security_group_egress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_egress_rule.endpoint[\"verify\"]",
+          "type": "aws_vpc_security_group_egress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_egress_rule.s3[\"baseline\"]",
+          "type": "aws_vpc_security_group_egress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_egress_rule.s3[\"bootstrap\"]",
+          "type": "aws_vpc_security_group_egress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_egress_rule.s3[\"control\"]",
+          "type": "aws_vpc_security_group_egress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_egress_rule.s3[\"receipt\"]",
+          "type": "aws_vpc_security_group_egress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_egress_rule.s3[\"verify\"]",
+          "type": "aws_vpc_security_group_egress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_ingress_rule.db[\"baseline_control\"]",
+          "type": "aws_vpc_security_group_ingress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_ingress_rule.db[\"bootstrap_control\"]",
+          "type": "aws_vpc_security_group_ingress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_ingress_rule.db[\"bootstrap_receipts\"]",
+          "type": "aws_vpc_security_group_ingress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_ingress_rule.db[\"control_control\"]",
+          "type": "aws_vpc_security_group_ingress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_ingress_rule.db[\"receipt_receipts\"]",
+          "type": "aws_vpc_security_group_ingress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_ingress_rule.db[\"verify_control\"]",
+          "type": "aws_vpc_security_group_ingress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_ingress_rule.db[\"verify_receipts\"]",
+          "type": "aws_vpc_security_group_ingress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_ingress_rule.endpoint[\"baseline\"]",
+          "type": "aws_vpc_security_group_ingress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_ingress_rule.endpoint[\"bootstrap\"]",
+          "type": "aws_vpc_security_group_ingress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_ingress_rule.endpoint[\"control\"]",
+          "type": "aws_vpc_security_group_ingress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_ingress_rule.endpoint[\"receipt\"]",
+          "type": "aws_vpc_security_group_ingress_rule",
+          "actions": [
+            "create"
+          ]
+        },
+        {
+          "address": "aws_vpc_security_group_ingress_rule.endpoint[\"verify\"]",
+          "type": "aws_vpc_security_group_ingress_rule",
+          "actions": [
+            "create"
+          ]
+        }
+      ]
+    },
+    "guard": {
+      "tests": {
+        "status": "pass",
+        "passed": 2,
+        "failed": 0,
+        "errored": 0,
+        "skipped": 0
+      },
+      "resource_count": 23,
+      "resources": [
+        {
+          "address": "aws_cloudwatch_log_group.function[\"checker\"]",
+          "type": "aws_cloudwatch_log_group",
+          "actions": [
+            "mock_created"
+          ]
+        },
+        {
+          "address": "aws_cloudwatch_log_group.function[\"watchdog\"]",
+          "type": "aws_cloudwatch_log_group",
+          "actions": [
+            "mock_created"
+          ]
+        },
+        {
+          "address": "aws_cloudwatch_metric_alarm.failures",
+          "type": "aws_cloudwatch_metric_alarm",
+          "actions": [
+            "mock_created"
+          ]
+        },
+        {
+          "address": "aws_iam_role.function[\"checker\"]",
+          "type": "aws_iam_role",
+          "actions": [
+            "mock_created"
+          ]
+        },
+        {
+          "address": "aws_iam_role.function[\"watchdog\"]",
+          "type": "aws_iam_role",
+          "actions": [
+            "mock_created"
+          ]
+        },
+        {
+          "address": "aws_iam_role.schedule",
+          "type": "aws_iam_role",
+          "actions": [
+            "mock_created"
+          ]
+        },
+        {
+          "address": "aws_iam_role_policy.cleanup",
+          "type": "aws_iam_role_policy",
+          "actions": [
+            "mock_created"
+          ]
+        },
+        {
+          "address": "aws_iam_role_policy.function[\"checker\"]",
+          "type": "aws_iam_role_policy",
+          "actions": [
+            "mock_created"
+          ]
+        },
+        {
+          "address": "aws_iam_role_policy.function[\"watchdog\"]",
+          "type": "aws_iam_role_policy",
+          "actions": [
+            "mock_created"
+          ]
+        },
+        {
+          "address": "aws_iam_role_policy.schedule",
+          "type": "aws_iam_role_policy",
+          "actions": [
+            "mock_created"
+          ]
+        },
+        {
+          "address": "aws_kms_key.guard",
+          "type": "aws_kms_key",
+          "actions": [
+            "mock_created"
+          ]
+        },
+        {
+          "address": "aws_lambda_function.guard[\"checker\"]",
+          "type": "aws_lambda_function",
+          "actions": [
+            "mock_created"
+          ]
+        },
+        {
+          "address": "aws_lambda_function.guard[\"watchdog\"]",
+          "type": "aws_lambda_function",
+          "actions": [
+            "mock_created"
+          ]
+        },
+        {
+          "address": "aws_lambda_function_event_invoke_config.guard[\"checker\"]",
+          "type": "aws_lambda_function_event_invoke_config",
+          "actions": [
+            "mock_created"
+          ]
+        },
+        {
+          "address": "aws_lambda_function_event_invoke_config.guard[\"watchdog\"]",
+          "type": "aws_lambda_function_event_invoke_config",
+          "actions": [
+            "mock_created"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket.guard",
+          "type": "aws_s3_bucket",
+          "actions": [
+            "mock_created"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_lifecycle_configuration.guard",
+          "type": "aws_s3_bucket_lifecycle_configuration",
+          "actions": [
+            "mock_created"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_policy.guard",
+          "type": "aws_s3_bucket_policy",
+          "actions": [
+            "mock_created"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_public_access_block.guard",
+          "type": "aws_s3_bucket_public_access_block",
+          "actions": [
+            "mock_created"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_server_side_encryption_configuration.guard",
+          "type": "aws_s3_bucket_server_side_encryption_configuration",
+          "actions": [
+            "mock_created"
+          ]
+        },
+        {
+          "address": "aws_s3_bucket_versioning.guard",
+          "type": "aws_s3_bucket_versioning",
+          "actions": [
+            "mock_created"
+          ]
+        },
+        {
+          "address": "aws_scheduler_schedule.cleanup",
+          "type": "aws_scheduler_schedule",
+          "actions": [
+            "mock_created"
+          ]
+        },
+        {
+          "address": "aws_sqs_queue.failures",
+          "type": "aws_sqs_queue",
+          "actions": [
+            "mock_created"
+          ]
+        }
+      ]
+    }
+  }
+}

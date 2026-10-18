@@ -53,7 +53,7 @@ The narrower lane needs its own reviewed configuration and manifest. Do **not** 
 `infra/aws` to Ohio, relax `Release` region validation, or run the production
 `aws_acceptance` collector against a smaller topology and call its missing checks passed.
 That collector intentionally expects the production service topology and Multi-AZ.
-No deployable smaller Terraform root or complete native fixture executor is claimed yet.
+The [isolated implementation and execution procedure](aws-ohio-execution.md) now provide separate Terraform roots, a native fixture/PITR executor and an independent scheduled guard. They have not been deployed.
 
 ## Native experiment and independent facts
 
@@ -102,7 +102,7 @@ URLs, retrieval/publication dates, SKUs and catalog hashes. Reproduce the estima
 python scripts/estimate_ohio_acceptance.py
 ```
 
-[The result](evidence/aws-readiness/ohio/credit-estimate.json) models **USD 1.942795**
+[The updated result](evidence/aws-readiness/implementation/credit-estimate.json) models **USD 1.948274**
 in credit consumption, including fixed contingency allowances for unmetered supporting
 items. Propose a **USD 5 credit planning allowance** for four hours. It is not a hard cap
 or measured consumption. No legacy free-usage deductions are assumed.
@@ -114,7 +114,7 @@ or measured consumption. No legacy free-usage deductions are assumed.
 | 60 GB additional-backup allowance at 0.095/GB-month | 0.031233 |
 | Four interface endpoint AZ units for four hours at 0.01/hour | 0.160000 |
 | Eight aggregate quarter-vCPU/half-GB task-hours | 0.098740 |
-| Eight secrets and one KMS key, prorated | 0.023014 |
+| Eight secrets and two KMS keys, prorated | 0.028493 |
 | 60 small CodeBuild minutes at 0.005/minute | 0.300000 |
 | Logs, requests, transfer, scheduler/checker and residual allowances | 1.100000 |
 
@@ -125,36 +125,17 @@ plan; any denied creation must fail closed without requesting advanced/Paid acti
 Credit checks must continue during the run. Do not represent a remaining-credit API
 response as a universal cost cap or an authorization to provision.
 
-## Reliable teardown design and remaining implementation
+## Implemented cleanup controls and remaining native execution
 
-A laptop timer is insufficient. Use a one-shot EventBridge Scheduler in Ohio to start
-a separate, non-VPC cleanup runner at hour three, with bounded retries and a private
-failure notification. An outside-VPC CodeBuild runner can call AWS control-plane APIs
-without depending on the runtime endpoints it will delete. Its role must cover only
-the uniquely tagged acceptance resources and exact recorded IDs, including the restore.
-The schedule, runner, role and private cleanup bundle must be observed armed before
-the first database is created. Their own lifecycle belongs to a separate guard inventory.
+The [current implementation](aws-ohio-execution.md) replaces the earlier proposed
+CodeBuild cleanup job with a smaller non-VPC Lambda watchdog and independently scoped
+read-only Lambda checker. The one-minute schedule starts at hour three and ends one
+hour later, with bounded invocation/retry controls, a private failure queue and an
+observable queue alarm. It has not run in AWS. See the execution guide for exact
+inventory, private versioned evidence, synthetic disposal and independent guard retirement.
 
-The reviewed cleanup configuration must explicitly handle RDS deletion protection and
-Terraform `prevent_destroy`, approve disposal of isolated synthetic state, and include
-the out-of-state PITR target. Never weaken the production root's protections. Generate
-and validate the final saved destroy plan against the approved exact inventory using
-the existing `controlplane.teardown` tool. A zero exit code does not prove absence.
-
-After deletion, a **separate read-only identity/job** must enumerate databases, snapshots,
-retained automated backups, ECS tasks, ECR images/repositories, endpoints/ENIs, runtime
-secrets, log groups, keys pending deletion and guard resources. Compare against both
-the recorded IDs and unique run tags, to detect an unrecorded partial creation. Disclose
-scheduled key/secret deletion and retained storage; never claim account-wide zero cost
-from an empty ECS cluster. Reconcile later credit/usage reporting after its delay.
-
-The existing independent checker covers only some resource types and reports others
-unsupported. Extending residual coverage, building the isolated native fixture/root,
-and implementing/validating the cloud-side watchdog are required **before** unattended
-provisioning. None is claimed deployed or complete here. If those controls or their
-Free-plan service permissions cannot be established, remain blocked rather than launch
-an environment with no reliable teardown.
-
-**Approval status: not requested by a tool or granted for resource creation.** This
-document is the reviewable architecture and credit proposal. Native deployment/PITR
-remains the next milestone; PR #4 stays draft and must not be merged before that review.
+All prior discovery, cost v1 and local records remain historical evidence. The new
+[implementation records](evidence/aws-readiness/implementation/README.md) bind the current
+sources. Native arming, effective IAM/SCP permissions, saved live plans, RDS PITR,
+SQL verification, cleanup and delayed usage reconciliation remain unexecuted.
+Provisioning requires explicit owner approval; PR #4 remains draft and unmerged.

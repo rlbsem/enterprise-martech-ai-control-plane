@@ -43,15 +43,15 @@ Delivery is **at least once with idempotent effects under the downstream adapter
 
 ## AWS operating architecture
 
-**AWS readiness update:** [164 passing local tests and static infrastructure checks](docs/evidence/aws-readiness/ohio/README.md)
+**AWS readiness update:** [Local tests and static infrastructure checks](docs/evidence/aws-readiness/implementation/README.md)
 cover the hardened release, startup and restore boundaries. A bounded read-only collector
 is ready for an authorized deployment. [Native acceptance](docs/aws-native-acceptance.md)
-and [cost/teardown review](docs/aws-cost-review.md) remain pending account access and explicit
+and [cost/teardown review](docs/aws-cost-review.md) remain pending native execution and explicit
 cost approval; these records do not claim a deployed AWS environment.
 [Ohio preflight](docs/evidence/aws-readiness/ohio/README.md) independently confirmed
 regional access and corrected the earlier Canadian-region denial diagnosis. The
 [separate Single-AZ/PITR proposal](docs/aws-ohio-acceptance.md) preserves the production
-architecture. No deployment or PITR has run; provisioning remains approval-gated.
+architecture. The [executable Ohio fixture, isolated Terraform and independent cleanup guard](docs/aws-ohio-execution.md) are implemented and locally tested. No deployment or PITR has run; provisioning remains approval-gated.
 The [minimal acceptance assessment](docs/aws-minimal-acceptance.md) explains which
 recovery tests can run without ACM, custom DNS, an ALB or a workstation VPN.
 

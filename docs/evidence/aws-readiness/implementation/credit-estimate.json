@@ -1,0 +1,29 @@
+{
+  "profile": "ohio-free-single-az-pitr-v1",
+  "region": "us-east-2",
+  "status": "PROPOSED_NOT_AUTHORIZED_NOT_DEPLOYED",
+  "hours": 4,
+  "currency": "USD_equivalent_AWS_credit_consumption",
+  "items": {
+    "three_single_az_micro_instances": "0.192000",
+    "sixty_gb_gp3": "0.037808",
+    "sixty_gb_additional_backup_allowance": "0.031233",
+    "four_interface_endpoint_az_units": "0.160000",
+    "eight_aggregate_quarter_cpu_half_gb_task_hours": "0.098740",
+    "eight_secrets": "0.017534",
+    "two_kms_keys": "0.010959",
+    "sixty_codebuild_cleanup_and_image_build_minutes": "0.300000",
+    "logs_allowance_not_metered": "0.500000",
+    "storage_transfer_and_request_allowance_not_metered": "0.250000",
+    "scheduler_and_independent_check_allowance_not_metered": "0.100000",
+    "residual_retention_allowance_not_metered": "0.250000"
+  },
+  "modeled_total": "1.948274",
+  "planning_allowance": "5.00",
+  "contingency": "3.051726",
+  "hard_billing_cap": false,
+  "actual_usage": "not_executed",
+  "paid_plan_authorized": false,
+  "out_of_pocket_authorized": false,
+  "full_application_acceptance": false
+}

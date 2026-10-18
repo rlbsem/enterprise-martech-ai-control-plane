@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import subprocess
+import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -20,17 +21,20 @@ def main():
     if trivy_version.strip() != 'Version: 0.75.0':
         raise RuntimeError('Use the pinned Trivy 0.75.0 scanner')
     args.output.mkdir(parents=True, exist_ok=True)
+    subprocess.run([sys.executable, str(ROOT/'scripts/package_native_guard.py'), str(ROOT/'.local/native-guard.zip')], check=True)
     commands = [[args.terraform, 'fmt', '-check', '-recursive', 'infra']]
-    for module in ('foundation', 'aws'):
+    for module in ('foundation', 'aws', 'acceptance-guard', 'acceptance-runtime'):
         for options in [['init', '-backend=false', '-input=false', '-lockfile=readonly'], ['validate', '-no-color']]:
             commands.append([args.terraform, f'-chdir=infra/{module}', *options])
-    commands.append([args.terraform, '-chdir=infra/aws', 'test', '-no-color'])
+    for module in ('aws', 'acceptance-guard', 'acceptance-runtime'):
+        commands.append([args.terraform, f'-chdir=infra/{module}', 'test', '-no-color'])
     commands.append([args.trivy, 'config', '--severity', 'HIGH,CRITICAL', '--exit-code', '1',
                      '--tf-vars', 'infra/testing/static.tfvars.json',
                      '--format', 'json', '--output', str(args.output/'security.json'), 'infra'])
     commands.append([args.trivy, 'fs', '--scanners', 'secret', '--exit-code', '1',
                      '--skip-dirs', '.local',
                      '--skip-dirs', 'node_modules', '--skip-dirs', 'work', '--skip-dirs', '.git',
+                     '--skip-dirs', 'infra/acceptance-guard/.terraform', '--skip-dirs', 'infra/acceptance-runtime/.terraform',
                      '--skip-dirs', 'infra/aws/.terraform', '--skip-dirs', 'infra/foundation/.terraform',
                      '--format', 'json', '--output', str(args.output/'secrets.json'), '.'])
     results = []
