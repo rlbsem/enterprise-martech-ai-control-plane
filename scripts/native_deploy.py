@@ -30,6 +30,23 @@ def review_plan(plan, phase):
     return len(plan["resource_changes"])
 
 
+def guard_deadline_gate(document, manifest):
+    """Bind deferred clocks to the approved plan; explicit deadlines retain the old bound."""
+    from datetime import UTC, datetime
+
+    deadline = document["variables"]["cleanup_at"]["value"]
+    if deadline is None:
+        expected = "three_hours_from_guard_apply_start"
+        policy = document["output_changes"]["guard_manifest"]["after"]["deadline_policy"]
+        if manifest.get("deadline_policy") != expected or policy != expected:
+            raise ValueError("Explicit deployment-anchored clock approval required")
+        unknown = document["output_changes"]["guard_manifest"]["after_unknown"]
+        if not unknown.get("cleanup_at") or not unknown.get("deployment_started_at"):
+            raise ValueError("Deployment timestamps must resolve only at apply")
+    elif not 0 < (datetime.fromisoformat(deadline) - datetime.now(UTC)).total_seconds() <= 10800:
+        raise ValueError("Guard deadline must be within three hours")
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--phase", choices=["guard", "runtime"], required=True)
@@ -66,14 +83,7 @@ def main():
             p.error("Approved guard code mismatch")
     else:
         account_gate(manifest, clients)
-        from datetime import UTC, datetime
-
-        if (
-            not 0
-            < (datetime.fromisoformat(manifest["cleanup_at"]) - datetime.now(UTC)).total_seconds()
-            <= 10800
-        ):
-            p.error("Guard deadline must be within three hours")
+        guard_deadline_gate(document, manifest)
     subprocess.run(
         [a.terraform, f"-chdir={root}", "apply", "-input=false", str(a.plan.resolve())], check=True
     )

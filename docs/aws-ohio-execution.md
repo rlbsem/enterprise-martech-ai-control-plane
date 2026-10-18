@@ -57,8 +57,8 @@ not public environment variables in GitHub logs.
    private state/evidence outputs. Creating it also requires owner approval.
 2. Build the deterministic small guard bundle:
    `python scripts/package_native_guard.py .local/native-guard.zip`.
-   Prepare private guard variables with pinned account/run, UTC `cleanup_at` within three hours,
-   and the bundle path. Initialize `infra/acceptance-guard` with its **local private backend**.
+   Prepare private guard variables with pinned account/run and `cleanup_at: null`,
+   and the bundle path. A nonbillable local Terraform clock stores the first deployment timestamp at apply and preserves it across retries. The saved plan starts cleanup three hours later and ends scheduled passes four hours later; approval time does not consume that window. Fixed timestamps remain supported for explicit test configurations. Initialize `infra/acceptance-guard` with its **local private backend**.
    Generate the saved guard plan, inspect it, record its SHA-256 and use
    `python scripts/native_deploy.py --phase guard --plan <absolute-plan> --approved-sha256 <digest> --manifest <private-identity-json> --execute`.
    The guard's initial state must be archived privately; it is independent of runtime state.
@@ -105,7 +105,7 @@ not public environment variables in GitHub logs.
 
 ## Evidence boundaries and verification
 
-[Current local evidence](evidence/aws-readiness/implementation/README.md) covers actual PostgreSQL/HTTP
+[Current local verification](evidence/aws-readiness/deployment-clock/local/verification.json) and [infrastructure checks](evidence/aws-readiness/deployment-clock/infrastructure/verification.json) covers actual PostgreSQL/HTTP
 regressions, new local SQL fixture tests, mocked controller/guard fault tests, pinned Terraform
 validation/mock tests and static security checks. Native RDS/PITR, native cleanup and final IAM
 permissions remain unexecuted. Public evidence must contain only sanitized results and hashed

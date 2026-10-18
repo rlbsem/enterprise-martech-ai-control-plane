@@ -23,21 +23,32 @@ variable "run_id" {
   }
 }
 variable "cleanup_at" {
-  type = string
+  type    = string
+  default = null
   validation {
-    condition     = can(formatdate("YYYY-MM-DD'T'hh:mm:ssZ", var.cleanup_at))
-    error_message = "UTC cleanup timestamp required."
+    condition     = var.cleanup_at == null || can(formatdate("YYYY-MM-DD'T'hh:mm:ssZ", var.cleanup_at))
+    error_message = "Use null for a deployment-anchored three-hour clock, or an explicit UTC deadline."
   }
 }
 variable "bundle" { type = string }
+# Local state only: freeze the first apply timestamp so retries cannot extend the window.
+resource "terraform_data" "deployment_clock" {
+  count = var.cleanup_at == null ? 1 : 0
+  input = timestamp()
+  lifecycle { ignore_changes = [input] }
+}
 locals {
-  name         = "csa-native-${var.run_id}"
-  functions    = toset(["watchdog", "checker"])
-  runtime_tag  = { StringEquals = { "aws:ResourceTag/AcceptanceRun" = var.run_id } }
-  read_actions = ["sts:GetCallerIdentity", "rds:DescribeDBInstances", "rds:DescribeDBSnapshots", "rds:DescribeDBInstanceAutomatedBackups", "rds:DescribeDBSubnetGroups", "rds:DescribeDBParameterGroups", "ecs:DescribeClusters", "ecs:ListTasks", "ecs:ListTaskDefinitions", "ecr:DescribeRepositories", "ecr:DescribeImages", "secretsmanager:ListSecrets", "logs:DescribeLogGroups", "kms:ListKeys", "kms:DescribeKey", "kms:ListResourceTags", "ec2:DescribeVpcs", "ec2:DescribeVpcEndpoints", "ec2:DescribeNetworkInterfaces", "ec2:DescribeRouteTables", "ec2:DescribeSecurityGroups", "ec2:DescribeSubnets", "iam:ListRoles"]
-  trust        = jsonencode({ Version = "2012-10-17", Statement = [{ Effect = "Allow", Principal = { Service = "lambda.amazonaws.com" }, Action = "sts:AssumeRole" }] })
+  name                  = "csa-native-${var.run_id}"
+  deployment_started_at = var.cleanup_at == null ? terraform_data.deployment_clock[0].output : timeadd(var.cleanup_at, "-3h")
+  cleanup_deadline      = timeadd(local.deployment_started_at, "3h")
+  deadline_policy       = var.cleanup_at == null ? "three_hours_from_guard_apply_start" : "fixed_deadline"
+  functions             = toset(["watchdog", "checker"])
+  runtime_tag           = { StringEquals = { "aws:ResourceTag/AcceptanceRun" = var.run_id } }
+  read_actions          = ["sts:GetCallerIdentity", "rds:DescribeDBInstances", "rds:DescribeDBSnapshots", "rds:DescribeDBInstanceAutomatedBackups", "rds:DescribeDBSubnetGroups", "rds:DescribeDBParameterGroups", "ecs:DescribeClusters", "ecs:ListTasks", "ecs:ListTaskDefinitions", "ecr:DescribeRepositories", "ecr:DescribeImages", "secretsmanager:ListSecrets", "logs:DescribeLogGroups", "kms:ListKeys", "kms:DescribeKey", "kms:ListResourceTags", "ec2:DescribeVpcs", "ec2:DescribeVpcEndpoints", "ec2:DescribeNetworkInterfaces", "ec2:DescribeRouteTables", "ec2:DescribeSecurityGroups", "ec2:DescribeSubnets", "iam:ListRoles"]
+  trust                 = jsonencode({ Version = "2012-10-17", Statement = [{ Effect = "Allow", Principal = { Service = "lambda.amazonaws.com" }, Action = "sts:AssumeRole" }] })
 }
 resource "aws_kms_key" "guard" {
+  tags                    = { GuardDeploymentStartedAt = local.deployment_started_at }
   description             = "Independent cleanup evidence ${var.run_id}"
   enable_key_rotation     = true
   deletion_window_in_days = 7
@@ -46,7 +57,10 @@ resource "aws_kms_key" "guard" {
     { Effect = "Allow", Principal = { Service = "logs.us-east-2.amazonaws.com" }, Action = ["kms:Encrypt", "kms:Decrypt", "kms:ReEncrypt*", "kms:GenerateDataKey*", "kms:DescribeKey"], Resource = "*", Condition = { ArnLike = { "kms:EncryptionContext:aws:logs:arn" = "arn:aws:logs:us-east-2:${var.account_id}:log-group:/aws/lambda/${local.name}-*" } } }
   ] })
 }
-resource "aws_s3_bucket" "guard" { bucket = "${local.name}-guard-${var.account_id}" }
+resource "aws_s3_bucket" "guard" {
+  bucket = "${local.name}-guard-${var.account_id}"
+  tags   = { GuardDeploymentStartedAt = local.deployment_started_at }
+}
 resource "aws_s3_bucket_public_access_block" "guard" {
   bucket                  = aws_s3_bucket.guard.id
   block_public_acls       = true
@@ -84,6 +98,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "guard" {
   }
 }
 resource "aws_sqs_queue" "failures" {
+  tags                      = { GuardDeploymentStartedAt = local.deployment_started_at }
   name                      = "${local.name}-cleanup-failures"
   sqs_managed_sse_enabled   = true
   message_retention_seconds = 604800
@@ -152,7 +167,7 @@ resource "aws_lambda_function" "guard" {
   reserved_concurrent_executions = 1
   environment {
     variables = {
-      RUN_ID      = var.run_id, ACCOUNT_ID = var.account_id, CLEANUP_AT = var.cleanup_at,
+      RUN_ID      = var.run_id, ACCOUNT_ID = var.account_id, CLEANUP_AT = local.cleanup_deadline,
       DISPOSITION = "discard_isolated_synthetic_state", GUARD_BUCKET = aws_s3_bucket.guard.id, GUARD_KEY_ARN = aws_kms_key.guard.arn,
       CHECKER_ARN = "arn:aws:lambda:us-east-2:${var.account_id}:function:${local.name}-checker"
     }
@@ -185,8 +200,8 @@ resource "aws_scheduler_schedule" "cleanup" {
   group_name                   = "default"
   schedule_expression          = "rate(1 minute)"
   schedule_expression_timezone = "UTC"
-  start_date                   = var.cleanup_at
-  end_date                     = timeadd(var.cleanup_at, "1h")
+  start_date                   = local.cleanup_deadline
+  end_date                     = timeadd(local.cleanup_deadline, "1h")
   state                        = "ENABLED"
   flexible_time_window { mode = "OFF" }
   target {
@@ -202,7 +217,7 @@ resource "aws_scheduler_schedule" "cleanup" {
   depends_on = [aws_iam_role_policy.schedule, aws_lambda_function_event_invoke_config.guard]
 }
 output "guard_manifest" {
-  value = { account = var.account_id, region = "us-east-2", run = var.run_id, cleanup_at = var.cleanup_at,
+  value = { account = var.account_id, region = "us-east-2", run = var.run_id, cleanup_at = local.cleanup_deadline, deployment_started_at = local.deployment_started_at, deadline_policy = local.deadline_policy,
     watchdog          = aws_lambda_function.guard["watchdog"].function_name, schedule = aws_scheduler_schedule.cleanup.name,
     guard_code_sha256 = filebase64sha256(var.bundle), guard_bucket = aws_s3_bucket.guard.id,
     checker           = aws_lambda_function.guard["checker"].function_name, queue = aws_sqs_queue.failures.id,

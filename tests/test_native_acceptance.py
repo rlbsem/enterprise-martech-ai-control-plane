@@ -484,3 +484,41 @@ def test_inactive_task_metadata_deletion_failure_stays_visible():
     result = cleanup_pass(SimpleNamespace(collect=lambda: rows), {"ecs": ecs})
     assert result["failed_kinds"] == ["task_definition"]
     assert not result["before"]["all_resources_absent"]
+
+
+def test_guard_apply_time_clock_requires_explicit_approval():
+    module = script("native_deploy")
+    document = {
+        "variables": {"cleanup_at": {"value": None}},
+        "output_changes": {
+            "guard_manifest": {
+                "after": {"deadline_policy": "three_hours_from_guard_apply_start"},
+                "after_unknown": {"cleanup_at": True, "deployment_started_at": True},
+            }
+        },
+    }
+    module.guard_deadline_gate(document, {"deadline_policy": "three_hours_from_guard_apply_start"})
+    with pytest.raises(ValueError, match="approval"):
+        module.guard_deadline_gate(document, {})
+
+
+def test_guard_cannot_substitute_known_timestamp_for_deployment_clock():
+    module = script("native_deploy")
+    document = {
+        "variables": {"cleanup_at": {"value": None}},
+        "output_changes": {
+            "guard_manifest": {
+                "after": {"deadline_policy": "three_hours_from_guard_apply_start"},
+                "after_unknown": {"cleanup_at": False, "deployment_started_at": False},
+            }
+        },
+    }
+    with pytest.raises(ValueError, match="only at apply"):
+        module.guard_deadline_gate(document, {"deadline_policy": "three_hours_from_guard_apply_start"})
+
+
+def test_explicit_old_deadline_still_expires():
+    with pytest.raises(ValueError, match="within three hours"):
+        script("native_deploy").guard_deadline_gate(
+            {"variables": {"cleanup_at": {"value": "2020-01-01T00:00:00Z"}}}, {}
+        )

@@ -31,3 +31,28 @@ run "identity_rejected" {
   expect_failures = [var.run_id]
   # Valid names are not authority. Account/Free-plan/deadline checks are independently exercised in Python.
 }
+run "deployment_clock_starts_at_apply" {
+  command = apply
+  variables { cleanup_at = null }
+  assert {
+    condition     = aws_scheduler_schedule.cleanup.start_date == timeadd(output.guard_manifest.deployment_started_at, "3h") && aws_scheduler_schedule.cleanup.end_date == timeadd(output.guard_manifest.deployment_started_at, "4h")
+    error_message = "The execution and cleanup windows must start at this deployment, not planning or approval time."
+  }
+  assert {
+    condition     = alltrue([for f in aws_lambda_function.guard : f.environment[0].variables["CLEANUP_AT"] == aws_scheduler_schedule.cleanup.start_date]) && aws_kms_key.guard.tags["GuardDeploymentStartedAt"] == output.guard_manifest.deployment_started_at && aws_s3_bucket.guard.tags["GuardDeploymentStartedAt"] == output.guard_manifest.deployment_started_at && aws_sqs_queue.failures.tags["GuardDeploymentStartedAt"] == output.guard_manifest.deployment_started_at
+    error_message = "All guard timers and first chargeable resources must share one deployment clock."
+  }
+  assert {
+    condition     = output.guard_manifest.deadline_policy == "three_hours_from_guard_apply_start"
+    error_message = "The deployed manifest must declare its approved clock policy."
+  }
+}
+
+run "retry_preserves_original_clock" {
+  command = plan
+  variables { cleanup_at = null }
+  assert {
+    condition     = output.guard_manifest.deployment_started_at == run.deployment_clock_starts_at_apply.guard_manifest.deployment_started_at && output.guard_manifest.cleanup_at == run.deployment_clock_starts_at_apply.guard_manifest.cleanup_at
+    error_message = "A retry or later plan must not restart or extend the original execution window."
+  }
+}
