@@ -1,0 +1,10 @@
+2026-10-18T00:38:49-04:00	INFO	[misconfig] Misconfiguration scanning is enabled
+2026-10-18T00:38:49-04:00	INFO	[checks-client] Using existing checks from cache	path="C:\\Users\\rlbse\\AppData\\Local\\trivy\\policy\\content"
+2026-10-18T00:38:50-04:00	INFO	[terraform scanner] Scanning root module	file_path="aws"
+2026-10-18T00:38:50-04:00	INFO	[terraform scanner] Scanning root module	file_path="foundation"
+2026-10-18T00:38:50-04:00	INFO	Detected config files	num=5
+
+ðŸ“£ [34mNotices:[0m
+  - Version 0.76.0 of Trivy is now available, current version is 0.75.0
+
+To suppress version checks, run Trivy scans with the --skip-version-check flag

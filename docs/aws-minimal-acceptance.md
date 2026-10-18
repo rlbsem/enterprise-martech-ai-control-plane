@@ -1,5 +1,11 @@
 # Minimum secure native acceptance
 
+**Latest region correction:** [Ohio preflight](evidence/aws-readiness/ohio/README.md)
+supersedes the account-wide-block interpretation below. AWS documents Canada projects
+in `us-east-2`; 29 independent reads there succeeded. The new
+[Ohio acceptance proposal](aws-ohio-acceptance.md) separates Single-AZ/PITR from full
+production acceptance. Historical denied-call records remain unchanged.
+
 **2026-10-18 update:** AWS Core now provides a real authenticated read-only connection.
 Account and billing checks succeeded, while resource discovery encountered explicit
 organization-policy denials. See the [sanitized native account preflight](evidence/aws-readiness/account-preflight/README.md).

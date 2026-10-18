@@ -1,0 +1,97 @@
+{
+  "region": "us-east-2",
+  "sources": {
+    "AmazonRDS": {
+      "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonRDS/current/us-east-2/index.json",
+      "retrieved_at": "2026-10-18T04:36:29.620198+00:00",
+      "publication_date": "2026-10-06T22:40:50Z",
+      "catalog_sha256": "920ba086051a5ed56fe415da6eeb5abb21cf482d6de92e77f6bfda6925893676"
+    },
+    "AmazonVPC": {
+      "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonVPC/current/us-east-2/index.json",
+      "retrieved_at": "2026-10-18T04:36:24.418642+00:00",
+      "publication_date": "2026-10-16T22:43:21Z",
+      "catalog_sha256": "d39be27486a06c9769bc61dd77206d8d9f8a95a9495986fe42d1b93a23e0f2e4"
+    },
+    "AmazonECS": {
+      "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonECS/current/us-east-2/index.json",
+      "retrieved_at": "2026-10-18T04:36:25.211864+00:00",
+      "publication_date": "2026-09-11T12:44:25Z",
+      "catalog_sha256": "affdf951a33a6c721ab915d2d88420ca1fc6589e7a529d8dfd238823606ee85a"
+    },
+    "AWSSecretsManager": {
+      "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AWSSecretsManager/current/us-east-2/index.json",
+      "retrieved_at": "2026-10-18T04:36:24.313276+00:00",
+      "publication_date": "2026-09-11T12:46:10Z",
+      "catalog_sha256": "357a59b1b57c45ad0c7514e0e5b069c047d33e7ca7f1ee9dfdc7d215a41abdbe"
+    },
+    "awskms": {
+      "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/awskms/current/us-east-2/index.json",
+      "retrieved_at": "2026-10-18T04:36:24.614093+00:00",
+      "publication_date": "2026-09-11T12:46:01Z",
+      "catalog_sha256": "0b28db07f59503170a20b90890a8542625c53c9030ed3383b01c90f861b4353c"
+    },
+    "CodeBuild": {
+      "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/CodeBuild/current/us-east-2/index.json",
+      "retrieved_at": "2026-10-18T04:36:26.212681+00:00",
+      "publication_date": "2026-09-11T12:46:25Z",
+      "catalog_sha256": "2cdc9a8a574bc23055c149d9814ac42996ebb0a9249d8274c8e3ffab9eeb7818"
+    }
+  },
+  "rates": {
+    "rds_instance_hour": {
+      "sku": "GGD6FE59WWUNDKDC",
+      "description": "$ 0.016 per RDS db.t4g.micro Single-AZ instance hour (or partial hour) running PostgreSQL",
+      "usd": "0.0160000000",
+      "unit": "Hrs"
+    },
+    "rds_gp3_gb_month": {
+      "sku": "JQQGK6D789TWJF8B",
+      "description": "$0.115 per GB-month of provisioned GP3 storage running PostgreSQL",
+      "usd": "0.1150000000",
+      "unit": "GB-Mo"
+    },
+    "rds_backup_gb_month": {
+      "sku": "HQRQUXJ6DAN3XS6X",
+      "description": "$0.095 per additional GB-month of backup storage exceeding free allocation running PostgreSQL",
+      "usd": "0.0950000000",
+      "unit": "GB-Mo"
+    },
+    "endpoint_az_hour": {
+      "sku": "P2Q7Y6KZKKFAHEVG",
+      "description": "$0.01 per VPC Endpoint Hour",
+      "usd": "0.0100000000",
+      "unit": "Hrs"
+    },
+    "fargate_vcpu_hour": {
+      "sku": "UGSJ89BUWB7SMJ6A",
+      "description": "AWS Fargate - vCPU  - US East 2 (Ohio)",
+      "usd": "0.0404800000",
+      "unit": "hours"
+    },
+    "fargate_gb_hour": {
+      "sku": "HH5EE3ZFWSFKGKWM",
+      "description": "AWS Fargate - Memory  - US East 2 (Ohio)",
+      "usd": "0.0044450000",
+      "unit": "hours"
+    },
+    "secret_month": {
+      "sku": "HHK3AZN6HN5CFDJM",
+      "description": "$0.40 per Secret",
+      "usd": "0.4000000000",
+      "unit": "Secrets"
+    },
+    "kms_key_month": {
+      "sku": "FEMX7ZQ4DJ6QE2KP",
+      "description": "$1 per customer managed KMS key version in US East (Ohio)",
+      "usd": "1.0000000000",
+      "unit": "Keys"
+    },
+    "codebuild_minute": {
+      "sku": "9343EGWDZJRG5FR6",
+      "description": "AWS CodeBuild - Build minutes on build.general1.small - US East (Ohio)",
+      "usd": "0.0050000000",
+      "unit": "minutes"
+    }
+  }
+}

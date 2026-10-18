@@ -1,0 +1,160 @@
+# Ohio Free-plan database/PITR acceptance proposal
+
+**Status: read-only preflight executed; provisioning not authorized.** No Paid-plan
+upgrade, advanced-feature activation, out-of-pocket expense or resource creation is
+authorized. The existing Canadian-region production Terraform, release manifest guards,
+Multi-AZ witness and all historical evidence remain unchanged.
+
+## Region correction and verified inventory
+
+AWS's [project-region table](https://docs.aws.amazon.com/accounts/latest/reference/project-regions.html)
+assigns Canadian projects to `us-east-2`. Independent Ohio reads succeeded for RDS,
+ECS, EC2 and supporting services. This corroborates the region assignment; no direct
+project-settings metadata read is claimed. The prior `ca-central-1` SCP denials are
+real historical observations, **not evidence that this account cannot use those services
+in Ohio**. They must not be erased or reinterpreted as empty inventories.
+
+[The sanitized Ohio record](evidence/aws-readiness/ohio/inventory.json) contains 29
+successful read calls and zero mutations. RDS instances/snapshots/subnet groups, ECS
+clusters, EC2 instances, managed SSM nodes, private endpoints, ECR repositories, secrets,
+log groups, Lambda functions and Scheduler schedules were empty in the queried region.
+One default VPC and three default subnets exist. Those subnets assign public IPs and
+their main route table has an internet gateway; they are **not** ready-made private
+acceptance subnets. Preserve them and do not modify project-managed roles or policies.
+
+The account's Free-plan state and remaining credit balance were rechecked privately.
+The regional catalog offers PostgreSQL `17.11`, `db.t4g.micro`, encrypted gp3 and a
+20-GB minimum for that storage type. An exact engine lookup reports `available`.
+Quota reads support planning a three-instance peak, but neither quotas nor orderable
+options establish effective permission to create an instance or restore it.
+
+## Minimal candidate, separate from production
+
+| Component | Proposed bound |
+|---|---|
+| Region and namespace | `us-east-2`; unique acceptance-run namespace and ownership tags |
+| Control and independent receipts | Two separate encrypted Single-AZ PostgreSQL 17.11 micro instances, 20 GB gp3 each |
+| PITR | At most one additional identical control restore; original control and receipt store retained during reconciliation |
+| Backup and SQL safety | 14-day automated backup configuration, TLS `verify-full`, forced TLS parameter group, fixed storage cap, no public DB endpoint |
+| Network | Separate VPC and two private subnets across AZs; local routes only; no NAT, public tasks, ALB, custom DNS, ACM, VPN or paid Private CA |
+| Task access | Four interface endpoints in one task AZ: ECR API/Docker, Logs and Secrets Manager; S3 gateway for image layers |
+| Compute | One-off bootstrap, isolated synthetic fixture writers and read-only verifier; no persistent ECS services, at most two concurrent tasks and eight aggregate task-hours |
+| Credentials | Runtime retrieval only; scoped separate identities for control writes, independent receipt writes and verification; no owner credentials in fixture writers |
+| Deadline | Four hours from first billable creation; stop new experiments and begin cleanup at hour three |
+| Cleanup/image builds | At most 60 small CodeBuild minutes, separate cloud-side scheduling and independent read-only post-check |
+
+RDS's [current Free Tier guide](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html)
+describes Single-AZ micro options. Use those as a conservative eligibility candidate;
+do not transfer the old 750-hour offer to this credit-based project. The regional
+catalog's `MultiAZCapable` flag is a service capability, **not** proof that Multi-AZ is
+permitted by this project's plan. Existing production Multi-AZ defaults are preserved.
+
+The narrower lane needs its own reviewed configuration and manifest. Do **not** change
+`infra/aws` to Ohio, relax `Release` region validation, or run the production
+`aws_acceptance` collector against a smaller topology and call its missing checks passed.
+That collector intentionally expects the production service topology and Multi-AZ.
+No deployable smaller Terraform root or complete native fixture executor is claimed yet.
+
+## Native experiment and independent facts
+
+1. After explicit owner approval, recheck `FREE`/`ACTIVE`, credit headroom and the exact
+   home region. Refuse Paid/expired/unavailable state. Never call account-upgrade,
+   advanced-feature activation, organization-join or commitment-purchase APIs. If any
+   required service demands an upgrade, stop; do not silently substitute a paid path.
+2. Review the actual scoped resource plan and arm the independent cleanup mechanism
+   before starting database provisioning. Track every ID immediately, including partial
+   creations and managed-owner secrets. Keep all raw plans, IDs and logs private.
+3. Bootstrap the existing schema and restricted SQL roles on separate control/receipt
+   databases. Use the repository's source revision and immutable container digest.
+   Confirm SQL role denial boundaries and read-only verifier privileges natively.
+4. Establish an actual restorable time **before** a known fixture intent/effect. Commit
+   a deterministic synthetic intent and its matching receipt using separate identities.
+   Preserve the stable key, immutable content hash and independently committed receipt.
+   Compare actual source ledgers through `operations.recovery_snapshot`; require a pass.
+5. Quiesce writers and prove no write-capable tasks remain. Restore **only control** to
+   that earlier time; never restore the independent receipt database. Wait for actual
+   RDS availability and independently check private/encrypted/Single-AZ/TLS settings,
+   backups and roles. Do not manufacture a restore gap by deleting a local row.
+6. Read the restored control and unchanged receipt store with the verifier identity.
+   Require the remote-ahead finding and `safe_to_resume=false`. No resume operation is
+   permitted from an old report. Preserve the failed gate as successful evidence of
+   fail-closed behavior, not as a failed experiment to hide.
+7. Rebind to the preserved original control or a separately approved later recovery
+   point, rerun a fresh independent comparison and only then consider reopening.
+   A second restore is outside the one-restore bound and needs another approval.
+
+This proves native managed PostgreSQL/PITR and ledger reconciliation **only if it
+actually executes**. Direct SQL fixture writes are not HTTP delivery, real customer
+outcomes, ECS worker recovery or application release/rollback proof. Multi-AZ failover,
+HTTPS ingress, consent races through the live API and full ECS application acceptance
+remain a later, separate milestone. Preserve the existing local proof for those controls.
+
+Backup readiness and PITR can exceed a four-hour window. If no valid recovery point
+becomes available with cleanup time remaining, record incomplete native acceptance and
+tear down. Do not extend the run automatically or claim success from a snapshot listing.
+
+## Reproducible credit estimate
+
+[Public Ohio catalog rates](evidence/aws-readiness/ohio/public-rates.json) retain source
+URLs, retrieval/publication dates, SKUs and catalog hashes. Reproduce the estimate:
+
+```bash
+python scripts/estimate_ohio_acceptance.py
+```
+
+[The result](evidence/aws-readiness/ohio/credit-estimate.json) models **USD 1.942795**
+in credit consumption, including fixed contingency allowances for unmetered supporting
+items. Propose a **USD 5 credit planning allowance** for four hours. It is not a hard cap
+or measured consumption. No legacy free-usage deductions are assumed.
+
+| Main rate/quantity | USD credit equivalent |
+|---|---:|
+| Three micro RDS instances for all four hours, at 0.016/hour | 0.192000 |
+| 60 GB gp3, prorated at 0.115/GB-month | 0.037808 |
+| 60 GB additional-backup allowance at 0.095/GB-month | 0.031233 |
+| Four interface endpoint AZ units for four hours at 0.01/hour | 0.160000 |
+| Eight aggregate quarter-vCPU/half-GB task-hours | 0.098740 |
+| Eight secrets and one KMS key, prorated | 0.023014 |
+| 60 small CodeBuild minutes at 0.005/minute | 0.300000 |
+| Logs, requests, transfer, scheduler/checker and residual allowances | 1.100000 |
+
+Regional reads establish discovery availability, **not create/restore/RunTask eligibility**.
+RDS has no harmless create/PITR dry-run that proves all write conditions. No write probe
+was attempted. Final permissions/service availability must be checked against the exact
+plan; any denied creation must fail closed without requesting advanced/Paid activation.
+Credit checks must continue during the run. Do not represent a remaining-credit API
+response as a universal cost cap or an authorization to provision.
+
+## Reliable teardown design and remaining implementation
+
+A laptop timer is insufficient. Use a one-shot EventBridge Scheduler in Ohio to start
+a separate, non-VPC cleanup runner at hour three, with bounded retries and a private
+failure notification. An outside-VPC CodeBuild runner can call AWS control-plane APIs
+without depending on the runtime endpoints it will delete. Its role must cover only
+the uniquely tagged acceptance resources and exact recorded IDs, including the restore.
+The schedule, runner, role and private cleanup bundle must be observed armed before
+the first database is created. Their own lifecycle belongs to a separate guard inventory.
+
+The reviewed cleanup configuration must explicitly handle RDS deletion protection and
+Terraform `prevent_destroy`, approve disposal of isolated synthetic state, and include
+the out-of-state PITR target. Never weaken the production root's protections. Generate
+and validate the final saved destroy plan against the approved exact inventory using
+the existing `controlplane.teardown` tool. A zero exit code does not prove absence.
+
+After deletion, a **separate read-only identity/job** must enumerate databases, snapshots,
+retained automated backups, ECS tasks, ECR images/repositories, endpoints/ENIs, runtime
+secrets, log groups, keys pending deletion and guard resources. Compare against both
+the recorded IDs and unique run tags, to detect an unrecorded partial creation. Disclose
+scheduled key/secret deletion and retained storage; never claim account-wide zero cost
+from an empty ECS cluster. Reconcile later credit/usage reporting after its delay.
+
+The existing independent checker covers only some resource types and reports others
+unsupported. Extending residual coverage, building the isolated native fixture/root,
+and implementing/validating the cloud-side watchdog are required **before** unattended
+provisioning. None is claimed deployed or complete here. If those controls or their
+Free-plan service permissions cannot be established, remain blocked rather than launch
+an environment with no reliable teardown.
+
+**Approval status: not requested by a tool or granted for resource creation.** This
+document is the reviewable architecture and credit proposal. Native deployment/PITR
+remains the next milestone; PR #4 stays draft and must not be merged before that review.

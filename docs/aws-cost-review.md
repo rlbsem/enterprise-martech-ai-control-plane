@@ -1,5 +1,10 @@
 # Isolated AWS cost and teardown review
 
+**Current candidate:** The [Ohio database/PITR proposal](aws-ohio-acceptance.md) has its
+own public-rate calculator and a USD 5 credit planning allowance. It supersedes this
+older full-design worksheet for the next Free-plan milestone. The existing production
+design and original estimate are retained; no deployment or spending is authorized.
+
 **Free-plan boundary:** This worksheet prices the existing full Multi-AZ design, not a
 validated Free-plan deployment. The [native account preflight](evidence/aws-readiness/account-preflight/README.md)
 found resource-discovery denials and documents the narrower eligible RDS shape. No
