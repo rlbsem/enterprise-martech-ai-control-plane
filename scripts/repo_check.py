@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--verification-record', default='docs/evidence/aws-readiness/free-retention/local/verification.json')
+    parser.add_argument('--verification-record', default='docs/evidence/aws-readiness/rds-bootstrap/local/verification.json')
     parser.add_argument('--infrastructure-record', default='docs/evidence/aws-readiness/free-retention/infrastructure/verification.json')
     args = parser.parse_args()
     names = subprocess.check_output(['git', 'ls-files', '--cached', '--others', '--exclude-standard'],

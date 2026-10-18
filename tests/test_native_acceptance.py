@@ -614,3 +614,16 @@ def test_native_database_requires_actual_nonzero_pinned_retention(days, accepted
     else:
         with pytest.raises(RuntimeError):
             NativeRun(manifest(), c).database("db")
+
+
+
+def test_native_failure_diagnostic_never_serializes_secret_messages():
+    import json
+    from controlplane.native_tasks import safe_failure
+    exc = RuntimeError('password=never-publish-this-value')
+    exc.response = {'Error': {'Code': 'AccessDeniedException', 'Message': 'never-publish-this-value'}}
+    result = safe_failure(exc)
+    assert result['error_type'] == 'RuntimeError'
+    assert result['aws_code'] == 'AccessDeniedException'
+    assert 'never-publish-this-value' not in json.dumps(result)
+    assert 'Message' not in json.dumps(result)

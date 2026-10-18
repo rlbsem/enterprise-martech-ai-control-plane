@@ -44,10 +44,20 @@ def configure(service, client):
 
 
 def role(c, name, password):
-    if not c.execute('SELECT 1 FROM pg_roles WHERE rolname=%s', (name,)).fetchone():
+    # Managed RDS owners have CREATEROLE, not PostgreSQL superuser. Do not issue
+    # superuser-only attribute changes, even to set an attribute to false.
+    query = """SELECT rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolbypassrls,
+        EXISTS(SELECT 1 FROM pg_auth_members m WHERE m.member=r.oid) AS inherits_roles
+        FROM pg_roles r WHERE rolname=%s"""
+    attributes = c.execute(query, (name,)).fetchone()
+    if attributes is None:
         c.execute(sql.SQL('CREATE ROLE {} LOGIN').format(sql.Identifier(name)))
-    c.execute(sql.SQL('ALTER ROLE {} PASSWORD {} NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS')
-              .format(sql.Identifier(name), sql.Literal(password)))
+        attributes = c.execute(query, (name,)).fetchone()
+    required = {'rolsuper', 'rolcreatedb', 'rolcreaterole', 'rolreplication',
+                'rolbypassrls', 'inherits_roles'}
+    if attributes is None or set(attributes) != required or any(attributes.values()):
+        raise ValueError('Refuse administrative or inheriting application role')
+    c.execute(sql.SQL('ALTER ROLE {} PASSWORD {}').format(sql.Identifier(name), sql.Literal(password)))
 
 
 def grants(control_dsn, remote_dsn):

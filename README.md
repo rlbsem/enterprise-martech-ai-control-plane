@@ -51,7 +51,7 @@ cost approval; these records do not claim a deployed AWS environment.
 [Ohio preflight](docs/evidence/aws-readiness/ohio/README.md) independently confirmed
 regional access and corrected the earlier Canadian-region denial diagnosis. The
 [separate Single-AZ/PITR proposal](docs/aws-ohio-acceptance.md) preserves the production
-architecture. The [executable Ohio fixture, isolated Terraform and independent cleanup guard](docs/aws-ohio-execution.md) are implemented and locally tested. The [isolated guard and image bootstrap have deployed and passed native arming/checker and exact image read-back checks](docs/evidence/aws-readiness/guard-native/README.md). The [approved native runtime is provisioning after provider-compatibility corrections](docs/evidence/aws-readiness/free-retention/README.md); SQL/PITR acceptance remains pending.
+architecture. The [executable Ohio fixture, isolated Terraform and independent cleanup guard](docs/aws-ohio-execution.md) are implemented and locally tested. The [isolated guard and image bootstrap have deployed and passed native arming/checker and exact image read-back checks](docs/evidence/aws-readiness/guard-native/README.md). The [native RDS runtime has deployed](docs/evidence/aws-readiness/free-retention/README.md) and [bootstrap is being corrected against the restricted RDS owner](docs/evidence/aws-readiness/rds-bootstrap/README.md); SQL/PITR acceptance remains pending.
 The [minimal acceptance assessment](docs/aws-minimal-acceptance.md) explains which
 recovery tests can run without ACM, custom DNS, an ALB or a workstation VPN.
 
@@ -130,4 +130,4 @@ python scripts/validate_infra.py
 | Restore and operations | [Read-only comparison](src/controlplane/operations.py), [PITR tool](src/controlplane/restore.py), [runbook](docs/cloud-operations.md) |
 | Verification | [Generated test proof](docs/evidence/verification.json), [infrastructure checks](docs/evidence/infrastructure/verification.json), [validation guide](docs/validation.md), [GitHub Actions](https://github.com/rlbsem/enterprise-martech-ai-control-plane/actions) |
 
-The isolated guard/image bootstrap executed and approved native databases are provisioning; production deployment, live failover and PITR remain [environment acceptance checks](docs/cloud-operations.md).
+The isolated guard, image bootstrap and native RDS runtime have deployed; production deployment, live failover and PITR remain [environment acceptance checks](docs/cloud-operations.md).

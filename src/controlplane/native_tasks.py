@@ -3,6 +3,8 @@
 import json
 import os
 import sys
+import traceback
+from pathlib import Path
 from uuid import UUID, NAMESPACE_URL, uuid5
 
 import boto3
@@ -13,6 +15,21 @@ from psycopg.types.json import Jsonb
 from . import cloud, db, operations, service
 from .contracts import Proposal, SourceEvent
 from .policy import digest
+
+
+def safe_failure(exc):
+    """Codes and source locations only; never serialize messages, locals or SQL."""
+    return {
+        "error_type": type(exc).__name__,
+        "sqlstate": getattr(exc, "sqlstate", None),
+        "aws_code": getattr(exc, "response", {}).get("Error", {}).get("Code"),
+        "operation": getattr(exc, "operation_name", None),
+        "locations": [
+            {"file": Path(frame.filename).name, "function": frame.name, "line": frame.lineno}
+            for frame in traceback.extract_tb(exc.__traceback__)
+            if Path(frame.filename).name in {"native_tasks.py", "cloud.py", "db.py"}
+        ],
+    }
 
 
 def control_fixture(run):
@@ -138,5 +155,6 @@ def main():
 if __name__ == "__main__":
     try:
         raise SystemExit(main())
-    except Exception:
+    except Exception as exc:
+        print(json.dumps({"native_failure": safe_failure(exc)}), flush=True)
         raise SystemExit("Native task failed closed; inspect private configuration") from None

@@ -1,6 +1,6 @@
 # Isolated Ohio native acceptance implementation
 
-**The isolated guard and image bootstrap have deployed and passed native arming/checker and exact image read-back checks; approved native database provisioning is in progress; SQL/PITR and teardown have not executed.** See [native guard evidence](evidence/aws-readiness/guard-native/README.md).
+**The isolated guard and image bootstrap have deployed and passed native arming/checker and exact image read-back checks; the approved native RDS runtime has deployed; bootstrap is being corrected against the restricted RDS owner, and SQL/PITR acceptance and teardown have not completed.** See [native guard evidence](evidence/aws-readiness/guard-native/README.md).
 This lane supplements the unchanged production design. It proves only managed PostgreSQL,
 independent SQL receipts and recovery refusal if the native run succeeds. It does not prove
 live API dispatch, worker recovery, HTTPS ingress, Multi-AZ failover or a production deployment.
