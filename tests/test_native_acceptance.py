@@ -340,10 +340,14 @@ def test_controller_requests_real_timestamp_restore_and_independent_negative_pro
                 DBSubnetGroup={"DBSubnetGroupName": "owned"},
                 VpcSecurityGroups=[{"VpcSecurityGroupId": "owned-sg"}],
                 DBParameterGroups=[{"DBParameterGroupName": "owned-tls"}],
-                EarliestRestorableTime=baseline - timedelta(minutes=1),
                 LatestRestorableTime=baseline + timedelta(minutes=1),
                 Endpoint={"Address": "private-restored-host"},
             )
+
+        def restorable_window(self, source):
+            return {"earliest": baseline - timedelta(minutes=1),
+                    "latest": baseline + timedelta(minutes=1),
+                    "backup_reference": "mock-only", "request_id": "mock-only"}
 
         def task(self, name, **kwargs):
             if name == "baseline":
@@ -627,3 +631,60 @@ def test_native_failure_diagnostic_never_serializes_secret_messages():
     assert result['aws_code'] == 'AccessDeniedException'
     assert 'never-publish-this-value' not in json.dumps(result)
     assert 'Message' not in json.dumps(result)
+
+
+
+def test_rds_restore_bounds_use_actual_sdk_response_contract():
+    import boto3
+    client = boto3.client('rds', region_name='us-east-2', aws_access_key_id='mock', aws_secret_access_key='mock')
+    assert 'EarliestRestorableTime' not in client.meta.service_model.shape_for('DBInstance').members
+    assert 'LatestRestorableTime' in client.meta.service_model.shape_for('DBInstance').members
+    shape = client.meta.service_model.shape_for('DBInstanceAutomatedBackup').members['RestoreWindow']
+    assert set(shape.members) == {'EarliestTime', 'LatestTime'}
+
+
+def window_fixture():
+    now = datetime.now(UTC)
+    source = {'DbiResourceId': 'physical-control', 'DBInstanceIdentifier': 'owned-control',
+              'LatestRestorableTime': now}
+    response = {'DBInstanceAutomatedBackups': [{
+        'DbiResourceId': source['DbiResourceId'], 'DBInstanceIdentifier': source['DBInstanceIdentifier'],
+        'DBInstanceAutomatedBackupsArn': 'arn:aws:rds:us-east-2:123456789012:auto-backup:owned',
+        'Status': 'active', 'RestoreWindow': {'EarliestTime': now-timedelta(hours=1),
+                                           'LatestTime': now+timedelta(minutes=1)},
+    }], 'ResponseMetadata': {'RequestId': 'mock-only'}}
+    return source, response
+
+
+def test_restore_window_intersects_two_service_bounds_and_pins_physical_identity():
+    source, response = window_fixture()
+    c = {'rds': MagicMock()}
+    c['rds'].describe_db_instance_automated_backups.return_value = response
+    result = NativeRun(manifest(), c).restorable_window(source)
+    assert result['latest'] == source['LatestRestorableTime']
+    assert result['earliest'] == response['DBInstanceAutomatedBackups'][0]['RestoreWindow']['EarliestTime']
+    c['rds'].describe_db_instance_automated_backups.assert_called_once_with(DbiResourceId='physical-control')
+
+
+@pytest.mark.parametrize('case', ['missing_window', 'different_database', 'different_resource', 'ambiguous', 'denied'])
+def test_restore_window_cannot_invent_or_cross_database_bounds(case):
+    source, response = window_fixture()
+    c = {'rds': MagicMock()}
+    c['rds'].describe_db_instance_automated_backups.return_value = response
+    if case == 'missing_window':
+        response['DBInstanceAutomatedBackups'][0].pop('RestoreWindow')
+        assert NativeRun(manifest(), c).restorable_window(source) is None
+        return
+    if case == 'different_database':
+        response['DBInstanceAutomatedBackups'][0]['DBInstanceIdentifier'] = 'other'
+    elif case == 'different_resource':
+        response['DBInstanceAutomatedBackups'][0]['DbiResourceId'] = 'other'
+    elif case == 'ambiguous':
+        response['DBInstanceAutomatedBackups'] *= 2
+    else:
+        c['rds'].describe_db_instance_automated_backups.side_effect = PermissionError('denied')
+        with pytest.raises(PermissionError):
+            NativeRun(manifest(), c).restorable_window(source)
+        return
+    with pytest.raises(RuntimeError, match='identity mismatch'):
+        NativeRun(manifest(), c).restorable_window(source)

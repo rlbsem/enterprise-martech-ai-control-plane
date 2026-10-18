@@ -171,6 +171,36 @@ class NativeRun:
             raise RuntimeError("Private Single-AZ acceptance database not established")
         return db
 
+    def restorable_window(self, source):
+        response = self.c["rds"].describe_db_instance_automated_backups(
+            DbiResourceId=source["DbiResourceId"]
+        )
+        rows = response.get("DBInstanceAutomatedBackups", [])
+        if not rows:
+            return None
+        if (len(rows) != 1 or rows[0]["DbiResourceId"] != source["DbiResourceId"]
+                or rows[0]["DBInstanceIdentifier"] != source["DBInstanceIdentifier"]):
+            raise RuntimeError("Automated backup identity mismatch")
+        backup = rows[0]
+        if backup["Status"] != "active":
+            return None
+        window = backup.get("RestoreWindow", {})
+        earliest, latest = window.get("EarliestTime"), window.get("LatestTime")
+        instance_latest = source.get("LatestRestorableTime")
+        if earliest is None or latest is None or instance_latest is None:
+            return None
+        if any(not isinstance(t, datetime) or t.tzinfo is None
+               for t in (earliest, latest, instance_latest)):
+            raise RuntimeError("Aware service restore timestamps required")
+        latest = min(latest, instance_latest)
+        if earliest > latest:
+            return None
+        return {
+            "earliest": earliest, "latest": latest,
+            "backup_reference": hashlib.sha256(backup["DBInstanceAutomatedBackupsArn"].encode()).hexdigest(),
+            "request_id": response["ResponseMetadata"]["RequestId"],
+        }
+
     def run(self):
         self.gate()
         original = self.database(self.m["control_db"])
@@ -190,6 +220,13 @@ class NativeRun:
         good = self.task("verify")
         if not good["safe_to_resume"] or good["local_intents"] != 1 or good["remote_effects"] != 1:
             raise RuntimeError("Original independent ledger comparison failed")
+        return self._recover_from_baseline(baseline)
+
+    def _recover_from_baseline(self, baseline):
+        # The normal run captures this timestamp before intent creation. An operator
+        # continuation must independently revalidate its original executed checkpoint.
+        self.gate()
+        self.drained()
         source, remote = self.database(self.m["control_db"]), self.database(self.m["downstream_db"])
         if source["DbiResourceId"] == remote["DbiResourceId"]:
             raise RuntimeError("Independent database identities required")
@@ -197,11 +234,8 @@ class NativeRun:
         for _ in range(90):
             self.gate()
             source = self.database(self.m["control_db"])
-            if (
-                source.get("EarliestRestorableTime")
-                and source.get("LatestRestorableTime")
-                and source["EarliestRestorableTime"] <= baseline <= source["LatestRestorableTime"]
-            ):
+            window = self.restorable_window(source)
+            if window and window["earliest"] <= baseline <= window["latest"]:
                 break
             time.sleep(30)
         else:
@@ -230,9 +264,11 @@ class NativeRun:
             time.sleep(30)
         else:
             raise RuntimeError("PITR availability deadline exceeded")
-        self.c["rds"].modify_db_instance(
-            DBInstanceIdentifier=target, BackupRetentionPeriod=self.m["backup_retention_days"], ApplyImmediately=True
-        )
+        if row.get("BackupRetentionPeriod") != self.m["backup_retention_days"]:
+            self.c["rds"].modify_db_instance(
+                DBInstanceIdentifier=target, BackupRetentionPeriod=self.m["backup_retention_days"],
+                ApplyImmediately=True,
+            )
         for _ in range(60):
             self.gate()
             observed = self.c["rds"].describe_db_instances(DBInstanceIdentifier=target)["DBInstances"][0]
@@ -265,8 +301,10 @@ class NativeRun:
                 for name, row in [("control", source), ("receipts", remote), ("restored_control", restored)]
             },
             "restorable_window": {
-                "earliest": source["EarliestRestorableTime"].isoformat(),
-                "latest": source["LatestRestorableTime"].isoformat(),
+                "earliest": window["earliest"].isoformat(),
+                "latest": window["latest"].isoformat(),
+                "backup_reference": window["backup_reference"],
+                "request_id": window["request_id"],
             },
         }
 
