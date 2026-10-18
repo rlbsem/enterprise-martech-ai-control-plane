@@ -13,8 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--verification-record', default='docs/evidence/aws-readiness/deployment-clock/local/verification.json')
-    parser.add_argument('--infrastructure-record', default='docs/evidence/aws-readiness/deployment-clock/infrastructure/verification.json')
+    parser.add_argument('--verification-record', default='docs/evidence/aws-readiness/guard-native/local/verification.json')
+    parser.add_argument('--infrastructure-record', default='docs/evidence/aws-readiness/guard-native/infrastructure/verification.json')
     args = parser.parse_args()
     names = subprocess.check_output(['git', 'ls-files', '--cached', '--others', '--exclude-standard'],
                                     cwd=ROOT, text=True).splitlines()

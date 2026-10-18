@@ -25,6 +25,17 @@ run "independent_guard" {
     error_message = "Bounded guard and private independent evidence required."
   }
 }
+run "encrypted_repository_cleanup_grants" {
+  command = plan
+  assert {
+    condition = anytrue([for statement in jsondecode(aws_iam_role_policy.cleanup.policy).Statement :
+      try(contains(statement.Action, "kms:RetireGrant"), false) &&
+      try(statement.Condition.StringEquals["aws:ResourceTag/AcceptanceRun"] == var.run_id, false) &&
+      statement.Resource == "arn:aws:kms:us-east-2:${var.account_id}:key/*"
+    ])
+    error_message = "Encrypted ECR cleanup requires RetireGrant on this run's tagged runtime keys only."
+  }
+}
 run "identity_rejected" {
   command = plan
   variables { run_id = "bad" }

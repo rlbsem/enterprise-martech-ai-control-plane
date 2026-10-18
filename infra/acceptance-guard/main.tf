@@ -150,7 +150,7 @@ resource "aws_iam_role_policy" "cleanup" {
     { Effect = "Allow", Action = "logs:DeleteLogGroup", Resource = ["arn:aws:logs:us-east-2:${var.account_id}:log-group:/csa-native/${var.run_id}/*:*", "arn:aws:logs:us-east-2:${var.account_id}:log-group:/aws/rds/instance/${local.name}-*/postgresql:*"] },
     { Effect = "Allow", Action = ["ec2:DeleteVpcEndpoints", "ec2:DeleteNetworkInterface", "ec2:DeleteRouteTable", "ec2:DeleteSecurityGroup", "ec2:DeleteSubnet", "ec2:DeleteVpc", "ec2:RevokeSecurityGroupIngress", "ec2:RevokeSecurityGroupEgress", "ec2:DisassociateRouteTable"], Resource = "*", Condition = local.runtime_tag },
     { Effect = "Allow", Action = ["iam:ListRolePolicies", "iam:DeleteRolePolicy", "iam:DeleteRole"], Resource = "arn:aws:iam::${var.account_id}:role/csa-native/${var.run_id}/*" },
-    { Effect = "Allow", Action = "kms:ScheduleKeyDeletion", Resource = "arn:aws:kms:us-east-2:${var.account_id}:key/*", Condition = local.runtime_tag },
+    { Effect = "Allow", Action = ["kms:ScheduleKeyDeletion", "kms:RetireGrant"], Resource = "arn:aws:kms:us-east-2:${var.account_id}:key/*", Condition = local.runtime_tag },
     { Effect = "Allow", Action = "lambda:InvokeFunction", Resource = "arn:aws:lambda:us-east-2:${var.account_id}:function:${local.name}-checker" }
   ] })
 }

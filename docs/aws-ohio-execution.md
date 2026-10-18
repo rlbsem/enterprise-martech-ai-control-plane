@@ -1,6 +1,6 @@
 # Isolated Ohio native acceptance implementation
 
-**Implemented and locally checked; native provisioning, SQL/PITR and teardown have not executed.**
+**The isolated guard has deployed and passed native arming/checker checks; runtime provisioning, SQL/PITR and teardown have not executed.** See [native guard evidence](evidence/aws-readiness/guard-native/README.md).
 This lane supplements the unchanged production design. It proves only managed PostgreSQL,
 independent SQL receipts and recovery refusal if the native run succeeds. It does not prove
 live API dispatch, worker recovery, HTTPS ingress, Multi-AZ failover or a production deployment.
@@ -27,7 +27,7 @@ moving the baseline past its existing intent.
 
 ## Approval envelope
 
-No provisioning has been authorized. The [updated four-hour estimate](evidence/aws-readiness/implementation/credit-estimate.json)
+Guard-only deployment and arming were authorized and executed. Runtime provisioning has not been authorized. The [updated four-hour estimate](evidence/aws-readiness/implementation/credit-estimate.json)
 includes **two** customer-managed keys, three micro instances at peak, four interface endpoint
 AZ units, eight aggregate quarter-vCPU/half-GB task-hours, eight secrets, at most 60 small
 CodeBuild minutes if a cloud execution bridge is used, and supporting/residual allowances.
@@ -44,13 +44,12 @@ original evidence and earlier regional denials are preserved.
 
 ## Execution sequence after explicit approval
 
-These commands describe the prepared tooling; none has deployed resources. Use a private
+The guard steps have executed in the isolated account; subsequent runtime steps remain unexecuted. Use a private
 ignored directory and a fresh run ID. `account_id` and timestamps below are private configuration,
 not public environment variables in GitHub logs.
 
 1. Establish a short-lived authenticated execution host. The connected AWS Core session does
-   not automatically authenticate local Terraform or boto3. This workstation currently has no
-   SDK credentials. Supported choices are a temporary operator SDK session or a separately
+   not automatically authenticate local Terraform or boto3. This workstation now has an authenticated short-lived `aws login` session through a private refreshable credential-process profile. Supported choices are a temporary operator SDK session or a separately
    scoped, time-bounded cloud build host authorized through the connected AWS API. Do not copy
    plugin credentials, create long-lived access keys, upgrade the plan or reuse production roles.
    A cloud bridge must use the same reviewed commit, tooling checksums, cost/time bounds and
@@ -65,13 +64,12 @@ not public environment variables in GitHub logs.
 3. Export `terraform output -json guard_manifest` privately. Independently run `armed_gate`
    through the SDK before any runtime creation. The gate must observe both active functions and
    the exact enabled schedule; no user assertion alone is accepted by the deployment wrapper.
-   Inspect effective cleanup permissions in the actual account; local IAM analysis does not
+   Before invoking the checker, run `python scripts/native_initialize_registry.py --manifest <guard-json> --approved-sha256 <manifest-digest> --execute`. This uses the operator session, requires independently empty runtime discovery and creates only a missing encrypted registry with `IfNoneMatch=*`; existing history is preserved. It does not grant either function `ListBucket`. Before creating the KMS-encrypted ECR repository, review/apply the separate watchdog policy correction adding only `kms:RetireGrant` for this run's tagged runtime keys. AWS requires that permission to retire repository grants on deletion; the original deployed policy lacks it. Inspect effective cleanup permissions in the actual account; local IAM analysis does not
    prove SCP permission or Free-plan service eligibility. Stop on an unavailable service.
 4. Initialize the runtime S3 backend using the new guard bucket, Ohio and a unique `state/runtime`
    key with S3 lockfiles and the guard CMK. Do not use or alter the Canadian production backend.
    First review/create only the ECR repository and its CMK using a targeted saved plan through
-   the same runtime gate. Build the existing Dockerfile from the reviewed commit on an approved
-   build host, push to that exact repository and pin its actual image digest. No image build is
+   the same runtime gate. The existing container CI job exports a source-labelled Linux/amd64 OCI archive as a one-day artifact, without AWS credentials or a registry push. Inspect its manifest/config/layer hashes and source label before uploading to the approved repository with the local short-lived session, then confirm ECR returns the identical manifest digest. This avoids a chargeable CodeBuild host. No upload is authorized by the artifact export. No image build is
    claimed locally on this Docker-less host.
 5. Generate the full runtime saved plan. Pin its source commit, actual image digest, account/run,
    guard code hash, schedule and deadline; compare creates against the resource envelope.
@@ -107,8 +105,7 @@ not public environment variables in GitHub logs.
 
 [Current local verification](evidence/aws-readiness/deployment-clock/local/verification.json) and [infrastructure checks](evidence/aws-readiness/deployment-clock/infrastructure/verification.json) covers actual PostgreSQL/HTTP
 regressions, new local SQL fixture tests, mocked controller/guard fault tests, pinned Terraform
-validation/mock tests and static security checks. Native RDS/PITR, native cleanup and final IAM
-permissions remain unexecuted. Public evidence must contain only sanitized results and hashed
+validation/mock tests and static security checks. The separate native guard record demonstrates actual arming and restricted checker execution. Native RDS/PITR, scheduled cleanup and effective runtime-deletion permissions remain unexecuted. Public evidence must contain only sanitized results and hashed
 resource references, never credentials, raw plans or private account/network identifiers.
 
 AWS documents that [RDS deletes its managed owner secret with the instance](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-secrets-manager.html)

@@ -522,3 +522,68 @@ def test_explicit_old_deadline_still_expires():
         script("native_deploy").guard_deadline_gate(
             {"variables": {"cleanup_at": {"value": "2020-01-01T00:00:00Z"}}}, {}
         )
+
+
+def registry_session(monkeypatch, rows):
+    import io
+    module = script("native_initialize_registry")
+    monkeypatch.setattr(module, "armed_gate", lambda *_: None)
+    monkeypatch.setattr(module, "Inventory", lambda *_: SimpleNamespace(collect=lambda: rows))
+    session, s3 = MagicMock(), MagicMock()
+    session.client.return_value = s3
+    class Missing(Exception):
+        pass
+    s3.exceptions.NoSuchKey = Missing
+    s3.get_object.side_effect = [Missing(), {"Body": io.BytesIO(b"[]")}]
+    s3.put_object.return_value = {"VersionId": "version-one"}
+    m = manifest()
+    m.update(guard_bucket=f"csa-native-{m['run']}-guard-{m['account']}", guard_key="guard-key")
+    return module, m, session, s3
+
+
+def test_registry_initialization_is_conditional_and_exact(monkeypatch):
+    module, m, session, s3 = registry_session(monkeypatch, [])
+    result = module.initialize_registry(m, session)
+    assert result["status"] == "EMPTY_REGISTRY_INITIALIZED"
+    assert s3.put_object.call_args.kwargs["IfNoneMatch"] == "*"
+    assert s3.put_object.call_args.kwargs["Body"] == b"[]"
+    assert s3.get_object.call_args.kwargs["VersionId"] == "version-one"
+
+
+def test_registry_initialization_refuses_existing_runtime(monkeypatch):
+    module, m, session, s3 = registry_session(monkeypatch, [{"id": "existing"}])
+    with pytest.raises(RuntimeError, match="must be empty"):
+        module.initialize_registry(m, session)
+    s3.put_object.assert_not_called()
+
+
+def test_registry_initialization_does_not_treat_denial_as_absence(monkeypatch):
+    module, m, session, s3 = registry_session(monkeypatch, [])
+    s3.get_object.side_effect = PermissionError("denied")
+    with pytest.raises(PermissionError):
+        module.initialize_registry(m, session)
+    s3.put_object.assert_not_called()
+
+
+def test_registry_initialization_preserves_existing_history(monkeypatch):
+    import io
+    module, m, session, s3 = registry_session(monkeypatch, [])
+    s3.get_object.side_effect = None
+    s3.get_object.return_value = {"Body": io.BytesIO(b'[{"id":"prior"}]')}
+    assert module.initialize_registry(m, session)["status"] == "EXISTING_REGISTRY_PRESERVED"
+    s3.put_object.assert_not_called()
+
+
+def test_registry_initialization_does_not_swallow_concurrent_writer(monkeypatch):
+    module, m, session, s3 = registry_session(monkeypatch, [])
+    s3.put_object.side_effect = RuntimeError("precondition failed")
+    with pytest.raises(RuntimeError, match="precondition failed"):
+        module.initialize_registry(m, session)
+
+
+def test_registry_initialization_requires_exact_readback(monkeypatch):
+    import io
+    module, m, session, s3 = registry_session(monkeypatch, [])
+    s3.get_object.side_effect = [s3.exceptions.NoSuchKey(), {"Body": io.BytesIO(b"{}")}]
+    with pytest.raises(RuntimeError, match="read-back"):
+        module.initialize_registry(m, session)

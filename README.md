@@ -19,7 +19,7 @@ Built for integration challenges across multi-brand operators, PE-backed portfol
 - **I kept AI outside the authority boundary.** An agent can propose an action, but it cannot assign field ownership, override source identity or hold downstream execution credentials. Typed proposals, scoped actors and a separate executor keep business state governed even when an AI output sounds persuasive. [Transaction and trust decisions](docs/architecture.md).
 - **I chose durable intent and receiver receipts over blind retries.** An HTTP timeout cannot tell us whether the effect committed. The exact intent and effect ID are saved before dispatch; a retry first reconciles the receiver's receipt and rechecks authority if there is no matching effect. This is **at-least-once delivery with idempotent effects under the receiver contract**, not an unsupported exactly-once network guarantee. [Failure semantics](docs/failures.md).
 - **I made database recovery conditional on business-state reconciliation.** A restored control database can be older than independently committed downstream effects. The executed remote-ahead case blocks resumption instead of treating a successful database restore as sufficient. [Recovery design](docs/cloud-operations.md) · [Recorded blocked case](docs/evidence/remote-ahead-restore.json).
-- **I accepted a bounded performance tradeoff.** A global admission lock simplifies correct identity discovery in this implementation, but limits throughput. Its measured synthetic workload and the thresholds for introducing pooling or partitioning are documented; AWS infrastructure is defined but **not deployed**. [Capacity boundaries](docs/capacity.md).
+- **I accepted a bounded performance tradeoff.** A global admission lock simplifies correct identity discovery in this implementation, but limits throughput. Its measured synthetic workload and the thresholds for introducing pooling or partitioning are documented; The production AWS infrastructure is defined but **not deployed**. [Capacity boundaries](docs/capacity.md).
 
 ## The invariants
 
@@ -51,7 +51,7 @@ cost approval; these records do not claim a deployed AWS environment.
 [Ohio preflight](docs/evidence/aws-readiness/ohio/README.md) independently confirmed
 regional access and corrected the earlier Canadian-region denial diagnosis. The
 [separate Single-AZ/PITR proposal](docs/aws-ohio-acceptance.md) preserves the production
-architecture. The [executable Ohio fixture, isolated Terraform and independent cleanup guard](docs/aws-ohio-execution.md) are implemented and locally tested. No deployment or PITR has run; provisioning remains approval-gated.
+architecture. The [executable Ohio fixture, isolated Terraform and independent cleanup guard](docs/aws-ohio-execution.md) are implemented and locally tested. The [isolated guard has deployed and passed native arming/checker checks](docs/evidence/aws-readiness/guard-native/README.md). Runtime provisioning and PITR remain unexecuted and approval-gated.
 The [minimal acceptance assessment](docs/aws-minimal-acceptance.md) explains which
 recovery tests can run without ACM, custom DNS, an ALB or a workstation VPN.
 
@@ -130,4 +130,4 @@ python scripts/validate_infra.py
 | Restore and operations | [Read-only comparison](src/controlplane/operations.py), [PITR tool](src/controlplane/restore.py), [runbook](docs/cloud-operations.md) |
 | Verification | [Generated test proof](docs/evidence/verification.json), [infrastructure checks](docs/evidence/infrastructure/verification.json), [validation guide](docs/validation.md), [GitHub Actions](https://github.com/rlbsem/enterprise-martech-ai-control-plane/actions) |
 
-AWS resources have not been provisioned; live failover and PITR remain [environment acceptance checks](docs/cloud-operations.md).
+Only the isolated acceptance guard has been provisioned; production deployment, live failover and PITR remain [environment acceptance checks](docs/cloud-operations.md).

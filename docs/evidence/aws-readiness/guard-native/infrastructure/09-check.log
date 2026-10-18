@@ -1,0 +1,11 @@
+tests\security.tftest.hcl... in progress
+  run "private_encrypted_and_quiescent"... pass
+  run "reject_mutable_image"... pass
+  run "reject_untrusted_oidc"... pass
+  run "reject_cross_environment_restore_binding"... pass
+  run "reject_public_restore_binding"... pass
+  run "reject_wrong_restore_binding"... pass
+tests\security.tftest.hcl... tearing down
+tests\security.tftest.hcl... pass
+
+Success! 6 passed, 0 failed.
