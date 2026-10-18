@@ -34,6 +34,12 @@ def configure(service, client):
     document = read_secret(client, os.environ['RUNTIME_SECRET_ARN'])
     if set(document) != RUNTIME_KEYS[service] or any(not isinstance(v, str) or not v for v in document.values()):
         raise ValueError('Invalid role secret contract')
+    # A reused process or unexpected task environment must not leave another
+    # responsibility's credentials available to this service.
+    credentials = set().union(*RUNTIME_KEYS.values()) | {'CONTROL_ADMIN_DSN', 'TEST_ADMIN_DSN',
+                                                        'APP_DB_PASSWORD', 'REMOTE_DB_PASSWORD'}
+    for key in credentials:
+        os.environ.pop(key, None)
     os.environ.update(document)
 
 
@@ -115,13 +121,21 @@ def bootstrap(client):
             documents[key] = document
     if documents['remote']['EXECUTOR_TOKEN'] != documents['worker']['EXECUTOR_TOKEN']:
         raise ValueError('Executor credential mismatch; rotation requires coordinated service restart')
+    expected_users = {'api': {'CONTROL_DSN': 'control_api'}, 'worker': {'CONTROL_DSN': 'control_worker'},
+                      'remote': {'REMOTE_DSN': 'synthetic_remote'}, 'observer': {'CONTROL_DSN': 'control_observer'},
+                      'verifier': {'CONTROL_DSN': 'control_audit', 'REMOTE_DSN': 'remote_audit'}}
     from psycopg.conninfo import conninfo_to_dict
     # A reviewed PITR binding supplies the new host via Terraform. Keep passwords and effect keys stable.
     for key, document in documents.items():
+        if set(document) != RUNTIME_KEYS[key] or any(not isinstance(v, str) or not v for v in document.values()):
+            raise ValueError('Invalid existing role secret contract')
         revised = dict(document)
         for field, value in document.items():
             if field.endswith('_DSN'):
                 info = conninfo_to_dict(value)
+                if info.get('user') != expected_users[key][field] or any(
+                        k in info for k in ('service', 'servicefile', 'options')):
+                    raise ValueError('Existing runtime secret has unexpected database authority')
                 database = 'downstream' if info['user'] in ('synthetic_remote', 'remote_audit') else 'control'
                 revised[field] = make_conninfo(value, host=hosts[database], sslmode='verify-full',
                                                sslrootcert='/app/certs/rds-global-bundle.pem')

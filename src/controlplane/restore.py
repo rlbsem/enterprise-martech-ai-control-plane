@@ -16,6 +16,9 @@ def restore_request(source, target, at):
         raise ValueError('Use a distinct control-<environment>-restore-<incident> identifier')
     if target == source['DBInstanceIdentifier'] or source['Engine'] != 'postgres':
         raise ValueError('Restore must be an independent PostgreSQL instance')
+    boundary = re.fullmatch(r'control-(dev|stage|prod)-(?:control|restore-[a-z0-9-]+)', source['DBInstanceIdentifier'])
+    if not boundary or not target.startswith('control-' + boundary[1] + '-restore-'):
+        raise ValueError('Restore source and target must share the reviewed environment')
     if not source['StorageEncrypted'] or source['PubliclyAccessible']:
         raise ValueError('Unexpected database security boundary')
     if at.tzinfo is None or not source['EarliestRestorableTime'] <= at <= source['LatestRestorableTime']:

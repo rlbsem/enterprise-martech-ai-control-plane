@@ -56,6 +56,10 @@ variable "restored_control_identifier" {
   type        = string
   default     = null
   description = "Existing, reviewed PITR instance to bind while the original is retained. Never restore downstream with it."
+  validation {
+    condition     = var.restored_control_identifier == null ? true : can(regex("^control-${var.environment}-restore-[a-z0-9-]{1,30}$", var.restored_control_identifier))
+    error_message = "Bind only a separately restored control database in this exact environment."
+  }
 }
 variable "multi_az" { default = true }
 variable "alarm_topic_arn" {

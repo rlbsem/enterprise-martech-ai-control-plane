@@ -29,6 +29,7 @@ def main():
                      '--tf-vars', 'infra/testing/static.tfvars.json',
                      '--format', 'json', '--output', str(args.output/'security.json'), 'infra'])
     commands.append([args.trivy, 'fs', '--scanners', 'secret', '--exit-code', '1',
+                     '--skip-dirs', '.local',
                      '--skip-dirs', 'node_modules', '--skip-dirs', 'work', '--skip-dirs', '.git',
                      '--skip-dirs', 'infra/aws/.terraform', '--skip-dirs', 'infra/foundation/.terraform',
                      '--format', 'json', '--output', str(args.output/'secrets.json'), '.'])

@@ -49,3 +49,76 @@ run "reject_untrusted_oidc" {
   variables { github_oidc_subject = "repo:other/repo:environment:aws-release" }
   expect_failures = [var.github_oidc_subject]
 }
+
+run "reject_cross_environment_restore_binding" {
+  command = plan
+  variables { restored_control_identifier = "control-prod-restore-other" }
+  expect_failures = [var.restored_control_identifier]
+}
+
+run "reject_public_restore_binding" {
+  command = plan
+  variables { restored_control_identifier = "control-stage-restore-incident" }
+  override_data {
+    target          = data.aws_db_instance.restored[0]
+    override_during = plan
+    values = {
+      engine                  = "postgres"
+      storage_encrypted       = true
+      publicly_accessible     = true
+      multi_az                = true
+      backup_retention_period = 14
+      db_name                 = "control"
+      db_subnet_group         = "wrong-subnet"
+      vpc_security_groups     = ["sg-other"]
+      db_parameter_groups     = ["wrong-parameters"]
+      master_user_secret = [{
+        kms_key_id    = "arn:aws:kms:ca-central-1:123456789012:key/mock"
+        secret_arn    = "arn:aws:secretsmanager:ca-central-1:123456789012:secret:mock"
+        secret_status = "active"
+      }]
+    }
+  }
+  expect_failures = [data.aws_db_instance.restored[0]]
+}
+
+run "reject_wrong_restore_binding" {
+  command = plan
+  variables { restored_control_identifier = "control-stage-restore-incident" }
+  override_data {
+    target          = data.aws_db_instance.restored[0]
+    override_during = plan
+    values = {
+      engine                  = "postgres"
+      storage_encrypted       = true
+      publicly_accessible     = false
+      multi_az                = true
+      backup_retention_period = 14
+      db_name                 = "control"
+      db_subnet_group         = "wrong-subnet"
+      vpc_security_groups     = ["sg-other"]
+      db_parameter_groups     = ["wrong-parameters"]
+      master_user_secret = [{
+        kms_key_id    = "arn:aws:kms:ca-central-1:123456789012:key/mock"
+        secret_arn    = "arn:aws:secretsmanager:ca-central-1:123456789012:secret:mock"
+        secret_status = "active"
+      }]
+    }
+  }
+  override_resource {
+    target          = aws_kms_key.data
+    override_during = plan
+    values          = { arn = "arn:aws:kms:ca-central-1:123456789012:key/mock" }
+  }
+  override_resource {
+    target          = aws_security_group.database["control"]
+    override_during = plan
+    values          = { id = "sg-00000000" }
+  }
+  override_resource {
+    target          = aws_db_parameter_group.postgres
+    override_during = plan
+    values          = { name = "control-stage-tls" }
+  }
+  expect_failures = [aws_ecs_task_definition.runtime]
+}

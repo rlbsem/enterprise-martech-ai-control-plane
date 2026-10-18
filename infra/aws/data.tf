@@ -71,6 +71,17 @@ resource "aws_db_instance" "state" {
 data "aws_db_instance" "restored" {
   count                  = var.restored_control_identifier == null ? 0 : 1
   db_instance_identifier = var.restored_control_identifier
+  lifecycle {
+    postcondition {
+      condition = (
+        self.engine == "postgres" && self.storage_encrypted && !self.publicly_accessible &&
+        self.multi_az == var.multi_az &&
+        self.backup_retention_period >= 14 && self.db_name == "control"
+      )
+      error_message = "The restored control database must preserve the encrypted, private, backed-up recovery boundary."
+    }
+
+  }
 }
 locals {
   control_address = var.restored_control_identifier == null ? aws_db_instance.state["control"].address : data.aws_db_instance.restored[0].address

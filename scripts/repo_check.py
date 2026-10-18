@@ -1,5 +1,6 @@
 """Validate repository links, generated proof bindings, diagram coverage and secret hygiene."""
 
+import argparse
 import hashlib
 import json
 import re
@@ -11,6 +12,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--verification-record', default='docs/evidence/aws-readiness/local/verification.json')
+    parser.add_argument('--infrastructure-record', default='docs/evidence/aws-readiness/infrastructure/verification.json')
+    args = parser.parse_args()
     names = subprocess.check_output(['git', 'ls-files', '--cached', '--others', '--exclude-standard'],
                                     cwd=ROOT, text=True).splitlines()
     files = [ROOT / name for name in sorted(set(names)) if (ROOT/name).is_file()]
@@ -31,7 +36,7 @@ def main():
             patterns = [r'AKIA[A-Z0-9]{16}', r'ASIA[A-Z0-9]{16}', r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----']
             if any(re.search(pattern, content) for pattern in patterns):
                 errors.append(f'Credential material in {path.relative_to(ROOT)}')
-    record = json.loads((ROOT/'docs/evidence/verification.json').read_text())
+    record = json.loads((ROOT/args.verification_record).read_text())
     for name, expected in record['source_sha256'].items():
         actual = hashlib.sha256((ROOT/name).read_bytes().replace(b'\r\n', b'\n')).hexdigest()
         if actual != expected:
@@ -45,7 +50,7 @@ def main():
             path = (ROOT/'docs/diagrams'/name).with_suffix('.'+extension)
             if hashlib.sha256(path.read_bytes().replace(b'\r\n', b'\n')).hexdigest() != expected:
                 errors.append(f'Stale rendered diagram: {path.name}')
-    infrastructure = json.loads((ROOT/'docs/evidence/infrastructure/verification.json').read_text())
+    infrastructure = json.loads((ROOT/args.infrastructure_record).read_text())
     for name, expected in infrastructure['source_sha256'].items():
         if hashlib.sha256((ROOT/name).read_bytes().replace(b'\r\n', b'\n')).hexdigest() != expected:
             errors.append(f'Stale infrastructure proof: {name}')

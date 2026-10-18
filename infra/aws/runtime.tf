@@ -43,6 +43,17 @@ resource "aws_ecs_task_definition" "runtime" {
       awslogs-group = aws_cloudwatch_log_group.task[each.key].name, awslogs-region = var.region, awslogs-stream-prefix = "task"
     } }
   }])
+  lifecycle {
+    precondition {
+      condition = var.restored_control_identifier == null ? true : (
+        data.aws_db_instance.restored[0].kms_key_id == aws_kms_key.data.arn && data.aws_db_instance.restored[0].db_subnet_group == aws_db_subnet_group.private.name &&
+        toset(data.aws_db_instance.restored[0].vpc_security_groups) == toset([aws_security_group.database["control"].id]) &&
+        contains(data.aws_db_instance.restored[0].db_parameter_groups, aws_db_parameter_group.postgres.name) &&
+        length(data.aws_db_instance.restored[0].master_user_secret) == 1
+      )
+      error_message = "The restored database must use this environment's subnet group, control security group, TLS parameter group and managed owner secret."
+    }
+  }
   tags = { SourceCommit = var.source_commit }
 }
 resource "aws_ecs_service" "runtime" {

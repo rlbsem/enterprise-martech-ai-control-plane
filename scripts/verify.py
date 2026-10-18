@@ -42,6 +42,11 @@ def main():
         subprocess.run([sys.executable, "-m", "pytest", "-q", "--junitxml", str(stage / "tests.xml")],
                        cwd=ROOT, env=env, check=True)
         suite = ET.parse(stage / "tests.xml").getroot().find("testsuite")
+        # Keep runner hostnames and absolute developer paths out of public evidence.
+        suite.attrib.pop("hostname", None)
+        tree = ET.Element("testsuites")
+        tree.append(suite)
+        ET.ElementTree(tree).write(stage / "tests.xml", encoding="utf-8", xml_declaration=True)
         with psycopg.connect(os.environ["TEST_ADMIN_DSN"]) as c:
             postgres = c.execute("SELECT version()").fetchone()[0]
         if hashes != source_hashes():
@@ -56,6 +61,7 @@ def main():
                    "seconds": float(suite.attrib["time"]),
                    "github_actions": ("running_in_actions_workflow_result_not_yet_known"
                                       if os.environ.get("GITHUB_ACTIONS") == "true" else "not_executed"),
+                   "aws_execution": "not_executed_sdk_stubs_only",
                    "container_execution": "not_claimed_by_this_native_verifier", "source_sha256": hashes}
         (stage / "verification.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
         names = ["no-regress", "consent-race", "unknown-result", "competing-workers", "process-death"]
@@ -71,7 +77,7 @@ def main():
                   f"| Eight competing workers | {cases['competing-workers']['claimed']} claim; 1 effect |",
                   f"| Worker process killed after remote commit | {cases['process-death']['final']}; 1 effect |", "",
                   "The JSON cases retain IDs, decisions and receipts. `verification.json` records source hashes and runtime versions. "
-                  "`tests.xml` records every test. This record covers native execution; hosted checks are linked separately. "
+                  "`tests.xml` records every test. This record covers local PostgreSQL/HTTP execution; hosted checks are linked separately. "
                   "AWS SDK tests use stubs and do not provision resources.", ""]
         (stage / "report.md").write_text("\n".join(report), encoding="utf-8")
         target.mkdir(parents=True, exist_ok=True)
