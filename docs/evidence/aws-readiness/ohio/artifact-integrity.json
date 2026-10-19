@@ -1,0 +1,10 @@
+{
+  "scope": "recomputed_cost_model_and_LF_normalized_artifact_hashes",
+  "aws_mutations": 0,
+  "files": {
+    "scripts/estimate_ohio_acceptance.py": "59c7bbed362e37f4d70da133ac515db1b46b52c55dfeeb331861ab8612559337",
+    "docs/evidence/aws-readiness/ohio/public-rates.json": "a6184dce33f6bfd8794ade953bdebf1ca8fd0819ea843c4e6247642d2db81d33",
+    "docs/evidence/aws-readiness/ohio/credit-estimate.json": "76a09f2c6a670700c75fa8e0b5fddb9d68992029fe2742c2c87f7c35afef7337",
+    "docs/evidence/aws-readiness/ohio/inventory.json": "a6f9195f41269686808e796df95a675a385b11c18c703da799f3803d79ec497e"
+  }
+}

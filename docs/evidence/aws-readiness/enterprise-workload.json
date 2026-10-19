@@ -1,0 +1,30 @@
+{
+  "profile": "enterprise-v1",
+  "environment": "local PostgreSQL and separate HTTP/worker processes",
+  "entities": 1000,
+  "intents": 1000,
+  "workers": 4,
+  "statuses": {
+    "succeeded": 950,
+    "dead": 50
+  },
+  "worker_attempts": 1200,
+  "reconciled_effects": 50,
+  "unique_remote_effects": 950,
+  "duplicate_effects": 0,
+  "schedule_sha256": "0b62ab9140f3dbd4ce5d28955458a8e2e9d6eb7377fae2aa83de25ba3ff681ac",
+  "admission_seconds": 20.922,
+  "drain_seconds": 63.156,
+  "drain_intents_per_second": 15.834,
+  "admission_http_p50_ms": 47.0,
+  "admission_http_p95_ms": 78.0,
+  "recovery_comparison": {
+    "safe_to_resume": true,
+    "local_intents": 1000,
+    "remote_effects": 950,
+    "findings": [],
+    "snapshot_hash": "0225684bc497a089682bbbbc2800279761186aafb799c62b3ae791d0712134ff",
+    "observed_at": "2026-10-18T03:11:23.376546+00:00",
+    "scope": "quiesced databases; no changes or replay performed"
+  }
+}

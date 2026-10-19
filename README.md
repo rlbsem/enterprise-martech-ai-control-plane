@@ -10,7 +10,7 @@ Built for integration challenges across multi-brand operators, PE-backed portfol
 
 **Example failure:** The receiving system commits an action, but its acknowledgment is lost. Instead of assuming failure and sending a new action, the control plane checks the stable effect ID, recognizes the existing receipt and preserves one downstream effect. After a database restore, services remain closed until recovered state agrees with independently held downstream receipts. These are tested controls in the published implementation, not claims of measured client savings.
 
-**Start with the [executed proof](docs/evidence/report.md), [enterprise workload results](docs/evidence/enterprise-workload.json), and [database recovery design](docs/cloud-operations.md).** The implementation includes deployable AWS infrastructure, distinct service identities, immutable releases and a fail-closed recovery gate.
+**Start with the [executed proof](docs/evidence/report.md), [enterprise workload results](docs/evidence/enterprise-workload.json), and [database recovery design](docs/cloud-operations.md).** The implementation includes defined AWS infrastructure, distinct service identities, immutable releases and a fail-closed recovery gate.
 
 ![Control-plane architecture](docs/diagrams/01-control-plane.svg)
 
@@ -19,7 +19,7 @@ Built for integration challenges across multi-brand operators, PE-backed portfol
 - **I kept AI outside the authority boundary.** An agent can propose an action, but it cannot assign field ownership, override source identity or hold downstream execution credentials. Typed proposals, scoped actors and a separate executor keep business state governed even when an AI output sounds persuasive. [Transaction and trust decisions](docs/architecture.md).
 - **I chose durable intent and receiver receipts over blind retries.** An HTTP timeout cannot tell us whether the effect committed. The exact intent and effect ID are saved before dispatch; a retry first reconciles the receiver's receipt and rechecks authority if there is no matching effect. This is **at-least-once delivery with idempotent effects under the receiver contract**, not an unsupported exactly-once network guarantee. [Failure semantics](docs/failures.md).
 - **I made database recovery conditional on business-state reconciliation.** A restored control database can be older than independently committed downstream effects. The executed remote-ahead case blocks resumption instead of treating a successful database restore as sufficient. [Recovery design](docs/cloud-operations.md) · [Recorded blocked case](docs/evidence/remote-ahead-restore.json).
-- **I accepted a bounded performance tradeoff.** A global admission lock simplifies correct identity discovery in this implementation, but limits throughput. Its measured synthetic workload and the thresholds for introducing pooling or partitioning are documented; AWS infrastructure is defined but **not deployed**. [Capacity boundaries](docs/capacity.md).
+- **I accepted a bounded performance tradeoff.** A global admission lock simplifies correct identity discovery in this implementation, but limits throughput. Its measured synthetic workload and the thresholds for introducing pooling or partitioning are documented; The production AWS infrastructure is defined but **not deployed**. [Capacity boundaries](docs/capacity.md).
 
 ## The invariants
 
@@ -42,6 +42,12 @@ If the response disappears or the worker dies, the next worker looks up the same
 Delivery is **at least once with idempotent effects under the downstream adapter contract**. Consent is enforced at dispatch authorization; an independently running remote system cannot recall an already in-flight request. See [precise failure semantics](docs/failures.md) and the [execution diagram](docs/diagrams/04-execution.svg).
 
 ## AWS operating architecture
+
+**Native AWS acceptance (synthetic, isolated):** [The first executed SQL experiment](docs/evidence/aws-readiness/native-sql/README.md) validated two private RDS PostgreSQL databases, independent receipt reconciliation, exact duplicate read-back and read-only mutation denials. Its attempt to add a *third* concurrent instance for PITR was blocked by the Free-plan instance quota. The [subsequent two-instance retained-backup experiment](docs/evidence/aws-readiness/retained-two-instance/native-outcome/README.md) **executed in AWS**: the disposable source was deleted with backups retained, and the restored control database was observed `available` beside the independent receipt database. **The native post-restore fail-closed comparison was not recorded and must not be claimed as passed.**
+
+The second experiment uncovered AWS SDK metadata and restore-parameter incompatibilities. Those edge cases have now been **reconstructed as committed source fixes with regression tests**; this revised controller has not been re-executed against AWS, so hosted CI does not establish missing native fail-closed acceptance. Earlier [two-instance local tests and saved-plan evidence](docs/evidence/aws-readiness/retained-two-instance/README.md) remain historical pre-run records, not native completion attestations. The separate [production AWS architecture and recovery design](docs/cloud-operations.md) remain **unexecuted**; one-off isolated SQL tasks and database restoration are not full application rollout, HTTP ingress or production failover validation. Independent cleanup removed active databases, runtime infrastructure and the guard; scheduled secret/key deletions and delayed billing settlement remain excluded from a zero-cost claim. [Read the sanitized native outcome and teardown evidence](docs/evidence/aws-readiness/retained-two-instance/native-outcome/README.md).
+
+[Ohio preflight](docs/evidence/aws-readiness/ohio/README.md), [native guard/image verification](docs/evidence/aws-readiness/guard-native/README.md) and [RDS bootstrap history](docs/evidence/aws-readiness/rds-bootstrap/README.md) preserve the sequence without reclassifying older local or cloud evidence.
 
 ![Private AWS runtime](docs/diagrams/02-aws-runtime.svg)
 
@@ -118,4 +124,4 @@ python scripts/validate_infra.py
 | Restore and operations | [Read-only comparison](src/controlplane/operations.py), [PITR tool](src/controlplane/restore.py), [runbook](docs/cloud-operations.md) |
 | Verification | [Generated test proof](docs/evidence/verification.json), [infrastructure checks](docs/evidence/infrastructure/verification.json), [validation guide](docs/validation.md), [GitHub Actions](https://github.com/rlbsem/enterprise-martech-ai-control-plane/actions) |
 
-AWS resources have not been provisioned; live failover and PITR remain [environment acceptance checks](docs/cloud-operations.md).
+The isolated guard, image bootstrap, native SQL runtime and retained-backup RDS restore executed and were subsequently cleaned up. The [final native recovery gate is unverified](docs/evidence/aws-readiness/retained-two-instance/native-outcome/README.md); production deployment and full application release/failover remain [environment acceptance checks](docs/cloud-operations.md).

@@ -1,0 +1,279 @@
+{
+  "observed_on": "2026-10-18",
+  "scope": "native_read_only_ohio_preflight_not_deployment_or_PITR",
+  "target_region": "us-east-2",
+  "plan_state_checked_privately": true,
+  "plan_change_attempted": false,
+  "region_basis": "AWS documented Canada project assignment plus successful service inventory; no project-settings metadata API claimed",
+  "api_calls": [
+    {
+      "service": "sts",
+      "operation": "GetCallerIdentity",
+      "status": "success"
+    },
+    {
+      "service": "freetier",
+      "operation": "GetAccountPlanState",
+      "status": "success"
+    },
+    {
+      "service": "rds",
+      "operation": "DescribeDBInstances",
+      "status": "success",
+      "n_items": {
+        "DBInstances": 0
+      }
+    },
+    {
+      "service": "ecs",
+      "operation": "ListClusters",
+      "status": "success",
+      "n_items": {
+        "clusterArns": 0
+      }
+    },
+    {
+      "service": "ec2",
+      "operation": "DescribeVpcs",
+      "status": "success",
+      "n_items": {
+        "Vpcs": 1
+      }
+    },
+    {
+      "service": "ec2",
+      "operation": "DescribeSubnets",
+      "status": "success",
+      "n_items": {
+        "Subnets": 3
+      }
+    },
+    {
+      "service": "rds",
+      "operation": "DescribeDBSnapshots",
+      "status": "success",
+      "n_items": {
+        "DBSnapshots": 0
+      }
+    },
+    {
+      "service": "rds",
+      "operation": "DescribeDBSubnetGroups",
+      "status": "success",
+      "n_items": {
+        "DBSubnetGroups": 0
+      }
+    },
+    {
+      "service": "rds",
+      "operation": "DescribeOrderableDBInstanceOptions",
+      "status": "success",
+      "n_items": {
+        "OrderableDBInstanceOptions": 172
+      }
+    },
+    {
+      "service": "rds",
+      "operation": "DescribeDBEngineVersions",
+      "status": "success",
+      "n_items": {
+        "DBEngineVersions": 0
+      }
+    },
+    {
+      "service": "ec2",
+      "operation": "DescribeRouteTables",
+      "status": "success",
+      "n_items": {
+        "RouteTables": 1
+      }
+    },
+    {
+      "service": "ec2",
+      "operation": "DescribeVpcEndpoints",
+      "status": "success",
+      "n_items": {
+        "VpcEndpoints": 0
+      }
+    },
+    {
+      "service": "ecr",
+      "operation": "DescribeRepositories",
+      "status": "success",
+      "n_items": {
+        "repositories": 0
+      }
+    },
+    {
+      "service": "secretsmanager",
+      "operation": "ListSecrets",
+      "status": "success",
+      "n_items": {
+        "SecretList": 0
+      }
+    },
+    {
+      "service": "kms",
+      "operation": "ListAliases",
+      "status": "success",
+      "n_items": {
+        "Aliases": 11
+      }
+    },
+    {
+      "service": "logs",
+      "operation": "DescribeLogGroups",
+      "status": "success",
+      "n_items": {
+        "logGroups": 0
+      }
+    },
+    {
+      "service": "lambda",
+      "operation": "ListFunctions",
+      "status": "success",
+      "n_items": {
+        "Functions": 0
+      }
+    },
+    {
+      "service": "scheduler",
+      "operation": "ListSchedules",
+      "status": "success",
+      "n_items": {
+        "Schedules": 0
+      }
+    },
+    {
+      "service": "rds",
+      "operation": "DescribeDBEngineVersions",
+      "status": "success",
+      "n_items": {
+        "DBEngineVersions": 1
+      }
+    },
+    {
+      "service": "rds",
+      "operation": "DescribeAccountAttributes",
+      "status": "success",
+      "n_items": {
+        "AccountQuotas": 19
+      }
+    },
+    {
+      "service": "ec2",
+      "operation": "DescribeAvailabilityZones",
+      "status": "success",
+      "n_items": {
+        "AvailabilityZones": 3
+      }
+    },
+    {
+      "service": "ec2",
+      "operation": "DescribeInstances",
+      "status": "success",
+      "n_items": {
+        "Reservations": 0
+      }
+    },
+    {
+      "service": "ec2",
+      "operation": "DescribeSecurityGroups",
+      "status": "success",
+      "n_items": {
+        "SecurityGroups": 1
+      }
+    },
+    {
+      "service": "ec2",
+      "operation": "DescribeVpcAttribute",
+      "status": "success"
+    },
+    {
+      "service": "iam",
+      "operation": "ListRoles",
+      "status": "success",
+      "n_items": {
+        "Roles": 9
+      }
+    },
+    {
+      "service": "ssm",
+      "operation": "DescribeInstanceInformation",
+      "status": "success",
+      "n_items": {
+        "InstanceInformationList": 0
+      }
+    },
+    {
+      "service": "iam",
+      "operation": "GetRole",
+      "status": "success"
+    },
+    {
+      "service": "iam",
+      "operation": "ListAttachedRolePolicies",
+      "status": "success",
+      "n_items": {
+        "AttachedPolicies": 1
+      }
+    },
+    {
+      "service": "iam",
+      "operation": "ListRolePolicies",
+      "status": "success",
+      "n_items": {
+        "PolicyNames": 0
+      }
+    }
+  ],
+  "counts": {
+    "attempted": 29,
+    "succeeded": 29,
+    "mutations": 0
+  },
+  "observations": {
+    "rds_instances": 0,
+    "rds_snapshots": 0,
+    "rds_subnet_groups": 0,
+    "ecs_clusters": 0,
+    "vpcs": 1,
+    "default_vpcs": 1,
+    "default_subnets": 3,
+    "default_subnets_map_public_ip": true,
+    "default_main_route_has_internet_gateway": true,
+    "existing_ec2_instances": 0,
+    "ssm_managed_instances": 0,
+    "vpc_endpoints": 0,
+    "ecr_repositories": 0,
+    "secrets": 0,
+    "log_groups": 0,
+    "lambda_functions": 0,
+    "scheduler_schedules": 0,
+    "postgres_version": "17.11",
+    "postgres_version_status": "available",
+    "orderable_class": "db.t4g.micro",
+    "orderable_storage": "gp3",
+    "min_orderable_storage_gb": 20,
+    "supports_storage_encryption": true
+  },
+  "qualifications": [
+    "Regional catalog orderability is not account-specific write entitlement.",
+    "The wildcard engine-version filter returned zero rows; an exact lookup confirmed 17.11.",
+    "Default subnets are not private acceptance subnets.",
+    "All prior Canadian-region evidence is preserved; it does not establish account-wide denial.",
+    "IAM observations do not establish effective mutation permissions or an SCP bypass."
+  ],
+  "native_acceptance": {
+    "rds_sql": false,
+    "pitr": false,
+    "application_recovery": false,
+    "teardown": false
+  },
+  "public_redactions": [
+    "account_principal_and_policy_identifiers",
+    "network_identifiers_and_CIDRs",
+    "credit_balance_and_expiration",
+    "raw_private_diagnostics"
+  ]
+}

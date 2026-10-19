@@ -1,0 +1,28 @@
+{
+  "hash_format": "SHA-256 with LF-normalized UTF-8 text",
+  "scope": "sanitized native SQL and rejected PITR evidence, cleanup, local regression; not an execution attestation",
+  "files": {
+    "docs/evidence/aws-readiness/native-sql/acceptance.json": "e0112ff8d15a4bdad09cc7f719c6c12c88089fce08ef4d6c6d4b919cd0a2bd13",
+    "docs/evidence/aws-readiness/native-sql/cleanup-requests.json": "94b7e6676dadc036a4a14439d04ecae064dfd7bdf8bde3144855d93c14dfe6f5",
+    "docs/evidence/aws-readiness/native-sql/cleanup.md": "a7226498caca5c339ef91b7dcea6f32a843d73be19ba9a007c21c210a6d8ac82",
+    "docs/evidence/aws-readiness/native-sql/guard-observations.json": "9fb7d2be8c11cf93e36c6d8316803e8de0d62cf4569b74f1ee5fa9a8efe87180",
+    "docs/evidence/aws-readiness/native-sql/guard-retirement.json": "88ce4f5bf4e4925e775ea0bb197f74af912b5ed940bc3f9c839ed55139a4b579",
+    "docs/evidence/aws-readiness/native-sql/image.json": "f5d38e8d8a22d73eb1a025407cc069de181610d1a41f440c683fb0db4f29a9f1",
+    "docs/evidence/aws-readiness/native-sql/pending-deletion.json": "69da4257eb34f915ff6c86eaf85736e27349e5fcd85ebdb25a3d3d07934e5a6b",
+    "docs/evidence/aws-readiness/native-sql/public-content-check.json": "52be79c55231e19b18dedcd972c5633bee4c9e5a10e3ce6e86afcba66c173116",
+    "docs/evidence/aws-readiness/native-sql/README.md": "e036e89e0048551564be9e4ebc78dc0580e10e09f7c33a560238187b414dd3bf",
+    "docs/evidence/aws-readiness/native-sql/resource-intervals.json": "45b8e7d8530f4e040c45cfe76f0d3c716a0c5c78844e61d564ae592b85b5a583",
+    "docs/evidence/aws-readiness/native-sql/secret-deletion-receipts.json": "0c597b916fd60ffc70b3e50a4b653e80c75839db0ca2098094140748c4d06aa9",
+    "docs/evidence/aws-readiness/native-sql/teardown.json": "f9435effd489179030a96b39b975ead49e99439cedf724e6c29721e07b1129c8",
+    "docs/evidence/aws-readiness/restore-parameters/local/competing-workers.json": "693df6bd2e4674b60688bea55fa9820ed9f3944ffaa5b763d75d4614d18953c6",
+    "docs/evidence/aws-readiness/restore-parameters/local/consent-race.json": "ae6101242e1e3b60a43df9d7f4ad1e891d4a6b8be055172fd2f8329ae727e9ee",
+    "docs/evidence/aws-readiness/restore-parameters/local/no-regress.json": "fa4ad955f9e49a3e355935a36bae7ca338b90a838ba8c9d7bb75404c20581f5c",
+    "docs/evidence/aws-readiness/restore-parameters/local/process-death.json": "06f10452b4af1f7a3ab6694536ef4eec63d9ec52293c673a91bc856516a7116c",
+    "docs/evidence/aws-readiness/restore-parameters/local/remote-ahead-restore.json": "875e68e1f7d68695858f4841394e9f6d2f8051f7394b07bf00c3cba8138c4572",
+    "docs/evidence/aws-readiness/restore-parameters/local/report.md": "a51121e413af6945cb830de15794ea482316b814b679f930cc13589fea253985",
+    "docs/evidence/aws-readiness/restore-parameters/local/tests.xml": "3250b0d6cb528f1e5c963a17569f0bc10d8406a806e299f04b5f9a4a5e1b093f",
+    "docs/evidence/aws-readiness/restore-parameters/local/unknown-result.json": "c1045f144e7cce0302bd1c2b809551605ca9a0f7565c36077668576caf4ff8ca",
+    "docs/evidence/aws-readiness/restore-parameters/local/verification.json": "77e9bcf0cd9bb75fd4513473517b065136f4fa399ff061f763a4dc2e75328e2a",
+    "docs/evidence/aws-readiness/restore-parameters/README.md": "34ea6061485af1e6d62eaa4c5904100abf996842553d0f5cfbc9d7d2e8815d13"
+  }
+}

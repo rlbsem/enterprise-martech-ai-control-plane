@@ -1,0 +1,824 @@
+{
+  "scope": "actual operator SDK cleanup/guard retirement request metadata, not watchdog-role deletion evidence",
+  "requests": [
+    {
+      "at": "2026-10-18T22:37:03.950326+00:00",
+      "service": "rds",
+      "operation": "ModifyDBInstance",
+      "request_id": "3876af4d-527b-4462-b439-81b037b8ea15",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:37:04.637684+00:00",
+      "service": "rds",
+      "operation": "ModifyDBInstance",
+      "request_id": "f546c623-891e-499b-9bdc-34750e48af45",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:37:05.206723+00:00",
+      "service": "ecs",
+      "operation": "DeleteCluster",
+      "request_id": "a461b544-ffca-402d-9121-e5f50f993799",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:37:05.722418+00:00",
+      "service": "ecr",
+      "operation": "DeleteRepository",
+      "request_id": "57b05bd1-32ae-4734-accd-243402868210",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:37:06.190431+00:00",
+      "service": "secretsmanager",
+      "operation": "DeleteSecret",
+      "request_id": "bc426dfc-54bc-48d9-bdbb-0b09f4bf2e8b",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:37:06.657782+00:00",
+      "service": "secretsmanager",
+      "operation": "DeleteSecret",
+      "request_id": "f9613d2e-beeb-4622-9d92-d3d4bdb04f0b",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:37:07.113613+00:00",
+      "service": "secretsmanager",
+      "operation": "DeleteSecret",
+      "request_id": "6a3ba34e-d019-42a2-9c0b-36122bc960ad",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:37:07.567168+00:00",
+      "service": "secretsmanager",
+      "operation": "DeleteSecret",
+      "request_id": "04fb5b8f-d9bf-4580-b389-6e3631cf4c10",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:37:07.988237+00:00",
+      "service": "secretsmanager",
+      "operation": "DeleteSecret",
+      "request_id": "96e4ad3c-228f-43a8-9284-1748fdb831bb",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:37:08.649562+00:00",
+      "service": "ec2",
+      "operation": "DeleteVpcEndpoints",
+      "request_id": "3305f565-752c-4fb3-8841-6bca45bf0a6d",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:37:09.275988+00:00",
+      "service": "ec2",
+      "operation": "DeleteVpcEndpoints",
+      "request_id": "3e1adf60-684e-4401-ba20-238c736b6da0",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:37:09.904004+00:00",
+      "service": "ec2",
+      "operation": "DeleteVpcEndpoints",
+      "request_id": "2c96c11a-33e0-4909-a9d8-3915676ba266",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:37:10.502583+00:00",
+      "service": "ec2",
+      "operation": "DeleteVpcEndpoints",
+      "request_id": "0d1ac1be-e8ee-4cb6-977a-e5e1fb884b07",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:37:13.226450+00:00",
+      "service": "ec2",
+      "operation": "DeleteVpcEndpoints",
+      "request_id": "5023d513-e3e3-4c3d-affa-f73c36061234",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:37:14.152198+00:00",
+      "service": "iam",
+      "operation": "DeleteRolePolicy",
+      "request_id": "a92f21ce-fdc5-4e7a-999d-746a8022a7ca",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:37:14.675623+00:00",
+      "service": "iam",
+      "operation": "DeleteRole",
+      "request_id": "43d2727f-c2d1-4ddb-9371-b984db1315e2",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:37:15.592081+00:00",
+      "service": "iam",
+      "operation": "DeleteRolePolicy",
+      "request_id": "5927e12b-723e-4053-b800-8d79cc3c42d9",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:37:16.116571+00:00",
+      "service": "iam",
+      "operation": "DeleteRole",
+      "request_id": "16538995-f1cc-4f8c-83f1-417642c366b9",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:37:17.069005+00:00",
+      "service": "iam",
+      "operation": "DeleteRolePolicy",
+      "request_id": "97f81527-8ba2-4911-a19d-1251889f5ff3",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:37:17.595267+00:00",
+      "service": "iam",
+      "operation": "DeleteRole",
+      "request_id": "f3dc966f-9583-4357-8b08-de6fe3c14534",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:37:18.527080+00:00",
+      "service": "iam",
+      "operation": "DeleteRolePolicy",
+      "request_id": "61c454ef-7a48-4879-b2d2-2d56570980a5",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:37:19.046608+00:00",
+      "service": "iam",
+      "operation": "DeleteRole",
+      "request_id": "e5f64ee0-d963-43b0-a74d-3b42bf18f691",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:37:19.947184+00:00",
+      "service": "iam",
+      "operation": "DeleteRolePolicy",
+      "request_id": "4b5ce048-f226-4d94-bc67-b5399d81f0cb",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:37:20.476342+00:00",
+      "service": "iam",
+      "operation": "DeleteRole",
+      "request_id": "ec689d8c-ee65-46de-aa66-8b00188815db",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:37:21.383673+00:00",
+      "service": "iam",
+      "operation": "DeleteRolePolicy",
+      "request_id": "162e2a2b-955e-4cdd-9e16-d3f8a3a9ff21",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:37:21.909191+00:00",
+      "service": "iam",
+      "operation": "DeleteRole",
+      "request_id": "f17bee41-f3b0-4db2-be6b-624c1711e45d",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:38:07.486956+00:00",
+      "service": "rds",
+      "operation": "DeleteDBInstance",
+      "request_id": "4c2d6b82-8463-4c01-a817-89bc3f8e4bdd",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:38:08.036327+00:00",
+      "service": "rds",
+      "operation": "DeleteDBInstance",
+      "request_id": "70bc180f-d095-42dc-b6b0-0fb83b653d98",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:38:08.597358+00:00",
+      "service": "ec2",
+      "operation": "DeleteVpcEndpoints",
+      "request_id": "bda05f3e-32d4-4fe3-9745-ff2b665475b1",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:38:09.168887+00:00",
+      "service": "ec2",
+      "operation": "DeleteVpcEndpoints",
+      "request_id": "68d72a03-a5e4-4a39-b865-82db450c7eaa",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:38:09.749396+00:00",
+      "service": "ec2",
+      "operation": "DeleteVpcEndpoints",
+      "request_id": "7d0ae7de-16cd-47cb-bbd4-cda8fbc972bc",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:38:10.323896+00:00",
+      "service": "ec2",
+      "operation": "DeleteVpcEndpoints",
+      "request_id": "ceb30e1d-68f3-47e8-ad94-b083c3b83ee9",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:38:56.960730+00:00",
+      "service": "ec2",
+      "operation": "DeleteVpcEndpoints",
+      "request_id": "b4906e58-7847-4199-a1c9-05449b24373a",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:38:57.564233+00:00",
+      "service": "ec2",
+      "operation": "DeleteVpcEndpoints",
+      "request_id": "8e824d89-1697-43bb-a17a-22d9fd0fc598",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:38:58.228903+00:00",
+      "service": "ec2",
+      "operation": "DeleteVpcEndpoints",
+      "request_id": "05c34bfd-692d-42fd-8acc-03a90498e115",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:38:58.786989+00:00",
+      "service": "ec2",
+      "operation": "DeleteVpcEndpoints",
+      "request_id": "2f695744-b2da-46ff-9966-e6771e761541",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:39:44.775303+00:00",
+      "service": "ec2",
+      "operation": "DeleteVpcEndpoints",
+      "request_id": "42a025ec-37d9-4e1d-ac87-99b722ec1767",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:40:31.354882+00:00",
+      "service": "ec2",
+      "operation": "DeleteRouteTable",
+      "request_id": "04b552dc-0d9f-4e01-aa95-527119b01de0",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:42:01.076606+00:00",
+      "service": "logs",
+      "operation": "DeleteLogGroup",
+      "request_id": "db9ab0af-17f9-4a9d-a573-da682cdb5ca1",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:42:01.515793+00:00",
+      "service": "logs",
+      "operation": "DeleteLogGroup",
+      "request_id": "ac78d4f8-b644-4242-b0b1-43d9a1ad7b31",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:42:01.959758+00:00",
+      "service": "logs",
+      "operation": "DeleteLogGroup",
+      "request_id": "cc275464-ec9f-4d76-9312-3c4eb148dbec",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:42:02.385889+00:00",
+      "service": "logs",
+      "operation": "DeleteLogGroup",
+      "request_id": "c54089fb-eee6-42ac-8bd8-89d88aeec85c",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:42:02.833374+00:00",
+      "service": "logs",
+      "operation": "DeleteLogGroup",
+      "request_id": "d61b84b5-fe79-458f-af7e-6ae7cb26b5e8",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:42:03.261908+00:00",
+      "service": "logs",
+      "operation": "DeleteLogGroup",
+      "request_id": "8c8d2bd7-1540-4cc4-be3b-297f8062b071",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:42:03.688246+00:00",
+      "service": "logs",
+      "operation": "DeleteLogGroup",
+      "request_id": "65a45da4-e3bb-4c03-8a54-3d846875d9d5",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:42:04.124165+00:00",
+      "service": "logs",
+      "operation": "DeleteLogGroup",
+      "request_id": "901a9342-6b7a-42c3-9e5b-9007db797f71",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:42:04.637905+00:00",
+      "service": "kms",
+      "operation": "ScheduleKeyDeletion",
+      "request_id": "b0093ff7-1288-4894-87d3-513c245476a4",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:42:05.879572+00:00",
+      "service": "ec2",
+      "operation": "DeleteSecurityGroup",
+      "request_id": "d737d6a7-2fec-4580-9d22-16ecd658ed72",
+      "http_status": 400,
+      "error_code": "DependencyViolation"
+    },
+    {
+      "at": "2026-10-18T22:42:07.255259+00:00",
+      "service": "ec2",
+      "operation": "DeleteSecurityGroup",
+      "request_id": "29cf550f-d935-4e00-91ed-754ebc465420",
+      "http_status": 400,
+      "error_code": "DependencyViolation"
+    },
+    {
+      "at": "2026-10-18T22:42:08.603005+00:00",
+      "service": "ec2",
+      "operation": "DeleteSecurityGroup",
+      "request_id": "a6c0e621-1e3d-41a8-bba7-c0a3ba0154b0",
+      "http_status": 400,
+      "error_code": "DependencyViolation"
+    },
+    {
+      "at": "2026-10-18T22:42:09.959577+00:00",
+      "service": "ec2",
+      "operation": "DeleteSecurityGroup",
+      "request_id": "6265f122-9332-4a1b-b0e3-6d361aeacc46",
+      "http_status": 400,
+      "error_code": "DependencyViolation"
+    },
+    {
+      "at": "2026-10-18T22:42:11.289438+00:00",
+      "service": "ec2",
+      "operation": "DeleteSecurityGroup",
+      "request_id": "8384c8e3-43bc-47aa-b215-4d3ef636a227",
+      "http_status": 400,
+      "error_code": "DependencyViolation"
+    },
+    {
+      "at": "2026-10-18T22:42:12.609262+00:00",
+      "service": "ec2",
+      "operation": "DeleteSecurityGroup",
+      "request_id": "a7f550aa-5946-4856-937b-6c13a09d1a33",
+      "http_status": 400,
+      "error_code": "DependencyViolation"
+    },
+    {
+      "at": "2026-10-18T22:42:14.046029+00:00",
+      "service": "ec2",
+      "operation": "DeleteSecurityGroup",
+      "request_id": "cda33c44-e5b4-41b7-8dc4-c27020594b63",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:42:15.334911+00:00",
+      "service": "ec2",
+      "operation": "DeleteSecurityGroup",
+      "request_id": "18cd0c67-57b4-438b-8982-6931d1dc2443",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:42:16.069845+00:00",
+      "service": "ec2",
+      "operation": "DeleteSubnet",
+      "request_id": "91853f4d-b445-453d-8725-49956121ba08",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:42:16.813640+00:00",
+      "service": "ec2",
+      "operation": "DeleteSubnet",
+      "request_id": "6c1803ca-5c4d-43f4-9a35-46bd975f5b57",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:42:17.253395+00:00",
+      "service": "rds",
+      "operation": "DeleteDBSubnetGroup",
+      "request_id": "9cf0a953-fb1d-4562-aa42-86cfaabe3051",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:42:17.720867+00:00",
+      "service": "rds",
+      "operation": "DeleteDBParameterGroup",
+      "request_id": "242be2a2-cf11-4a12-af28-c84d98d6945b",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:43:03.409671+00:00",
+      "service": "ec2",
+      "operation": "DeleteSecurityGroup",
+      "request_id": "e561dece-48c1-4dce-b400-091de41ad573",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:43:04.032538+00:00",
+      "service": "ec2",
+      "operation": "DeleteSecurityGroup",
+      "request_id": "57c0c2ba-4b59-4744-a4c5-f223dc9494d5",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:43:04.640884+00:00",
+      "service": "ec2",
+      "operation": "DeleteSecurityGroup",
+      "request_id": "0ce63bc1-3fdc-46ec-99a2-9418a7df7e40",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:43:05.272645+00:00",
+      "service": "ec2",
+      "operation": "DeleteSecurityGroup",
+      "request_id": "55d30c6f-6913-471a-9f94-74fd93eb9021",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:43:05.880848+00:00",
+      "service": "ec2",
+      "operation": "DeleteSecurityGroup",
+      "request_id": "6a08d2d7-dfc4-40f3-9163-3063641a9a90",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:43:06.513374+00:00",
+      "service": "ec2",
+      "operation": "DeleteSecurityGroup",
+      "request_id": "564b9289-1710-4e83-b713-2dd7791f4909",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-18T22:43:51.639246+00:00",
+      "service": "ec2",
+      "operation": "DeleteVpc",
+      "request_id": "b623c5da-c03f-45c5-a476-5be9f2e854f1",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-19T02:11:23.194623+00:00",
+      "service": "ecs",
+      "operation": "DeregisterTaskDefinition",
+      "request_id": "5f41d1a9-11aa-4506-8f29-0de95ff9b38e",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-19T02:11:23.649035+00:00",
+      "service": "ecs",
+      "operation": "DeregisterTaskDefinition",
+      "request_id": "b61f91df-5f1c-4fb8-8a59-3454ebd5fd96",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-19T02:11:24.096222+00:00",
+      "service": "ecs",
+      "operation": "DeregisterTaskDefinition",
+      "request_id": "cb20ae63-d56c-4fd0-b1ca-06e012b07625",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-19T02:11:24.544284+00:00",
+      "service": "ecs",
+      "operation": "DeregisterTaskDefinition",
+      "request_id": "a2eca3d8-9ab2-4dc2-bc4f-19f70e741f6a",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-19T02:11:24.996039+00:00",
+      "service": "ecs",
+      "operation": "DeregisterTaskDefinition",
+      "request_id": "eace7b39-89bc-4961-bc5a-eca4426aa35a",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-19T02:11:25.463124+00:00",
+      "service": "ecs",
+      "operation": "DeleteTaskDefinitions",
+      "request_id": "d10c1005-d31b-4201-bca8-2823c3d8d878",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-19T02:11:25.963736+00:00",
+      "service": "ecs",
+      "operation": "DeleteTaskDefinitions",
+      "request_id": "0b07fa2f-bcac-4842-836c-3b3c54e9678b",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-19T02:11:26.439839+00:00",
+      "service": "ecs",
+      "operation": "DeleteTaskDefinitions",
+      "request_id": "44370524-bf36-44b0-864f-708b2838c3fc",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-19T02:11:26.919741+00:00",
+      "service": "ecs",
+      "operation": "DeleteTaskDefinitions",
+      "request_id": "2faf3aab-dc14-4a62-b1bb-88ef90b3bf83",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-19T02:11:27.390374+00:00",
+      "service": "ecs",
+      "operation": "DeleteTaskDefinitions",
+      "request_id": "9c31f39f-6f19-402a-815c-6b778b06680e",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-19T02:12:25.876991+00:00",
+      "service": "ecs",
+      "operation": "DeleteTaskDefinitions",
+      "request_id": "3ff30508-629b-44f2-8c71-8c2bb1aad213",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-19T02:12:26.332023+00:00",
+      "service": "ecs",
+      "operation": "DeleteTaskDefinitions",
+      "request_id": "e6a45934-daff-4dbb-a6b0-68fe22d8ca93",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-19T02:12:26.775876+00:00",
+      "service": "ecs",
+      "operation": "DeleteTaskDefinitions",
+      "request_id": "c9bc0a2d-1dd2-4bef-becb-d157e117bc77",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-19T02:12:27.255980+00:00",
+      "service": "ecs",
+      "operation": "DeleteTaskDefinitions",
+      "request_id": "2833d4ba-fbfc-454b-a101-f16ac0ca166e",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-19T02:12:27.721809+00:00",
+      "service": "ecs",
+      "operation": "DeleteTaskDefinitions",
+      "request_id": "80dd3d76-183c-4705-8261-93c407f6b920",
+      "http_status": 200,
+      "error_code": null
+    },
+    {
+      "at": "2026-10-19T02:17:50.578072+00:00",
+      "service": "scheduler",
+      "operation": "DeleteSchedule",
+      "request_id": "39f04bff-edaa-492d-b448-769a96b837a3",
+      "http_status": 200,
+      "error_code": null,
+      "phase": "approved_guard_retirement"
+    },
+    {
+      "at": "2026-10-19T02:17:51.200885+00:00",
+      "service": "lambda",
+      "operation": "PutFunctionConcurrency",
+      "request_id": "ae6fd52f-f3ae-482c-8f2b-35da36b5012d",
+      "http_status": 200,
+      "error_code": null,
+      "phase": "approved_guard_retirement"
+    },
+    {
+      "at": "2026-10-19T02:17:51.678657+00:00",
+      "service": "lambda",
+      "operation": "PutFunctionConcurrency",
+      "request_id": "72a5dc3a-66cb-41d7-915d-972254a4f840",
+      "http_status": 200,
+      "error_code": null,
+      "phase": "approved_guard_retirement"
+    },
+    {
+      "at": "2026-10-19T02:19:58.546505+00:00",
+      "service": "s3",
+      "operation": "DeleteObjects",
+      "request_id": "GMJMYW6KBX9DH95J",
+      "http_status": 200,
+      "error_code": null,
+      "phase": "approved_guard_retirement"
+    },
+    {
+      "at": "2026-10-19T02:19:59.747443+00:00",
+      "service": "s3",
+      "operation": "DeleteBucket",
+      "request_id": "FCDMVGTF1P0C2KEK",
+      "http_status": 204,
+      "error_code": null,
+      "phase": "approved_guard_retirement"
+    },
+    {
+      "at": "2026-10-19T02:20:00.387380+00:00",
+      "service": "lambda",
+      "operation": "DeleteFunction",
+      "request_id": "e6875ce9-1071-4384-a366-9f0b73f9d14a",
+      "http_status": 204,
+      "error_code": null,
+      "phase": "approved_guard_retirement"
+    },
+    {
+      "at": "2026-10-19T02:20:00.988051+00:00",
+      "service": "logs",
+      "operation": "DeleteLogGroup",
+      "request_id": "4ba32f8e-59f4-4b1f-b492-46d2e8837b68",
+      "http_status": 200,
+      "error_code": null,
+      "phase": "approved_guard_retirement"
+    },
+    {
+      "at": "2026-10-19T02:20:01.628987+00:00",
+      "service": "lambda",
+      "operation": "DeleteFunction",
+      "request_id": "4e1f728a-f40b-4332-bfe6-09aa681629e9",
+      "http_status": 204,
+      "error_code": null,
+      "phase": "approved_guard_retirement"
+    },
+    {
+      "at": "2026-10-19T02:20:02.089537+00:00",
+      "service": "logs",
+      "operation": "DeleteLogGroup",
+      "request_id": "18222d94-4bb9-4f5a-985b-85b6a859585c",
+      "http_status": 200,
+      "error_code": null,
+      "phase": "approved_guard_retirement"
+    },
+    {
+      "at": "2026-10-19T02:20:03.083609+00:00",
+      "service": "sqs",
+      "operation": "DeleteQueue",
+      "request_id": "82e11072-1034-5ae6-88bd-733d90a64c94",
+      "http_status": 200,
+      "error_code": null,
+      "phase": "approved_guard_retirement"
+    },
+    {
+      "at": "2026-10-19T02:20:03.707446+00:00",
+      "service": "cloudwatch",
+      "operation": "DeleteAlarms",
+      "request_id": "09acfb7d-485e-45cf-92fa-cf96935cb1f9",
+      "http_status": 200,
+      "error_code": null,
+      "phase": "approved_guard_retirement"
+    },
+    {
+      "at": "2026-10-19T02:20:05.151137+00:00",
+      "service": "iam",
+      "operation": "DeleteRolePolicy",
+      "request_id": "0b9b243c-0c57-48db-bd8e-bdb93456fb40",
+      "http_status": 200,
+      "error_code": null,
+      "phase": "approved_guard_retirement"
+    },
+    {
+      "at": "2026-10-19T02:20:05.631193+00:00",
+      "service": "iam",
+      "operation": "DeleteRolePolicy",
+      "request_id": "72f4c6b1-36ac-4531-9297-34a637aaa02b",
+      "http_status": 200,
+      "error_code": null,
+      "phase": "approved_guard_retirement"
+    },
+    {
+      "at": "2026-10-19T02:20:06.132759+00:00",
+      "service": "iam",
+      "operation": "DeleteRole",
+      "request_id": "a30b5b9d-4e5f-40ca-89f2-04dec034dcb1",
+      "http_status": 200,
+      "error_code": null,
+      "phase": "approved_guard_retirement"
+    },
+    {
+      "at": "2026-10-19T02:20:07.497954+00:00",
+      "service": "iam",
+      "operation": "DeleteRolePolicy",
+      "request_id": "99aa75ce-12dd-4f1d-8fca-b0e97d413c66",
+      "http_status": 200,
+      "error_code": null,
+      "phase": "approved_guard_retirement"
+    },
+    {
+      "at": "2026-10-19T02:20:07.983142+00:00",
+      "service": "iam",
+      "operation": "DeleteRole",
+      "request_id": "d08820c4-e4d6-49c0-8088-84bf30c6eb4a",
+      "http_status": 200,
+      "error_code": null,
+      "phase": "approved_guard_retirement"
+    },
+    {
+      "at": "2026-10-19T02:20:09.384478+00:00",
+      "service": "iam",
+      "operation": "DeleteRolePolicy",
+      "request_id": "a53973c2-371b-4a17-b4ba-6dae6aee8b2e",
+      "http_status": 200,
+      "error_code": null,
+      "phase": "approved_guard_retirement"
+    },
+    {
+      "at": "2026-10-19T02:20:09.869227+00:00",
+      "service": "iam",
+      "operation": "DeleteRole",
+      "request_id": "7c89afd1-cec2-4cb4-817f-c8871c970095",
+      "http_status": 200,
+      "error_code": null,
+      "phase": "approved_guard_retirement"
+    },
+    {
+      "at": "2026-10-19T02:20:10.452261+00:00",
+      "service": "kms",
+      "operation": "ScheduleKeyDeletion",
+      "request_id": "4048ea6d-4fe2-4e96-b22a-3b3db9139882",
+      "http_status": 200,
+      "error_code": null,
+      "phase": "approved_guard_retirement"
+    }
+  ]
+}

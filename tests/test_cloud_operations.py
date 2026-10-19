@@ -231,14 +231,15 @@ def test_observer_has_only_queue_read_authority():
 
 
 @pytest.mark.parametrize('restored', [False, True])
-def test_bootstrap_reuses_partial_credentials_and_rebinds_only_hosts(monkeypatch, restored):
+@pytest.mark.parametrize('database_name', ['control', 'csaacceptance'])
+def test_bootstrap_reuses_partial_credentials_and_rebinds_only_hosts(monkeypatch, restored, database_name):
     from psycopg.conninfo import conninfo_to_dict
     client = Mock()
     host = 'restored.control.test' if restored else 'control.test'
     documents = {
         'master-control': {'username': 'owner', 'password': 'mock-owner'},
         'master-remote': {'username': 'owner', 'password': 'mock-owner'},
-        'worker': {'CONTROL_DSN': 'host=control.test dbname=control user=control_worker password=preserved',
+        'worker': {'CONTROL_DSN': f'host=control.test dbname={database_name} user=control_worker password=preserved',
                    'EXECUTOR_TOKEN': 'preserved-executor-token'},
     }
     def get(SecretId):
@@ -253,14 +254,67 @@ def test_bootstrap_reuses_partial_credentials_and_rebinds_only_hosts(monkeypatch
     monkeypatch.setenv('RUNTIME_SECRET_ARNS', json.dumps({k: k for k in ['api', 'observer', 'remote', 'verifier', 'worker']}))
     monkeypatch.setenv('DB_MASTER_SECRET_ARNS', json.dumps({'control': 'master-control', 'downstream': 'master-remote'}))
     monkeypatch.setenv('DB_HOSTS', json.dumps({'control': host, 'downstream': 'remote.test'}))
-    monkeypatch.setattr(db, 'connect', MagicMock())
+    connection = MagicMock()
+    connection.execute.return_value.fetchone.return_value = {
+        'rolsuper': False, 'rolcreatedb': False, 'rolcreaterole': False,
+        'rolreplication': False, 'rolbypassrls': False, 'inherits_roles': False,
+    }
+    connect_mock = MagicMock()
+    connect_mock.return_value.__enter__.return_value = connection
+    monkeypatch.setattr(db, 'connect', connect_mock)
     monkeypatch.setattr(db, 'migrate', Mock())
     monkeypatch.setattr(cloud, 'grants', Mock())
-    cloud.bootstrap(client)
+    cloud.bootstrap(client, **({} if database_name == "control" else {"database_name": database_name}))
     assert documents['worker']['EXECUTOR_TOKEN'] == documents['remote']['EXECUTOR_TOKEN'] == 'preserved-executor-token'
     info = conninfo_to_dict(documents['worker']['CONTROL_DSN'])
+    assert info['dbname'] == database_name
     assert info['host'] == host and info['password'] == 'preserved' and info['sslmode'] == 'verify-full'
     assert set(documents['observer']) == {'CONTROL_DSN'}
     before = deepcopy(documents)
-    cloud.bootstrap(client)
+    cloud.bootstrap(client, **({} if database_name == "control" else {"database_name": database_name}))
     assert before == documents
+
+
+
+def test_role_bootstrap_works_with_nonsuperuser_createrole():
+    from psycopg import sql
+    admin = os.environ['TEST_ADMIN_DSN']
+    creator, target = 'creator_' + uuid4().hex, 'target_' + uuid4().hex
+    with db.connect(admin) as c:
+        c.execute(sql.SQL('CREATE ROLE {} LOGIN CREATEROLE PASSWORD {}').format(
+            sql.Identifier(creator), sql.Literal('synthetic-creator-only')))
+    try:
+        dsn = make_conninfo(admin, user=creator, password='synthetic-creator-only')
+        with db.connect(dsn) as c:
+            assert not c.execute('SELECT rolsuper FROM pg_roles WHERE rolname=current_user').fetchone()['rolsuper']
+            cloud.role(c, target, 'synthetic-target-only')
+        with pytest.raises(psycopg.errors.InsufficientPrivilege), db.connect(dsn) as c:
+            c.execute(sql.SQL('ALTER ROLE {} NOSUPERUSER NOREPLICATION NOBYPASSRLS').format(sql.Identifier(target)))
+        with db.connect(make_conninfo(admin, user=target, password='synthetic-target-only')) as c:
+            assert c.execute('SELECT 1 AS result').fetchone()['result'] == 1
+    finally:
+        with db.connect(admin) as c:
+            c.execute(sql.SQL('DROP ROLE IF EXISTS {}').format(sql.Identifier(target)))
+            c.execute(sql.SQL('DROP ROLE IF EXISTS {}').format(sql.Identifier(creator)))
+
+
+@pytest.mark.parametrize('attribute', ['SUPERUSER', 'CREATEDB', 'CREATEROLE', 'REPLICATION', 'BYPASSRLS', 'membership'])
+def test_role_bootstrap_refuses_existing_escalated_authority(attribute):
+    from psycopg import sql
+    admin = os.environ['TEST_ADMIN_DSN']
+    target, parent = 'unsafe_' + uuid4().hex, 'parent_' + uuid4().hex
+    with db.connect(admin) as c:
+        c.execute(sql.SQL('CREATE ROLE {} LOGIN').format(sql.Identifier(target)))
+        if attribute == 'membership':
+            c.execute(sql.SQL('CREATE ROLE {}').format(sql.Identifier(parent)))
+            c.execute(sql.SQL('GRANT {} TO {}').format(sql.Identifier(parent), sql.Identifier(target)))
+        else:
+            c.execute(sql.SQL('ALTER ROLE {} {}').format(sql.Identifier(target), sql.SQL(attribute)))
+    try:
+        with db.connect(admin) as c, pytest.raises(ValueError, match='administrative or inheriting'):
+            cloud.role(c, target, 'must-not-be-applied')
+    finally:
+        with db.connect(admin) as c:
+            c.execute(sql.SQL('DROP ROLE {}').format(sql.Identifier(target)))
+            if attribute == 'membership':
+                c.execute(sql.SQL('DROP ROLE {}').format(sql.Identifier(parent)))

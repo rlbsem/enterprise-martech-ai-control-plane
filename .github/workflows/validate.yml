@@ -56,5 +56,20 @@ jobs:
       - run: docker compose run --build --rm demo
       - name: Verify all tests from the built image
         run: docker compose --profile test run --rm verify
+      - name: Export source-bound native acceptance image without AWS access
+        run: |
+          mkdir -p work/native-image
+          docker buildx create --name native-export --driver docker-container --use
+          docker buildx build --platform linux/amd64 --provenance=false --sbom=false \
+            --label org.opencontainers.image.revision=${{ github.sha }} \
+            --output type=oci,dest=work/native-image/image.oci.tar .
+          sha256sum work/native-image/image.oci.tar > work/native-image/SHA256SUMS
+          printf '%s\n' '${{ github.sha }}' > work/native-image/source-commit.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: native-acceptance-image
+          path: work/native-image
+          retention-days: 1
+          if-no-files-found: error
       - if: always()
         run: docker compose down --volumes

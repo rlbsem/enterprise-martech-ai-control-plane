@@ -1,0 +1,16 @@
+{
+  "scope": "actual_RDS_CreateDBInstance_rejection_not_PITR_success",
+  "request_ids": [
+    "cfac786c-509f-4767-860a-4ae7ea050895",
+    "a9018b91-e504-4e87-b1e6-971335d1a45e"
+  ],
+  "http_status": 400,
+  "aws_error": "FreeTierRestrictionError",
+  "reason": "The specified backup retention period exceeds the maximum available to free tier customers.",
+  "requested_backup_retention_days": 14,
+  "databases_created": 0,
+  "native_SQL_tasks_started": 0,
+  "corrective_action": "Acceptance lane alone pins one nonzero day of automated backups; real retry still required. Production retention is unchanged.",
+  "paid_upgrade": false,
+  "historical_log_preserved_privately": true
+}

@@ -1,0 +1,15 @@
+{
+  "failure": "timeout_after",
+  "worker_attempts": 2,
+  "remote_business_effects": 1,
+  "idempotency_key": "3d71fc4d-e0bc-46d3-960c-c31ba5066f1d",
+  "first_status": "retry",
+  "final_status": "succeeded",
+  "resolution": "reconciled_committed_effect",
+  "receipt": {
+    "key": "3d71fc4d-e0bc-46d3-960c-c31ba5066f1d",
+    "hash": "3a67b0183d3dd6ba74c820fc81f0e517e51ed299a797461a1a6f4cad980abb03",
+    "receipt": "36763458-c6d7-4059-ae57-5d8dd0034be5",
+    "committed_at": "2026-10-18T23:07:42.255267-04:00"
+  }
+}

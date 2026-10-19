@@ -1,0 +1,402 @@
+{
+  "Policies": [
+    {
+      "Policy": {
+        "Id": "IamPolicyAutopilot",
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ec2:DeleteNetworkInterface",
+              "ec2:DeleteRouteTable",
+              "ec2:DeleteSecurityGroup",
+              "ec2:DeleteSubnet",
+              "ec2:DeleteVpc",
+              "ec2:DeleteVpcEndpoints"
+            ],
+            "Resource": [
+              "arn:aws:ec2:us-east-2:123456789012:network-interface/*",
+              "arn:aws:ec2:us-east-2:123456789012:route-table/*",
+              "arn:aws:ec2:us-east-2:123456789012:security-group/*",
+              "arn:aws:ec2:us-east-2:123456789012:subnet/*",
+              "arn:aws:ec2:us-east-2:123456789012:vpc-endpoint/*",
+              "arn:aws:ec2:us-east-2:123456789012:vpc/*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ec2:DisassociateRouteTable"
+            ],
+            "Resource": [
+              "*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ecr:DeleteRepository"
+            ],
+            "Resource": [
+              "arn:aws:ecr:us-east-2:123456789012:repository/*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ecs:DeleteCluster",
+              "ecs:DeleteTaskDefinitions",
+              "ecs:DescribeClusters",
+              "ecs:DescribeTasks",
+              "ecs:ListTasks",
+              "ecs:RunTask",
+              "ecs:StopTask"
+            ],
+            "Resource": [
+              "arn:aws:ecs:us-east-2:123456789012:cluster/*",
+              "arn:aws:ecs:us-east-2:123456789012:container-instance/*/*",
+              "arn:aws:ecs:us-east-2:123456789012:task-definition/*:*",
+              "arn:aws:ecs:us-east-2:123456789012:task/*/*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ecs:DeregisterTaskDefinition",
+              "ecs:DescribeTaskDefinition",
+              "ecs:TagResource"
+            ],
+            "Resource": [
+              "*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "iam:DeleteRole",
+              "iam:DeleteRolePolicy",
+              "iam:GetRole",
+              "iam:ListRolePolicies"
+            ],
+            "Resource": [
+              "arn:aws:iam::123456789012:role/*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "iam:ListRoles"
+            ],
+            "Resource": [
+              "*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "iam:PassRole"
+            ],
+            "Resource": [
+              "*"
+            ],
+            "Condition": {
+              "StringEquals": {
+                "iam:PassedToService": [
+                  "rds-preview.amazonaws.com",
+                  "rds.amazonaws.com"
+                ]
+              }
+            }
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "iam:PassRole"
+            ],
+            "Resource": [
+              "*"
+            ],
+            "Condition": {
+              "StringEquals": {
+                "iam:PassedToService": [
+                  "ecs-tasks.amazonaws.com",
+                  "ecs.amazonaws.com"
+                ]
+              }
+            }
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "kms:Decrypt",
+              "kms:GenerateDataKey"
+            ],
+            "Resource": [
+              "arn:aws:kms:us-east-2:123456789012:key/*"
+            ],
+            "Condition": {
+              "StringEquals": {
+                "kms:ViaService": [
+                  "s3.us-east-2.amazonaws.com"
+                ]
+              }
+            }
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "kms:DescribeKey",
+              "kms:ListResourceTags",
+              "kms:ScheduleKeyDeletion"
+            ],
+            "Resource": [
+              "arn:aws:kms:us-east-2:123456789012:key/*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "lambda:DeleteFunction",
+              "lambda:GetFunctionConfiguration",
+              "lambda:InvokeFunction",
+              "lambda:PutFunctionConcurrency"
+            ],
+            "Resource": [
+              "arn:aws:lambda:us-east-2:123456789012:function:*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "logs:DeleteLogGroup",
+              "logs:Unmask"
+            ],
+            "Resource": [
+              "arn:aws:logs:us-east-2:123456789012:log-group:*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "logs:DescribeLogGroups"
+            ],
+            "Resource": [
+              "*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "logs:GetLogEvents"
+            ],
+            "Resource": [
+              "arn:aws:logs:us-east-2:123456789012:log-group:*:log-stream:*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "rds:AddTagsToResource",
+              "rds:ModifyDBInstance",
+              "rds:RestoreDBInstanceToPointInTime"
+            ],
+            "Resource": [
+              "*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "rds:CreateDBSnapshot",
+              "rds:CreateTenantDatabase",
+              "rds:DeleteDBInstance",
+              "rds:DeleteDBInstanceAutomatedBackup",
+              "rds:DeleteDBParameterGroup",
+              "rds:DeleteDBSnapshot",
+              "rds:DeleteDBSubnetGroup",
+              "rds:DeleteTenantDatabase",
+              "rds:DescribeDBInstances"
+            ],
+            "Resource": [
+              "arn:aws:rds:us-east-2:123456789012:auto-backup:*",
+              "arn:aws:rds:us-east-2:123456789012:db:*",
+              "arn:aws:rds:us-east-2:123456789012:pg:*",
+              "arn:aws:rds:us-east-2:123456789012:snapshot:*",
+              "arn:aws:rds:us-east-2:123456789012:subgrp:*",
+              "arn:aws:rds:us-east-2:123456789012:tenant-database:*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "s3:AbortMultipartUpload",
+              "s3:BypassGovernanceRetention",
+              "s3:DeleteObject",
+              "s3:DeleteObjectVersion",
+              "s3:GetObject",
+              "s3:GetObjectLegalHold",
+              "s3:GetObjectRetention",
+              "s3:GetObjectTagging",
+              "s3:GetObjectVersion",
+              "s3:PutObject",
+              "s3:PutObjectAcl",
+              "s3:PutObjectLegalHold",
+              "s3:PutObjectRetention",
+              "s3:PutObjectTagging"
+            ],
+            "Resource": [
+              "arn:aws:s3:::*/*",
+              "arn:aws:s3:us-east-2:123456789012:accesspoint/*/object/*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "s3:DeleteBucket",
+              "s3:ListBucketMultipartUploads",
+              "s3:ListBucketVersions"
+            ],
+            "Resource": [
+              "arn:aws:s3:::*",
+              "arn:aws:s3:us-east-2:123456789012:accesspoint/*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "s3:ListAllMyBuckets"
+            ],
+            "Resource": [
+              "*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "s3-object-lambda:AbortMultipartUpload",
+              "s3-object-lambda:GetObject",
+              "s3-object-lambda:PutObject"
+            ],
+            "Resource": [
+              "arn:aws:s3:::*/*",
+              "arn:aws:s3:us-east-2:123456789012:accesspoint/*/object/*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "s3-object-lambda:ListBucketMultipartUploads"
+            ],
+            "Resource": [
+              "arn:aws:s3:::*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "scheduler:DeleteSchedule",
+              "scheduler:GetSchedule"
+            ],
+            "Resource": [
+              "arn:aws:scheduler:us-east-2:123456789012:schedule/*/*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "secretsmanager:DeleteSecret"
+            ],
+            "Resource": [
+              "arn:aws:secretsmanager:us-east-2:123456789012:secret:*"
+            ]
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "sts:GetCallerIdentity"
+            ],
+            "Resource": [
+              "*"
+            ]
+          }
+        ]
+      },
+      "PolicyType": "Identity"
+    }
+  ],
+  "Warnings": [
+    {
+      "WarningType": "WildcardResource",
+      "Location": {
+        "PolicyIndex": 0,
+        "StatementIndex": 1
+      },
+      "Message": "Statement could not be scoped to specific resources and uses Resource \"*\". Review whether broad resource access is intended."
+    },
+    {
+      "WarningType": "WildcardResource",
+      "Location": {
+        "PolicyIndex": 0,
+        "StatementIndex": 4
+      },
+      "Message": "Statement could not be scoped to specific resources and uses Resource \"*\". Review whether broad resource access is intended."
+    },
+    {
+      "WarningType": "WildcardResource",
+      "Location": {
+        "PolicyIndex": 0,
+        "StatementIndex": 6
+      },
+      "Message": "Statement could not be scoped to specific resources and uses Resource \"*\". Review whether broad resource access is intended."
+    },
+    {
+      "WarningType": "WildcardResource",
+      "Location": {
+        "PolicyIndex": 0,
+        "StatementIndex": 7
+      },
+      "Message": "Statement could not be scoped to specific resources and uses Resource \"*\". Review whether broad resource access is intended."
+    },
+    {
+      "WarningType": "WildcardResource",
+      "Location": {
+        "PolicyIndex": 0,
+        "StatementIndex": 8
+      },
+      "Message": "Statement could not be scoped to specific resources and uses Resource \"*\". Review whether broad resource access is intended."
+    },
+    {
+      "WarningType": "WildcardResource",
+      "Location": {
+        "PolicyIndex": 0,
+        "StatementIndex": 13
+      },
+      "Message": "Statement could not be scoped to specific resources and uses Resource \"*\". Review whether broad resource access is intended."
+    },
+    {
+      "WarningType": "WildcardResource",
+      "Location": {
+        "PolicyIndex": 0,
+        "StatementIndex": 15
+      },
+      "Message": "Statement could not be scoped to specific resources and uses Resource \"*\". Review whether broad resource access is intended."
+    },
+    {
+      "WarningType": "WildcardResource",
+      "Location": {
+        "PolicyIndex": 0,
+        "StatementIndex": 19
+      },
+      "Message": "Statement could not be scoped to specific resources and uses Resource \"*\". Review whether broad resource access is intended."
+    },
+    {
+      "WarningType": "WildcardResource",
+      "Location": {
+        "PolicyIndex": 0,
+        "StatementIndex": 24
+      },
+      "Message": "Statement could not be scoped to specific resources and uses Resource \"*\". Review whether broad resource access is intended."
+    }
+  ]
+}

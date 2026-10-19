@@ -1,0 +1,62 @@
+{
+  "scope": "executed_native_guard_only_not_RDS_PITR_or_application_acceptance",
+  "source_commit": "b09f7f3dca48d467946f727056aedf7df588b554",
+  "approved_plan_sha256": "520b24b9c7262e3e88207ebeaf6adf89847e6b1fdcb05c530a4c9ac0c0785c72",
+  "terraform_apply": {
+    "exit_code": 0,
+    "aws_creates": 23,
+    "local_clock_creates": 1,
+    "updates": 0,
+    "deletes": 0
+  },
+  "deployment_started_at": "2026-10-18T21:00:38Z",
+  "cleanup_at": "2026-10-19T00:00:38Z",
+  "scheduler_end_at": "2026-10-19T01:00:38Z",
+  "independent_arming": {
+    "free_plan": true,
+    "account_pin": true,
+    "watchdog_armed": true,
+    "scope": "read_only_metadata_not_execution_or_permission_simulation"
+  },
+  "independent_checker": {
+    "request_id": "c144c553-61b2-475c-8ec1-5f21298c4522",
+    "function_error": null,
+    "result": {
+      "observed_at": "2026-10-18T21:03:43.302640+00:00",
+      "scope": "isolated_runtime_inventory_not_billing_bill",
+      "active_resources_absent": true,
+      "all_resources_absent": true,
+      "residuals": [],
+      "billing_clearance": "requires_delayed_usage_and_guard_inventory_review"
+    }
+  },
+  "watchdog_before_deadline": {
+    "request_id": "6a9d2824-6783-48df-a132-1a79e6c112d9",
+    "function_error": null,
+    "result": "ARMED_NO_MUTATION"
+  },
+  "initial_checker_failure": {
+    "aws_error": "AccessDenied",
+    "operation": "GetObject",
+    "cause": "Missing inventory key cannot be distinguished from denial without ListBucket; restricted roles intentionally lack ListBucket",
+    "resolution": "Operator independently discovered empty runtime namespace, conditionally initialized encrypted empty registry using IfNoneMatch=* and re-invoked checker; no IAM changes"
+  },
+  "not_executed": [
+    "RDS provisioning",
+    "native SQL fixture",
+    "RDS point-in-time restore",
+    "remote-ahead reconciliation",
+    "scheduled cleanup delivery",
+    "runtime cleanup",
+    "guard retirement",
+    "delayed billing clearance"
+  ],
+  "native_pitr_acceptance": "NOT_EXECUTED",
+  "account_plan": "FREE_ACTIVE_at_arming_check",
+  "financial_clearance": false,
+  "registry_initializer_native_preservation": {
+    "status": "EXISTING_REGISTRY_PRESERVED",
+    "source": "scripts/native_initialize_registry.py",
+    "scope": "native read path only; conditional creation exercised by local tests and earlier operator bootstrap"
+  }
+}

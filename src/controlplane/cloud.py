@@ -34,14 +34,30 @@ def configure(service, client):
     document = read_secret(client, os.environ['RUNTIME_SECRET_ARN'])
     if set(document) != RUNTIME_KEYS[service] or any(not isinstance(v, str) or not v for v in document.values()):
         raise ValueError('Invalid role secret contract')
+    # A reused process or unexpected task environment must not leave another
+    # responsibility's credentials available to this service.
+    credentials = set().union(*RUNTIME_KEYS.values()) | {'CONTROL_ADMIN_DSN', 'TEST_ADMIN_DSN',
+                                                        'APP_DB_PASSWORD', 'REMOTE_DB_PASSWORD'}
+    for key in credentials:
+        os.environ.pop(key, None)
     os.environ.update(document)
 
 
 def role(c, name, password):
-    if not c.execute('SELECT 1 FROM pg_roles WHERE rolname=%s', (name,)).fetchone():
+    # Managed RDS owners have CREATEROLE, not PostgreSQL superuser. Do not issue
+    # superuser-only attribute changes, even to set an attribute to false.
+    query = """SELECT rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolbypassrls,
+        EXISTS(SELECT 1 FROM pg_auth_members m WHERE m.member=r.oid) AS inherits_roles
+        FROM pg_roles r WHERE rolname=%s"""
+    attributes = c.execute(query, (name,)).fetchone()
+    if attributes is None:
         c.execute(sql.SQL('CREATE ROLE {} LOGIN').format(sql.Identifier(name)))
-    c.execute(sql.SQL('ALTER ROLE {} PASSWORD {} NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS')
-              .format(sql.Identifier(name), sql.Literal(password)))
+        attributes = c.execute(query, (name,)).fetchone()
+    required = {'rolsuper', 'rolcreatedb', 'rolcreaterole', 'rolreplication',
+                'rolbypassrls', 'inherits_roles'}
+    if attributes is None or set(attributes) != required or any(attributes.values()):
+        raise ValueError('Refuse administrative or inheriting application role')
+    c.execute(sql.SQL('ALTER ROLE {} PASSWORD {}').format(sql.Identifier(name), sql.Literal(password)))
 
 
 def grants(control_dsn, remote_dsn):
@@ -63,7 +79,7 @@ def grants(control_dsn, remote_dsn):
         c.execute('GRANT SELECT ON remote.effects TO remote_audit')
 
 
-def bootstrap(client):
+def bootstrap(client, *, database_name="control"):
     """One-shot task: migrations and initial secret creation, idempotent on partial failure.
 
     Runtime secret values are created BEFORE applying DB passwords so restart uses the same values.
@@ -75,7 +91,7 @@ def bootstrap(client):
     dsns = {}
     for name in ('control', 'downstream'):
         master = read_secret(client, masters[name])
-        dsns[name] = make_conninfo(host=hosts[name], dbname='control', user=master['username'],
+        dsns[name] = make_conninfo(host=hosts[name], dbname=database_name, user=master['username'],
                                   password=master['password'], sslmode='verify-full',
                                   sslrootcert='/app/certs/rds-global-bundle.pem')
     passwords = {key: secrets.token_urlsafe(36) for key in ('api', 'worker', 'remote', 'audit', 'remote_audit', 'observer')}
@@ -115,13 +131,21 @@ def bootstrap(client):
             documents[key] = document
     if documents['remote']['EXECUTOR_TOKEN'] != documents['worker']['EXECUTOR_TOKEN']:
         raise ValueError('Executor credential mismatch; rotation requires coordinated service restart')
+    expected_users = {'api': {'CONTROL_DSN': 'control_api'}, 'worker': {'CONTROL_DSN': 'control_worker'},
+                      'remote': {'REMOTE_DSN': 'synthetic_remote'}, 'observer': {'CONTROL_DSN': 'control_observer'},
+                      'verifier': {'CONTROL_DSN': 'control_audit', 'REMOTE_DSN': 'remote_audit'}}
     from psycopg.conninfo import conninfo_to_dict
     # A reviewed PITR binding supplies the new host via Terraform. Keep passwords and effect keys stable.
     for key, document in documents.items():
+        if set(document) != RUNTIME_KEYS[key] or any(not isinstance(v, str) or not v for v in document.values()):
+            raise ValueError('Invalid existing role secret contract')
         revised = dict(document)
         for field, value in document.items():
             if field.endswith('_DSN'):
                 info = conninfo_to_dict(value)
+                if info.get('user') != expected_users[key][field] or any(
+                        k in info for k in ('service', 'servicefile', 'options')):
+                    raise ValueError('Existing runtime secret has unexpected database authority')
                 database = 'downstream' if info['user'] in ('synthetic_remote', 'remote_audit') else 'control'
                 revised[field] = make_conninfo(value, host=hosts[database], sslmode='verify-full',
                                                sslrootcert='/app/certs/rds-global-bundle.pem')

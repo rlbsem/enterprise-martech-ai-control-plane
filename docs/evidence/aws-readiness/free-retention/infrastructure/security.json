@@ -1,0 +1,73 @@
+{
+  "SchemaVersion": 2,
+  "Trivy": {
+    "Version": "0.75.0"
+  },
+  "ReportID": "01a150ff-6212-7886-a68c-739b237a24af",
+  "CreatedAt": "2026-10-18T17:51:16.4985587-04:00",
+  "ArtifactName": "infra",
+  "ArtifactType": "filesystem",
+  "Results": [
+    {
+      "Target": "acceptance-guard",
+      "Class": "config",
+      "Type": "terraform",
+      "MisconfSummary": {
+        "Successes": 28,
+        "Failures": 0
+      }
+    },
+    {
+      "Target": "acceptance-guard/main.tf",
+      "Class": "config",
+      "Type": "terraform"
+    },
+    {
+      "Target": "acceptance-runtime",
+      "Class": "config",
+      "Type": "terraform",
+      "MisconfSummary": {
+        "Successes": 40,
+        "Failures": 0
+      }
+    },
+    {
+      "Target": "acceptance-runtime/main.tf",
+      "Class": "config",
+      "Type": "terraform"
+    },
+    {
+      "Target": "aws",
+      "Class": "config",
+      "Type": "terraform",
+      "MisconfSummary": {
+        "Successes": 44,
+        "Failures": 0
+      }
+    },
+    {
+      "Target": "aws/data.tf",
+      "Class": "config",
+      "Type": "terraform"
+    },
+    {
+      "Target": "aws/network.tf",
+      "Class": "config",
+      "Type": "terraform"
+    },
+    {
+      "Target": "foundation",
+      "Class": "config",
+      "Type": "terraform",
+      "MisconfSummary": {
+        "Successes": 24,
+        "Failures": 0
+      }
+    },
+    {
+      "Target": "foundation/main.tf",
+      "Class": "config",
+      "Type": "terraform"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "scope": "actual_RDS_API_contract_observation_not_restore_success",
+  "DBInstance_earliest_field_present": false,
+  "authoritative_operation": "DescribeDBInstanceAutomatedBackups",
+  "authoritative_field": "RestoreWindow",
+  "request_id": "5b6c20e7-9d02-42f4-b8a2-415b274b0b46",
+  "observed_window": {
+    "EarliestTime": "2026-10-18 21:57:57.508000+00:00",
+    "LatestTime": "2026-10-18 22:20:13+00:00"
+  },
+  "original_baseline": "2026-10-18T22:18:17.372633+00:00",
+  "fixture_reset": false,
+  "synthetic_intents": 1,
+  "independent_effects": 1,
+  "recovery_acceptance": "IN_PROGRESS"
+}

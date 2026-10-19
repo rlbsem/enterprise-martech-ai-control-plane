@@ -1,0 +1,55 @@
+{
+  "scope": "actual_native_bootstrap_failure_and_safe_diagnostic_not_acceptance_success",
+  "first_attempt": {
+    "status": "FAILED_NATIVE_ACCEPTANCE",
+    "task_exit": 1,
+    "image_digest": "sha256:39be25413bc7c41d328148bcbbb050589686798cd175e58fcdd371eb6872c109",
+    "synthetic_intents_generated": 0
+  },
+  "diagnostic_retry": {
+    "task_reference": "6be650e54d560f710646e1dbcd59ecefbcb00631cd56ff6b3f3c94814208d592",
+    "exit_code": 1,
+    "records": [
+      {
+        "native_diagnostic": {
+          "error_type": "InsufficientPrivilege",
+          "sqlstate": "42501",
+          "aws_code": null,
+          "operation": null,
+          "locations": [
+            {
+              "function": "<module>",
+              "line": 5,
+              "file": "<string>"
+            },
+            {
+              "function": "main",
+              "line": 112,
+              "file": "native_tasks.py"
+            },
+            {
+              "function": "bootstrap",
+              "line": 149,
+              "file": "cloud.py"
+            },
+            {
+              "function": "role",
+              "line": 49,
+              "file": "cloud.py"
+            },
+            {
+              "function": "execute",
+              "line": 257,
+              "file": "connection.py"
+            }
+          ]
+        }
+      }
+    ],
+    "scope": "diagnostic bootstrap retry, not acceptance pass"
+  },
+  "correction": "Replace superuser-only role attribute setters with explicit refusal of privileged/inheriting roles and ordinary password setting; preserve restricted role contract",
+  "local_counterpart": "A real PostgreSQL nonsuperuser with CREATEROLE reproduces rejection of the old statement and succeeds with the new helper; escalated roles are refused",
+  "runtime_secret_values": "never read by the agent or serialized into evidence",
+  "native_SQL_PITR": "NOT_EXECUTED"
+}

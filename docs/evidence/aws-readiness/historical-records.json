@@ -1,0 +1,28 @@
+{
+  "baseline_commit": "8557d4d7123d0a0dbe17491bc4f67641cf587bfe",
+  "hash_format": "raw Git blob bytes",
+  "files": {
+    "docs/evidence/build-checks.json": "4179cc5110b66e7ef69cf730367ead15499c508a845836d4999d45921d14410a",
+    "docs/evidence/competing-workers.json": "693df6bd2e4674b60688bea55fa9820ed9f3944ffaa5b763d75d4614d18953c6",
+    "docs/evidence/consent-race.json": "849fb443b730f08188ef23dbb87324b5c15385ca926f2042a75654af7eb7c7a3",
+    "docs/evidence/enterprise-workload.json": "2997a2d950ca0139c3f15a653b220dcb7cf184b612d55eb647cd6e808d798974",
+    "docs/evidence/infrastructure/00-check.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/evidence/infrastructure/01-check.log": "3c2a0cc0d313f01f417ea2d27434270df3f9ef45afc56fe30e130540fa79f620",
+    "docs/evidence/infrastructure/02-check.log": "8c2da36b055dadd87820511dda88d1c148debd142526dc41c74945c7cf693099",
+    "docs/evidence/infrastructure/03-check.log": "3c2a0cc0d313f01f417ea2d27434270df3f9ef45afc56fe30e130540fa79f620",
+    "docs/evidence/infrastructure/04-check.log": "8c2da36b055dadd87820511dda88d1c148debd142526dc41c74945c7cf693099",
+    "docs/evidence/infrastructure/05-check.log": "89c489c372fb02bb971b2ac1014868537cc6dd7fa908d255e2f0414eecf2dbf6",
+    "docs/evidence/infrastructure/06-check.log": "c019b76561a2a0c866fd7c8901b94797876814d98f85765eda374cde1c23b293",
+    "docs/evidence/infrastructure/07-check.log": "7ebea5b948c1c1d189f5a5cb3385903ab3cf8d619edc5b9a58f8cff2c3e7f7f7",
+    "docs/evidence/infrastructure/secrets.json": "9860b159054d0ce1478b9b83f7f53e23508ba97355b72c3092aa52cd47494279",
+    "docs/evidence/infrastructure/security.json": "6422d4d3565636478983727d93be539e899f7a6a681826ad7165a0db89c27a52",
+    "docs/evidence/infrastructure/verification.json": "c9322ca76fb9408461f069cf95abfb73ce4ff2f5214fdb96e1d04a10d61e38e1",
+    "docs/evidence/no-regress.json": "4ea0534da3a3b1156d1e5e6960f904ba61f28454acd698405bd24b9da58e8c9c",
+    "docs/evidence/process-death.json": "06f10452b4af1f7a3ab6694536ef4eec63d9ec52293c673a91bc856516a7116c",
+    "docs/evidence/remote-ahead-restore.json": "a621ad2ff9d9dbaf29137c78d79e35b37b190c9fb9a2f83b7e1af02947fec25d",
+    "docs/evidence/report.md": "8dfbc8dcb57a458e7a51eb9a3d1b8d62a3fcc11a0263658d4c23b984d6cd133f",
+    "docs/evidence/tests.xml": "ab1e3233131d9f7761098ef6cf20fb3f1cf1a5907f9533accd4b6d467ff77702",
+    "docs/evidence/unknown-result.json": "c645c2bceba6a88ba3be862ae8c6d59df354544db36be3069067fa3e6d1148a6",
+    "docs/evidence/verification.json": "a0ae9bc6c0a2d4ab62ab0cc2e066fbec39273057127bea7de9e498d055804c5e"
+  }
+}

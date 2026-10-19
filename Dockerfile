@@ -8,6 +8,7 @@ COPY certs ./certs
 RUN python -m pip install --no-deps --no-build-isolation .
 COPY tests ./tests
 COPY scripts ./scripts
+COPY docs/evidence/aws-readiness/ohio/public-rates.json ./docs/evidence/aws-readiness/ohio/public-rates.json
 COPY .github ./.github
 COPY infra ./infra
 COPY compose.yaml Dockerfile ./
