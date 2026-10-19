@@ -41,9 +41,12 @@ class RetainedRecovery:
         expected_arn = f"arn:aws:rds:us-east-2:{self.m['account']}:db:{self.control}"
         if (row["DbiResourceId"] != source["DbiResourceId"]
                 or row["DBInstanceIdentifier"] != self.control or row["DBInstanceArn"] != expected_arn
-                or row["Region"] != "us-east-2" or row["Engine"] != "postgres"
+                or row["Region"] not in {"us-east-2", "use2"} or row["Engine"] != "postgres"
                 or row["EngineVersion"] != "17.11" or row["AllocatedStorage"] != 20
-                or row["BackupRetentionPeriod"] != 1 or not row["Encrypted"]
+                or source.get("BackupRetentionPeriod") != 1
+                or (status == "active" and row.get("BackupRetentionPeriod") != 1)
+                or (status == "retained" and row.get("BackupRetentionPeriod") not in (None, 1))
+                or not row["Encrypted"]
                 or row["KmsKeyId"] != source["KmsKeyId"]
                 or not re.fullmatch(f"arn:aws:rds:us-east-2:{self.m['account']}:auto-backup:[A-Za-z0-9-]+",
                                     row["DBInstanceAutomatedBackupsArn"])):
@@ -236,7 +239,7 @@ class RetainedRecovery:
             DBSubnetGroupName=source["DBSubnetGroup"]["DBSubnetGroupName"],
             VpcSecurityGroupIds=[g["VpcSecurityGroupId"] for g in source["VpcSecurityGroups"]],
             DBParameterGroupName=source["DBParameterGroups"][0]["DBParameterGroupName"],
-            MaxAllocatedStorage=0, AutoMinorVersionUpgrade=False,
+            AutoMinorVersionUpgrade=False,
             DeletionProtection=True, Tags=[{"Key": "AcceptanceRun", "Value": self.m["run"]}])
         for _ in range(90):
             self.r.gate()
@@ -247,6 +250,10 @@ class RetainedRecovery:
             time.sleep(15)
         else:
             raise RuntimeError("Retained restore availability deadline exceeded")
+        # Omission of MaxAllocatedStorage requests the service default, not autoscaling.
+        # Fail closed if a restored instance unexpectedly inherits an autoscaling ceiling.
+        if row.get("MaxAllocatedStorage") not in (None, 0):
+            raise RuntimeError("Restored storage autoscaling unexpectedly enabled")
         # The pinned SDK does not accept BackupRetentionPeriod on RestoreDBInstanceToPointInTime.
         # Inspect inherited retention, then adjust only the disposable target if required.
         if row.get("BackupRetentionPeriod") != 1:
