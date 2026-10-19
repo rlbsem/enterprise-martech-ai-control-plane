@@ -43,23 +43,11 @@ Delivery is **at least once with idempotent effects under the downstream adapter
 
 ## AWS operating architecture
 
-**Native AWS result:** [Executed SQL and the actual PITR blocker](docs/evidence/aws-readiness/native-sql/README.md)
-document two private RDS databases, independently committed receipts, exact duplicate read-back,
-matching original ledgers and effective read-only permission denials. AWS rejected the third
-concurrent database needed for PITR at this account's Free-plan instance limit. **Native PITR
-and restored-state recovery acceptance remain incomplete.** No Paid upgrade was attempted.
-The [two-instance retained-backup recovery candidate](docs/aws-retained-pitr.md) is now implemented
-and locally tested. It deletes only a separately approved disposable control instance before
-restoring its retained backup, preserving the independent receipt database. It has not executed
-in AWS; account-specific retained-backup eligibility and destructive execution require review.
-[Local tests and static infrastructure checks](docs/evidence/aws-readiness/implementation/README.md)
-remain distinct from this native execution and from the unexecuted production design.
-[Ohio preflight](docs/evidence/aws-readiness/ohio/README.md) independently confirmed
-regional access and corrected the earlier Canadian-region denial diagnosis. The
-[separate Single-AZ/PITR proposal](docs/aws-ohio-acceptance.md) preserves the production
-architecture. The [executable Ohio fixture, isolated Terraform and independent cleanup guard](docs/aws-ohio-execution.md) are implemented and locally tested. The [isolated guard and image bootstrap deployed and passed native arming/checker and exact image read-back checks](docs/evidence/aws-readiness/guard-native/README.md). The [native RDS runtime deployed](docs/evidence/aws-readiness/free-retention/README.md) with [restricted-owner bootstrap corrected](docs/evidence/aws-readiness/rds-bootstrap/README.md). Native SQL reconciliation passed; actual recovery requests and their limitations are preserved in the [native evidence](docs/evidence/aws-readiness/native-sql/README.md).
-The [minimal acceptance assessment](docs/aws-minimal-acceptance.md) explains which
-recovery tests can run without ACM, custom DNS, an ALB or a workstation VPN.
+**Native AWS acceptance (synthetic, isolated):** [The first executed SQL experiment](docs/evidence/aws-readiness/native-sql/README.md) validated two private RDS PostgreSQL databases, independent receipt reconciliation, exact duplicate read-back and read-only mutation denials. Its attempt to add a *third* concurrent instance for PITR was blocked by the Free-plan instance quota. The [subsequent two-instance retained-backup experiment](docs/evidence/aws-readiness/retained-two-instance/native-outcome/README.md) **executed in AWS**: the disposable source was deleted with backups retained, and the restored control database was observed `available` beside the independent receipt database. **The native post-restore fail-closed comparison was not recorded and must not be claimed as passed.**
+
+The second experiment uncovered AWS SDK metadata and restore-parameter incompatibilities that were corrected during the hosted run but **are not yet reconciled into the committed controller**. Earlier [two-instance local tests and saved-plan evidence](docs/evidence/aws-readiness/retained-two-instance/README.md) remain historical pre-run records, not native completion attestations. The separate [production AWS architecture and recovery design](docs/cloud-operations.md) remain **unexecuted**; one-off isolated SQL tasks and database restoration are not full application rollout, HTTP ingress or production failover validation. Independent cleanup removed active databases, runtime infrastructure and the guard; scheduled secret/key deletions and delayed billing settlement remain excluded from a zero-cost claim. [Read the sanitized native outcome and teardown evidence](docs/evidence/aws-readiness/retained-two-instance/native-outcome/README.md).
+
+[Ohio preflight](docs/evidence/aws-readiness/ohio/README.md), [native guard/image verification](docs/evidence/aws-readiness/guard-native/README.md) and [RDS bootstrap history](docs/evidence/aws-readiness/rds-bootstrap/README.md) preserve the sequence without reclassifying older local or cloud evidence.
 
 ![Private AWS runtime](docs/diagrams/02-aws-runtime.svg)
 
@@ -136,4 +124,4 @@ python scripts/validate_infra.py
 | Restore and operations | [Read-only comparison](src/controlplane/operations.py), [PITR tool](src/controlplane/restore.py), [runbook](docs/cloud-operations.md) |
 | Verification | [Generated test proof](docs/evidence/verification.json), [infrastructure checks](docs/evidence/infrastructure/verification.json), [validation guide](docs/validation.md), [GitHub Actions](https://github.com/rlbsem/enterprise-martech-ai-control-plane/actions) |
 
-The isolated guard, image bootstrap and native RDS runtime have deployed; production deployment, live failover and PITR remain [environment acceptance checks](docs/cloud-operations.md).
+The isolated guard, image bootstrap, native SQL runtime and retained-backup RDS restore executed and were subsequently cleaned up. The [final native recovery gate is unverified](docs/evidence/aws-readiness/retained-two-instance/native-outcome/README.md); production deployment and full application release/failover remain [environment acceptance checks](docs/cloud-operations.md).
