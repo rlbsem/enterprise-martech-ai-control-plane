@@ -27,7 +27,7 @@ def historical_content(name):
 
 
 def historical_sha256(name):
-    return hashlib.sha256(historical_content(name).replace(b"\\r\\n", b"\\n")).hexdigest()
+    return hashlib.sha256(historical_content(name).replace(b"\r\n", b"\n")).hexdigest()
 
 
 
