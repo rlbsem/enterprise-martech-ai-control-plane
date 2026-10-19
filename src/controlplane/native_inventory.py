@@ -69,13 +69,16 @@ class Inventory:
                 self.add("cluster", cluster)
                 for task in self.pages("ecs", "list_tasks", "taskArns", cluster=cluster):
                     self.add("task", task, cluster=cluster)
-        for status in ("ACTIVE", "INACTIVE"):
-            for definition in self.pages(
-                "ecs", "list_task_definitions", "taskDefinitionArns", familyPrefix=self.prefix, status=status
-            ):
-                if definition.split("task-definition/")[1].split(":")[0] in {
-                    self.prefix + "-" + n for n in ("bootstrap", "baseline", "control", "receipt", "verify")
-                }:
+        for status in ("ACTIVE", "INACTIVE", "DELETE_IN_PROGRESS"):
+            # ListTaskDefinitions requires a full family, despite its familyPrefix name.
+            # The namespace alone returns no revisions and would falsely imply absence.
+            for name in ("bootstrap", "baseline", "control", "receipt", "verify"):
+                family = self.prefix + "-" + name
+                for definition in self.pages(
+                    "ecs", "list_task_definitions", "taskDefinitionArns", familyPrefix=family, status=status
+                ):
+                    if definition.split("task-definition/")[1].split(":")[0] != family:
+                        raise RuntimeError("Task definition family mismatch")
                     self.add("task_definition", definition, state=status)
         for repo in self.pages("ecr", "describe_repositories", "repositories"):
             if repo["repositoryName"] == self.prefix:
@@ -144,6 +147,7 @@ class Inventory:
 
 
 def public_report(rows):
+    runtime_can_execute = any(r["kind"] in {"cluster", "task"} for r in rows)
     residuals = [
         {
             "kind": row["kind"],
@@ -157,6 +161,10 @@ def public_report(rows):
         for r in rows
         if not (r["kind"] == "key" and r.get("state") == "PendingDeletion")
         and not (r["kind"] == "secret" and r.get("state") == "pending_deletion")
+        # AWS can retain deleting definition metadata after compute is gone. It cannot
+        # launch new tasks; never ignore it while an existing cluster/task remains.
+        and not (r["kind"] == "task_definition" and r.get("state") == "DELETE_IN_PROGRESS"
+                 and not runtime_can_execute)
     ]
     return {
         "observed_at": datetime.now(UTC).isoformat(),

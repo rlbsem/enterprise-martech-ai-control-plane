@@ -1,0 +1,223 @@
+{
+  "observed_at": "2026-10-18 22:35:47.063264+00:00",
+  "scope": "measured SDK resource intervals, not invoiced usage or billing clearance",
+  "rds_describe_request_id": "0a949a73-5e91-4102-a799-f6b08b1c50a8",
+  "databases": [
+    {
+      "reference": "381fb53bc8a6ef115d42d79933776b3d0be80c75941455b0ec31d9b28f165420",
+      "created_at": "2026-10-18 21:54:52.919000+00:00",
+      "state": "available",
+      "class": "db.t4g.micro",
+      "engine": "postgres",
+      "version": "17.11",
+      "storage_gb": 20,
+      "single_az": true,
+      "public": false,
+      "encrypted": true,
+      "backup_days": 1,
+      "database_name": "csaacceptance",
+      "observed_instance_hours": 0.68170674
+    },
+    {
+      "reference": "16b745efe5f1adb1b2452d0d4c3c0653fe712c2f8a0c2e754024d7988b6aa44d",
+      "created_at": "2026-10-18 21:55:05.678000+00:00",
+      "state": "available",
+      "class": "db.t4g.micro",
+      "engine": "postgres",
+      "version": "17.11",
+      "storage_gb": 20,
+      "single_az": true,
+      "public": false,
+      "encrypted": true,
+      "backup_days": 1,
+      "database_name": "csaacceptance",
+      "observed_instance_hours": 0.6781625733333333
+    }
+  ],
+  "tasks": [
+    {
+      "reference": "fb2d8972ac1d7d3bb12df5ece9814bbef45c46dad560bae360cb8794118175b9",
+      "cpu": "256",
+      "memory": "512",
+      "pull_started_at": "2026-10-18 18:17:08.436000-04:00",
+      "stopped_at": "2026-10-18 18:17:42.945000-04:00",
+      "last_status": "STOPPED",
+      "upper_elapsed_seconds": 34.509,
+      "containers": [
+        {
+          "exit_code": 0,
+          "image_digest": "sha256:5cf80401a6d259d82ed08c4ccee2896a611b27a10ea8997bb215ee28a704bac3"
+        }
+      ]
+    },
+    {
+      "reference": "c315d5555b0c5151b760cb9fd2cecd4a3aefac7c99fba7db9d17880d332ce305",
+      "cpu": "256",
+      "memory": "512",
+      "pull_started_at": "2026-10-18 18:30:13.025000-04:00",
+      "stopped_at": "2026-10-18 18:30:48.349000-04:00",
+      "last_status": "STOPPED",
+      "upper_elapsed_seconds": 35.324,
+      "containers": [
+        {
+          "exit_code": 0,
+          "image_digest": "sha256:5cf80401a6d259d82ed08c4ccee2896a611b27a10ea8997bb215ee28a704bac3"
+        }
+      ]
+    },
+    {
+      "reference": "bbb9629731bf024a90755d844e1452d1b7f10488275363424fc2807b5af731d9",
+      "cpu": "256",
+      "memory": "512",
+      "pull_started_at": "2026-10-18 18:18:07.138000-04:00",
+      "stopped_at": "2026-10-18 18:18:42.453000-04:00",
+      "last_status": "STOPPED",
+      "upper_elapsed_seconds": 35.315,
+      "containers": [
+        {
+          "exit_code": 0,
+          "image_digest": "sha256:5cf80401a6d259d82ed08c4ccee2896a611b27a10ea8997bb215ee28a704bac3"
+        }
+      ]
+    },
+    {
+      "reference": "0f4985ed7ea43230ade7639c377c474394f46386f1d9584ae14bd2cd1674506b",
+      "cpu": "256",
+      "memory": "512",
+      "pull_started_at": "2026-10-18 18:16:07.556000-04:00",
+      "stopped_at": "2026-10-18 18:16:47.282000-04:00",
+      "last_status": "STOPPED",
+      "upper_elapsed_seconds": 39.726,
+      "containers": [
+        {
+          "exit_code": 0,
+          "image_digest": "sha256:5cf80401a6d259d82ed08c4ccee2896a611b27a10ea8997bb215ee28a704bac3"
+        }
+      ]
+    },
+    {
+      "reference": "3929fe48a0de8423be88cb5554dc81f80ba46b0ee30b38c7881ad340965e7430",
+      "cpu": "256",
+      "memory": "512",
+      "pull_started_at": "2026-10-18 18:22:00.922000-04:00",
+      "stopped_at": "2026-10-18 18:22:39.032000-04:00",
+      "last_status": "STOPPED",
+      "upper_elapsed_seconds": 38.11,
+      "containers": [
+        {
+          "exit_code": 0,
+          "image_digest": "sha256:5cf80401a6d259d82ed08c4ccee2896a611b27a10ea8997bb215ee28a704bac3"
+        }
+      ]
+    },
+    {
+      "reference": "75421e61ca0ce7648c5a08641789003d242259181c8eac08d86189718c528654",
+      "cpu": "256",
+      "memory": "512",
+      "pull_started_at": "2026-10-18 18:19:03.679000-04:00",
+      "stopped_at": "2026-10-18 18:19:39.662000-04:00",
+      "last_status": "STOPPED",
+      "upper_elapsed_seconds": 35.983,
+      "containers": [
+        {
+          "exit_code": 0,
+          "image_digest": "sha256:5cf80401a6d259d82ed08c4ccee2896a611b27a10ea8997bb215ee28a704bac3"
+        }
+      ]
+    },
+    {
+      "reference": "6be650e54d560f710646e1dbcd59ecefbcb00631cd56ff6b3f3c94814208d592",
+      "cpu": "256",
+      "memory": "512",
+      "pull_started_at": "2026-10-18 18:04:25.373000-04:00",
+      "stopped_at": "2026-10-18 18:04:59.455000-04:00",
+      "last_status": "STOPPED",
+      "upper_elapsed_seconds": 34.082,
+      "containers": [
+        {
+          "exit_code": 1,
+          "image_digest": "sha256:39be25413bc7c41d328148bcbbb050589686798cd175e58fcdd371eb6872c109"
+        }
+      ]
+    },
+    {
+      "reference": "af7f558a90740ac51130c9d97237fdff7cddb231aa0d4164a860fcd7b9668cce",
+      "cpu": "256",
+      "memory": "512",
+      "pull_started_at": "2026-10-18 18:21:02.072000-04:00",
+      "stopped_at": "2026-10-18 18:21:42.463000-04:00",
+      "last_status": "STOPPED",
+      "upper_elapsed_seconds": 40.391,
+      "containers": [
+        {
+          "exit_code": 0,
+          "image_digest": "sha256:5cf80401a6d259d82ed08c4ccee2896a611b27a10ea8997bb215ee28a704bac3"
+        }
+      ]
+    },
+    {
+      "reference": "52021ead9de792683d3b601d7891541f1248305f4a7e77ade018ba17a2065854",
+      "cpu": "256",
+      "memory": "512",
+      "pull_started_at": "2026-10-18 18:01:56.992000-04:00",
+      "stopped_at": "2026-10-18 18:02:36.323000-04:00",
+      "last_status": "STOPPED",
+      "upper_elapsed_seconds": 39.331,
+      "containers": [
+        {
+          "exit_code": 1,
+          "image_digest": "sha256:39be25413bc7c41d328148bcbbb050589686798cd175e58fcdd371eb6872c109"
+        }
+      ]
+    },
+    {
+      "reference": "cd37ed90af24ed3cd9ab3b409b06bcfdbc53dc4c46761b9e9762b271d5f234cb",
+      "cpu": "256",
+      "memory": "512",
+      "pull_started_at": "2026-10-18 18:10:24.047000-04:00",
+      "stopped_at": "2026-10-18 18:10:58.392000-04:00",
+      "last_status": "STOPPED",
+      "upper_elapsed_seconds": 34.345,
+      "containers": [
+        {
+          "exit_code": 0,
+          "image_digest": "sha256:39be25413bc7c41d328148bcbbb050589686798cd175e58fcdd371eb6872c109"
+        }
+      ]
+    },
+    {
+      "reference": "55b3f6405cab6c1d79710604b90cfd66d7c441c556952575bc3e2c333ce88658",
+      "cpu": "256",
+      "memory": "512",
+      "pull_started_at": "2026-10-18 18:34:48.177000-04:00",
+      "stopped_at": "2026-10-18 18:35:22.860000-04:00",
+      "last_status": "STOPPED",
+      "upper_elapsed_seconds": 34.683,
+      "containers": [
+        {
+          "exit_code": 0,
+          "image_digest": "sha256:5cf80401a6d259d82ed08c4ccee2896a611b27a10ea8997bb215ee28a704bac3"
+        }
+      ]
+    },
+    {
+      "reference": "284cd56597503e6c5f2497aba9d1889b8ed9594c9e03125c3e3b736cdb229f5f",
+      "cpu": "256",
+      "memory": "512",
+      "pull_started_at": "2026-10-18 18:20:04.196000-04:00",
+      "stopped_at": "2026-10-18 18:20:39.472000-04:00",
+      "last_status": "STOPPED",
+      "upper_elapsed_seconds": 35.276,
+      "containers": [
+        {
+          "exit_code": 0,
+          "image_digest": "sha256:5cf80401a6d259d82ed08c4ccee2896a611b27a10ea8997bb215ee28a704bac3"
+        }
+      ]
+    }
+  ],
+  "task_count": 12,
+  "account_plan": "FREE",
+  "account_state": "ACTIVE",
+  "full_application_acceptance": false
+}

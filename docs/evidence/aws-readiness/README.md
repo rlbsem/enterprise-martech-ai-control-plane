@@ -1,5 +1,12 @@
 # AWS readiness evidence
 
+**Later native milestone:** [Executed RDS SQL and the actual Free-plan PITR blocker](native-sql/README.md)
+supersede the current-status interpretation of this historical checkpoint. Native SQL
+verification executed; RDS PITR was rejected at the concurrent-instance limit.
+[244 current local tests](restore-parameters/local/verification.json) and the
+[current infrastructure checks](free-retention/infrastructure/verification.json) remain
+separate from native results. The original readiness record below is retained unchanged.
+
 **Outcome A: local readiness verified; native AWS acceptance not executed.** No AWS
 credentials or configured SDK profile were available. No AWS resources were created,
 modified or deleted. SDK mocks are not deployment evidence.

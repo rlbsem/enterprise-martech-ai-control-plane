@@ -79,6 +79,8 @@ def cleanup_pass(inventory, clients):
             elif kind == "db_parameter_group" and "database" not in kinds:
                 clients["rds"].delete_db_parameter_group(DBParameterGroupName=identifier)
             elif kind == "task_definition":
+                if row["state"] == "DELETE_IN_PROGRESS":
+                    continue
                 if row["state"] == "ACTIVE":
                     clients["ecs"].deregister_task_definition(taskDefinition=identifier)
                 else:

@@ -5,7 +5,10 @@ This procedure describes the **full private HTTPS application** lane. See the
 database/PITR lane that does not inherently require ACM, custom DNS, ALB or a VPN.
 No account authentication or chargeable operation is requested during offline readiness.
 
-**Current boundary: AWS readiness, not native AWS acceptance.** The current local
+**Full-application boundary: readiness, not native application acceptance.** A separate
+[native SQL experiment](evidence/aws-readiness/native-sql/README.md) subsequently executed
+on RDS, with PITR blocked by a Free-plan quota. The following credential/deployment status
+describes the earlier full-application readiness checkpoint. The historical local
 regression and infrastructure records are in [aws-readiness](evidence/aws-readiness/README.md).
 No AWS credentials were available during this readiness work. No AWS environment
 was deployed, restored, stopped or deleted. Historical execution records remain intact.

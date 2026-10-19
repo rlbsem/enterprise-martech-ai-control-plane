@@ -1,8 +1,9 @@
 # Ohio Free-plan database/PITR acceptance proposal
 
-**Status: read-only preflight executed; provisioning not authorized.** No Paid-plan
-upgrade, advanced-feature activation, out-of-pocket expense or resource creation is
-authorized. The existing Canadian-region production Terraform, release manifest guards,
+**Original proposal; later execution is recorded separately.** The bounded smaller lane
+was subsequently approved and executed through native SQL verification; the actual PITR
+request was blocked by the Free-plan instance limit. See [executed results and teardown](evidence/aws-readiness/native-sql/README.md).
+No Paid-plan upgrade or out-of-pocket expense is authorized. The existing Canadian-region production Terraform, release manifest guards,
 Multi-AZ witness and all historical evidence remain unchanged.
 
 ## Region correction and verified inventory
@@ -131,11 +132,10 @@ The [current implementation](aws-ohio-execution.md) replaces the earlier propose
 CodeBuild cleanup job with a smaller non-VPC Lambda watchdog and independently scoped
 read-only Lambda checker. The one-minute schedule starts at hour three and ends one
 hour later, with bounded invocation/retry controls, a private failure queue and an
-observable queue alarm. It has not run in AWS. See the execution guide for exact
+observable queue alarm. Actual execution boundaries are in the [native evidence](evidence/aws-readiness/native-sql/README.md). See the execution guide for exact
 inventory, private versioned evidence, synthetic disposal and independent guard retirement.
 
 All prior discovery, cost v1 and local records remain historical evidence. The new
-[implementation records](evidence/aws-readiness/implementation/README.md) bind the current
-sources. Native arming, effective IAM/SCP permissions, saved live plans, RDS PITR,
-SQL verification, cleanup and delayed usage reconciliation remain unexecuted.
-Provisioning requires explicit owner approval; PR #4 remains draft and unmerged.
+[implementation records](evidence/aws-readiness/implementation/README.md) bind that implementation checkpoint.
+Native SQL verification and resource operations subsequently executed with explicit approval;
+PITR completion and delayed billing clearance remain incomplete. PR #4 remains draft and unmerged.

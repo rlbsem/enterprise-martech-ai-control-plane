@@ -1,0 +1,11 @@
+{
+  "status": "GUARD_RETIREMENT_REQUESTED_INDEPENDENT_RECHECK_REQUIRED",
+  "at": "2026-10-19T02:20:10.452261+00:00",
+  "key_deletion_days": 7,
+  "billing_clearance": false,
+  "private_archived_versions_and_markers": 301,
+  "private_archived_bytes": 1737546,
+  "private_archive_manifest_sha256": "385e6e5241e445d1ad693b669158e5de51c4d912b3d6dd859af662501c48d19d",
+  "private_archive_readback_verified": true,
+  "independent_runtime_active_absence": true
+}

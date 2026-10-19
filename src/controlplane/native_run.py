@@ -253,7 +253,6 @@ class NativeRun:
             VpcSecurityGroupIds=[g["VpcSecurityGroupId"] for g in source["VpcSecurityGroups"]],
             DBParameterGroupName=source["DBParameterGroups"][0]["DBParameterGroupName"],
             DeletionProtection=True,
-            ManageMasterUserPassword=True,
             Tags=[{"Key": "AcceptanceRun", "Value": self.m["run"]}],
         )
         for _ in range(90):

@@ -8,6 +8,7 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock
 
 import pytest
+from botocore.exceptions import ClientError
 from psycopg.types.json import Jsonb
 
 from controlplane import db, operations
@@ -216,6 +217,58 @@ def test_read_denial_is_not_empty_inventory():
         identity("../foreign", "123456789012")
 
 
+@pytest.mark.parametrize("foreign", [False, True])
+def test_inventory_queries_full_ecs_families_and_tracks_pending_deletion(foreign):
+    m = manifest()
+    clients = {"sts": MagicMock(), "ecs": MagicMock()}
+    clients["sts"].get_caller_identity.return_value = {"Account": m["account"]}
+    clients["ecs"].describe_clusters.return_value = {"clusters": []}
+    queries = []
+
+    class Reader(Inventory):
+        def pages(self, service, operation, key, **params):
+            if operation != "list_task_definitions":
+                return []
+            family = params["familyPrefix"]
+            assert family in {self.prefix + "-" + n for n in m["tasks"]}
+            queries.append((family, params["status"]))
+            family = "foreign-family" if foreign else family
+            return [f"arn:aws:ecs:us-east-2:{m['account']}:task-definition/{family}:1"]
+
+    reader = Reader(m["run"], m["account"], clients)
+    if foreign:
+        with pytest.raises(RuntimeError, match="family mismatch"):
+            reader.collect()
+    else:
+        rows = reader.collect()
+        assert len(rows) == len(set(queries)) == 15
+        assert {r["state"] for r in rows} == {"ACTIVE", "INACTIVE", "DELETE_IN_PROGRESS"}
+        assert not public_report(rows)["active_resources_absent"]
+
+
+def test_cleanup_waits_for_ecs_definition_deletion_without_reissuing_it():
+    inventory = SimpleNamespace(collect=lambda: [
+        {"kind": "task_definition", "id": "owned:1", "state": "DELETE_IN_PROGRESS"}
+    ])
+    clients = {"ecs": MagicMock()}
+    result = cleanup_pass(inventory, clients)
+    assert not result["failed_kinds"] and not result["attempted_kinds"]
+    clients["ecs"].delete_task_definitions.assert_not_called()
+    assert result["before"]["active_resources_absent"]
+    assert not result["before"]["all_resources_absent"]
+    assert result["before"]["residuals"][0]["state"] == "DELETE_IN_PROGRESS"
+
+
+@pytest.mark.parametrize("remaining", ["cluster", "task"])
+def test_deleting_definition_metadata_cannot_hide_remaining_compute(remaining):
+    report = public_report([
+        {"kind": "task_definition", "id": "owned:1", "state": "DELETE_IN_PROGRESS"},
+        {"kind": remaining, "id": "owned-runtime"},
+    ])
+    assert not report["active_resources_absent"]
+    assert not report["all_resources_absent"]
+
+
 def test_pending_deletions_not_all_clear():
     report = public_report(
         [
@@ -318,7 +371,8 @@ def test_wrong_engine_cannot_be_accepted():
         NativeRun(manifest(), c).database("db")
 
 
-def test_controller_requests_real_timestamp_restore_and_independent_negative_proof():
+@pytest.mark.parametrize("restore_error", [None, "InstanceQuotaExceeded", "AccessDenied"])
+def test_controller_requests_real_timestamp_restore_and_independent_negative_proof(restore_error):
     m = manifest()
     baseline = datetime.now(UTC) - timedelta(minutes=2)
     rds = MagicMock()
@@ -371,15 +425,31 @@ def test_controller_requests_real_timestamp_restore_and_independent_negative_pro
                 return {"safe_to_resume": True, "local_intents": 1, "remote_effects": 1}
             return {}
 
-    result = Runner(m, {"rds": rds}).run()
-    assert result["status"] == "NATIVE_SQL_PITR_ACCEPTANCE_PASSED"
-    assert not result["full_application_acceptance"]
+    runner = Runner(m, {"rds": rds})
+    if restore_error:
+        rds.restore_db_instance_to_point_in_time.side_effect = ClientError(
+            {"Error": {"Code": restore_error, "Message": "offline rejection"}},
+            "RestoreDBInstanceToPointInTime",
+        )
+        with pytest.raises(ClientError) as raised:
+            runner.run()
+        assert raised.value.response["Error"]["Code"] == restore_error
+        assert runner.verification_reads == 2  # Empty and original only; no invented restored proof.
+        rds.describe_db_instances.assert_not_called()
+        rds.modify_db_instance.assert_not_called()
+    else:
+        result = runner.run()
+        assert result["status"] == "NATIVE_SQL_PITR_ACCEPTANCE_PASSED"
+        assert not result["full_application_acceptance"]
+    assert rds.restore_db_instance_to_point_in_time.call_count == 1
     request = rds.restore_db_instance_to_point_in_time.call_args.kwargs
     assert request["RestoreTime"] == baseline
     assert request["SourceDBInstanceIdentifier"] == m["control_db"]
     assert request["TargetDBInstanceIdentifier"] == "csa-native-test2026-restore"
     assert not request["MultiAZ"] and not request["PubliclyAccessible"]
     assert "UseLatestRestorableTime" not in request
+    assert "ManageMasterUserPassword" not in request
+    assert "MasterUserPassword" not in request
     rds.delete_db_instance.assert_not_called()
 
 

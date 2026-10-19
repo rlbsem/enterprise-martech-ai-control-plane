@@ -1,0 +1,193 @@
+{
+  "status": "NATIVE_SQL_PASSED_PITR_BLOCKED_FREE_PLAN_QUOTA",
+  "region": "us-east-2",
+  "finished_at": "2026-10-18T22:35:41.218026+00:00",
+  "evidence_boundary": "native synthetic SQL in private RDS via one-off Fargate tasks; not HTTP worker dispatch",
+  "full_application_acceptance": false,
+  "pitr_completed": false,
+  "restored_remote_ahead_test_executed": false,
+  "records": [
+    {
+      "task": "bootstrap",
+      "task_reference": "0f4985ed7ea43230ade7639c377c474394f46386f1d9584ae14bd2cd1674506b",
+      "exit_code": 0,
+      "result": {
+        "bootstrap": "complete"
+      }
+    },
+    {
+      "task": "verify",
+      "task_reference": "fb2d8972ac1d7d3bb12df5ece9814bbef45c46dad560bae360cb8794118175b9",
+      "exit_code": 0,
+      "result": {
+        "safe_to_resume": true,
+        "local_intents": 0,
+        "remote_effects": 0,
+        "findings": [],
+        "snapshot_hash": "3e77a5ff9346807a034b8f0439fed66d742c25c68e2d7e62152bda4c6207e6d2",
+        "observed_at": "2026-10-18T22:17:19.280124+00:00",
+        "scope": "quiesced databases; no changes or replay performed",
+        "write_denials": 2
+      }
+    },
+    {
+      "task": "baseline",
+      "task_reference": "bbb9629731bf024a90755d844e1452d1b7f10488275363424fc2807b5af731d9",
+      "exit_code": 0,
+      "result": {
+        "baseline_at": "2026-10-18T22:18:17.372633+00:00"
+      }
+    },
+    {
+      "task": "control",
+      "task_reference": "75421e61ca0ce7648c5a08641789003d242259181c8eac08d86189718c528654",
+      "exit_code": 0,
+      "result": {
+        "key": "1e2e5826-d283-5dbe-a2b2-b1861f9db272",
+        "mutation": {
+          "customer_id": "cfaf303b-7175-4a17-9075-36b813ad28bc",
+          "action": "sync_profile",
+          "revision": 1,
+          "payload": {
+            "email": "o2610182018fd9d@example.test",
+            "lifecycle": "Opportunity"
+          }
+        },
+        "hash": "fa1cc79c6c34000be8d7c8d9e90e14185e11480b67f09ad1ad839786fe7b9e51",
+        "scope": "synthetic_SQL_intent_not_worker_dispatch"
+      }
+    },
+    {
+      "task": "receipt",
+      "task_reference": "284cd56597503e6c5f2497aba9d1889b8ed9594c9e03125c3e3b736cdb229f5f",
+      "exit_code": 0,
+      "result": {
+        "key": "1e2e5826-d283-5dbe-a2b2-b1861f9db272",
+        "receipt": "74b2770d-4ce0-5997-b0b9-db61e53cf23e",
+        "hash": "fa1cc79c6c34000be8d7c8d9e90e14185e11480b67f09ad1ad839786fe7b9e51",
+        "effects": 1
+      }
+    },
+    {
+      "task": "receipt",
+      "task_reference": "af7f558a90740ac51130c9d97237fdff7cddb231aa0d4164a860fcd7b9668cce",
+      "exit_code": 0,
+      "result": {
+        "key": "1e2e5826-d283-5dbe-a2b2-b1861f9db272",
+        "receipt": "74b2770d-4ce0-5997-b0b9-db61e53cf23e",
+        "hash": "fa1cc79c6c34000be8d7c8d9e90e14185e11480b67f09ad1ad839786fe7b9e51",
+        "effects": 1
+      }
+    },
+    {
+      "task": "verify",
+      "task_reference": "3929fe48a0de8423be88cb5554dc81f80ba46b0ee30b38c7881ad340965e7430",
+      "exit_code": 0,
+      "result": {
+        "safe_to_resume": true,
+        "local_intents": 1,
+        "remote_effects": 1,
+        "findings": [],
+        "snapshot_hash": "b72b2d07ef6353c784ea0a1bae54d1a2842358ac11df47a6359749c860211cbf",
+        "observed_at": "2026-10-18T22:22:13.225410+00:00",
+        "scope": "quiesced databases; no changes or replay performed",
+        "write_denials": 2
+      }
+    },
+    {
+      "task": "verify",
+      "task_reference": "55b3f6405cab6c1d79710604b90cfd66d7c441c556952575bc3e2c333ce88658",
+      "exit_code": 0,
+      "result": {
+        "safe_to_resume": true,
+        "local_intents": 1,
+        "remote_effects": 1,
+        "findings": [],
+        "snapshot_hash": "b72b2d07ef6353c784ea0a1bae54d1a2842358ac11df47a6359749c860211cbf",
+        "observed_at": "2026-10-18T22:34:58.818945+00:00",
+        "scope": "quiesced databases; no changes or replay performed",
+        "write_denials": 2
+      }
+    }
+  ],
+  "continuation": {
+    "original_checkpoint_sha256": "05318d85e37d7b9b380268cab55b0b642bcc0c83a36e2beae1ddf6b6c739ed6d",
+    "baseline_revalidated_from_actual_AWS_log": "2026-10-18T22:18:17.372633+00:00",
+    "vendor_log_receipts": [
+      {
+        "task": "bootstrap",
+        "task_reference": "0f4985ed7ea43230ade7639c377c474394f46386f1d9584ae14bd2cd1674506b",
+        "aws_log_request_id": "324a715e-a3c3-4e00-a9c8-0fb1b5c72047"
+      },
+      {
+        "task": "verify",
+        "task_reference": "fb2d8972ac1d7d3bb12df5ece9814bbef45c46dad560bae360cb8794118175b9",
+        "aws_log_request_id": "4b7b0aff-b739-457b-a720-3468aed4d4e3"
+      },
+      {
+        "task": "baseline",
+        "task_reference": "bbb9629731bf024a90755d844e1452d1b7f10488275363424fc2807b5af731d9",
+        "aws_log_request_id": "8cbd0d97-02d1-42ae-9cea-cac85d0ad8a1"
+      },
+      {
+        "task": "control",
+        "task_reference": "75421e61ca0ce7648c5a08641789003d242259181c8eac08d86189718c528654",
+        "aws_log_request_id": "664e60b8-e046-4cba-85c1-e8e0770361d6"
+      },
+      {
+        "task": "receipt",
+        "task_reference": "284cd56597503e6c5f2497aba9d1889b8ed9594c9e03125c3e3b736cdb229f5f",
+        "aws_log_request_id": "25a431bd-5994-4537-b2c9-01e08aa4d9d2"
+      },
+      {
+        "task": "receipt",
+        "task_reference": "af7f558a90740ac51130c9d97237fdff7cddb231aa0d4164a860fcd7b9668cce",
+        "aws_log_request_id": "73840dd3-0e8b-4a48-a9f0-11b5852ab02d"
+      },
+      {
+        "task": "verify",
+        "task_reference": "3929fe48a0de8423be88cb5554dc81f80ba46b0ee30b38c7881ad340965e7430",
+        "aws_log_request_id": "40d1890f-5136-4323-a9c6-33622a0ff845"
+      }
+    ],
+    "no_baseline_or_fixture_regeneration": true
+  },
+  "restore_requests": [
+    {
+      "at": "2026-10-18T22:31:02.696800+00:00",
+      "service": "rds",
+      "operation": "RestoreDBInstanceToPointInTime",
+      "request_id": "6a5b7e5d-c2fb-4386-a87f-3c93fd47b124",
+      "http_status": 400,
+      "error_code": "InvalidParameterValue",
+      "phase": "verified_checkpoint_continuation"
+    },
+    {
+      "at": "2026-10-18T22:35:41.216027+00:00",
+      "service": "rds",
+      "operation": "RestoreDBInstanceToPointInTime",
+      "request_id": "8da170d6-ed99-4c5f-9a30-2618d8a0d297",
+      "http_status": 400,
+      "error_code": "InstanceQuotaExceeded",
+      "phase": "verified_checkpoint_continuation"
+    }
+  ],
+  "blocker": {
+    "code": "InstanceQuotaExceeded",
+    "request_id": "8da170d6-ed99-4c5f-9a30-2618d8a0d297",
+    "http_status": 400,
+    "description": "AWS rejected the third concurrent database at the Free-plan instance limit; no restored instance was created. No account upgrade or quota increase was attempted."
+  },
+  "controller_source_sha256": "29d95c667ca0a9ab5fd209ebb78acfbece0d126f3312048c53861978cf8ad10b",
+  "container_source_commit": "8e8acaa4df0f43c71500b7777c0c9163d7d5b625",
+  "immutable_runtime_manifest_sha256": "8df56fe45e0da6ba45f78f56ed88278fb6b9b3de4dd15b68f8975dec9733f96c",
+  "no_new_fixture_or_baseline_on_continuation": true,
+  "not_executed": [
+    "RDS PITR completion",
+    "restored-control remote-ahead refusal",
+    "fresh post-restore source comparison",
+    "production application acceptance",
+    "Multi-AZ failover",
+    "scheduled cleanup delivery"
+  ]
+}

@@ -1,5 +1,9 @@
 # Isolated AWS cost and teardown review
 
+**Historical full-design worksheet.** The later [executed Ohio SQL experiment](evidence/aws-readiness/native-sql/README.md)
+was separately approved and used a smaller Single-AZ lane. This page's original proposal
+status and prices are retained as historical context, not the current deployment result or bill.
+
 **Current candidate:** The [Ohio database/PITR proposal](aws-ohio-acceptance.md) has its
 own public-rate calculator and a USD 5 credit planning allowance. It supersedes this
 older full-design worksheet for the next Free-plan milestone. The existing production

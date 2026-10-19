@@ -1,0 +1,98 @@
+{
+  "observed_at": "2026-10-19T02:20:44.006330+00:00",
+  "scope": "isolated_runtime_inventory_not_billing_bill",
+  "active_resources_absent": true,
+  "all_resources_absent": false,
+  "residuals": [
+    {
+      "kind": "task_definition",
+      "reference": "23d8ae0e27bbc4709d158a841b6656638c046e8e589398ddea896398bef67271",
+      "state": "DELETE_IN_PROGRESS"
+    },
+    {
+      "kind": "task_definition",
+      "reference": "a1310054611b630edaa3a28b385e85c52ee4454379324410ef1facd7ddfdb258",
+      "state": "DELETE_IN_PROGRESS"
+    },
+    {
+      "kind": "task_definition",
+      "reference": "6172e69d7d8912f16a397b9fc30d40ecbed431836b04f8e3f98f6f9a58f5f660",
+      "state": "DELETE_IN_PROGRESS"
+    },
+    {
+      "kind": "task_definition",
+      "reference": "0a2d0728c920c975c3240d2bbc3f27f3ec7c836bbcb8c0e2a1ec5e7812c92e32",
+      "state": "DELETE_IN_PROGRESS"
+    },
+    {
+      "kind": "task_definition",
+      "reference": "9e3873febec64a7f9e2748405ec7a4868b94b4c1767adb8328419094e73137c1",
+      "state": "DELETE_IN_PROGRESS"
+    },
+    {
+      "kind": "task_definition",
+      "reference": "46a7dc155643d7f638642fc4c670f0fc8a9fc66540a80ac43e5c016b0a841ae2",
+      "state": "DELETE_IN_PROGRESS"
+    },
+    {
+      "kind": "task_definition",
+      "reference": "108c57de8c698741158a33b40edfe642917de2116ee549047ddd0da772180c73",
+      "state": "DELETE_IN_PROGRESS"
+    },
+    {
+      "kind": "task_definition",
+      "reference": "df4e48535aea9fe92de87cea151481c5f8cbde9356e268f9dc9bbf328367f712",
+      "state": "DELETE_IN_PROGRESS"
+    },
+    {
+      "kind": "task_definition",
+      "reference": "3882494ddd7166bd058ddc68d9fed0ab3cbf39714889b9a326d3d11cb5310c99",
+      "state": "DELETE_IN_PROGRESS"
+    },
+    {
+      "kind": "task_definition",
+      "reference": "fcc2275b9e9f490c3502472164e899a54931f90dc9d188e6d17335a956a6c61e",
+      "state": "DELETE_IN_PROGRESS"
+    },
+    {
+      "kind": "secret",
+      "reference": "cfe34774b189f68c245c826bf295fecc568c80b173039b5ba01d8bc2b3a1b341",
+      "state": "pending_deletion"
+    },
+    {
+      "kind": "secret",
+      "reference": "5afaa33818d0a7b22f5ab852dd3272df603b365f2e28dc8dd55fcbccedff2ec1",
+      "state": "pending_deletion"
+    },
+    {
+      "kind": "secret",
+      "reference": "34d42b68fbcca20fa8fb4f024c1ad020c98c7b5c7caae742b7e05e6172a8f33b",
+      "state": "pending_deletion"
+    },
+    {
+      "kind": "secret",
+      "reference": "b86d76686cfa201fc507d720e48f11dae5dc72d1a8d12d7e8ab851af09369dca",
+      "state": "pending_deletion"
+    },
+    {
+      "kind": "secret",
+      "reference": "970052e7ff59b8e1c59a549bc1fa6563a846e359cd072d0916bef793cf5484f0",
+      "state": "pending_deletion"
+    },
+    {
+      "kind": "key",
+      "reference": "09ede91665647bef7e9342da0baa4b0158f23cf0e144f56b5471e88d5fdee7c1",
+      "state": "PendingDeletion"
+    }
+  ],
+  "billing_clearance": "requires_delayed_usage_and_guard_inventory_review",
+  "guard_residuals": [
+    {
+      "kind": "guard_key",
+      "reference": "3a0d2b9879708a924742405f542eaf4dc4f20d1e93ccc3c057d413cc934ebd48",
+      "state": "PendingDeletion"
+    }
+  ],
+  "guard_resources_absent": false,
+  "status": "RESIDUALS_REMAIN"
+}

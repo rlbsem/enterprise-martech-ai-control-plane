@@ -1,0 +1,43 @@
+{
+  "observed_at": "2026-10-19T02:11:34.514588+00:00",
+  "functions": [
+    {
+      "function": "watchdog",
+      "start_events": 63,
+      "starts_at_or_after_deadline": 60,
+      "reports": 63,
+      "observed_billed_milliseconds": 394085,
+      "first_event_at": "2026-10-18T21:02:40.163000+00:00",
+      "last_event_at": "2026-10-19T01:00:19.583000+00:00",
+      "origin": "actual Lambda platform logs; caller attribution is not inferred from invocation timing",
+      "observed_billed_gb_seconds": 98.52125
+    },
+    {
+      "function": "checker",
+      "start_events": 63,
+      "starts_at_or_after_deadline": 60,
+      "reports": 63,
+      "observed_billed_milliseconds": 330008,
+      "first_event_at": "2026-10-18T21:02:36.094000+00:00",
+      "last_event_at": "2026-10-19T01:00:23.810000+00:00",
+      "origin": "actual Lambda platform logs; caller attribution is not inferred from invocation timing",
+      "observed_billed_gb_seconds": 82.502
+    }
+  ],
+  "account_plan": "FREE",
+  "account_state": "ACTIVE",
+  "credit_headroom_above_five": true,
+  "not_billing_clearance": true,
+  "scheduled_mutation_permission_success_not_inferred": true,
+  "shared_service_linked_role_count_preserved": 8,
+  "acceptance_related_service_linked_roles_preserved": [
+    {
+      "name": "AWSServiceRoleForECS",
+      "reference": "3270cde554d03e0929a9527e20b83f2085afae14638eb4a86f78ab81fbe799f4"
+    },
+    {
+      "name": "AWSServiceRoleForRDS",
+      "reference": "39baf763c23f0fb9d214b99102ce9d47c865b7bbc6bd77d7231b118497395506"
+    }
+  ]
+}

@@ -1,5 +1,10 @@
 # Minimum secure native acceptance
 
+**Historical assessment.** Subsequent short-lived authentication, approved native RDS/SQL
+execution and the Free-plan PITR quota blocker are documented in the
+[executed record](evidence/aws-readiness/native-sql/README.md). The prerequisite table below
+describes the earlier assessment date, not current account access or execution status.
+
 **Latest region correction:** [Ohio preflight](evidence/aws-readiness/ohio/README.md)
 supersedes the account-wide-block interpretation below. AWS documents Canada projects
 in `us-east-2`; 29 independent reads there succeeded. The new

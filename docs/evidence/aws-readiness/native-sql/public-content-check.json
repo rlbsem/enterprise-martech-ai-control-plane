@@ -1,0 +1,10 @@
+{
+  "checked_text_files": 257,
+  "private_runtime_excluded": true,
+  "actual_account_id_absent": true,
+  "private_developer_paths_absent": true,
+  "credential_patterns_clear": true,
+  "native_controller_hash_matches_execution": true,
+  "native_recovery_not_falsely_claimed": true,
+  "local_tests": 244
+}

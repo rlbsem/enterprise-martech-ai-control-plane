@@ -1,6 +1,11 @@
 # Isolated Ohio native acceptance implementation
 
-**The isolated guard and image bootstrap have deployed and passed native arming/checker and exact image read-back checks; the approved native RDS runtime has deployed; restricted-owner bootstrap and SQL reconciliation have passed; PITR acceptance and teardown have not completed.** See [native guard evidence](evidence/aws-readiness/guard-native/README.md).
+**Native SQL passed; native PITR is blocked by the Free-plan instance limit.** The isolated
+guard, real CI image and two private RDS databases deployed. Bootstrap, exact receipt replay,
+original-state reconciliation and effective read-only mutation denials executed successfully.
+The actual third-instance restore request was rejected. See the [executed results and precise
+boundaries](evidence/aws-readiness/native-sql/README.md), alongside preserved
+[guard evidence](evidence/aws-readiness/guard-native/README.md). This is not full recovery acceptance.
 This lane supplements the unchanged production design. It proves only managed PostgreSQL,
 independent SQL receipts and recovery refusal if the native run succeeds. It does not prove
 live API dispatch, worker recovery, HTTPS ingress, Multi-AZ failover or a production deployment.
@@ -27,7 +32,11 @@ moving the baseline past its existing intent.
 
 ## Approval envelope
 
-Guard deployment, arming, the scoped ECR grant-retirement correction and image bootstrap were separately authorized and executed. The bounded native SQL/PITR run and cleanup are now approved. The first database requests were rejected by real RDS validation; the corrected requests are provisioning, with no Paid upgrade. The [updated four-hour estimate](evidence/aws-readiness/implementation/credit-estimate.json)
+Guard deployment, arming, the scoped ECR grant-retirement correction, image bootstrap and
+bounded native SQL/PITR run/cleanup were explicitly authorized. Two corrected database
+creates and native SQL tasks executed. AWS rejected the third concurrent database with
+`InstanceQuotaExceeded`; no account upgrade or replacement recovery sequence was attempted.
+The [updated four-hour estimate](evidence/aws-readiness/implementation/credit-estimate.json)
 includes **two** customer-managed keys, three micro instances at peak, four interface endpoint
 AZ units, eight aggregate quarter-vCPU/half-GB task-hours, eight secrets, at most 60 small
 CodeBuild minutes if a cloud execution bridge is used, and supporting/residual allowances.
@@ -44,7 +53,9 @@ original evidence and earlier regional denials are preserved.
 
 ## Execution sequence after explicit approval
 
-The guard steps have executed in the isolated account; subsequent runtime steps remain unexecuted. Use a private
+The sequence below is the reproducible procedure; the [native record](evidence/aws-readiness/native-sql/README.md)
+identifies which stages actually executed and which were blocked. A future run must resolve
+the concurrent-instance limit before provisioning. Use a private
 ignored directory and a fresh run ID. `account_id` and timestamps below are private configuration,
 not public environment variables in GitHub logs.
 
@@ -103,12 +114,17 @@ not public environment variables in GitHub logs.
 
 ## Evidence boundaries and verification
 
-[Current local verification](evidence/aws-readiness/deployment-clock/local/verification.json) and [infrastructure checks](evidence/aws-readiness/deployment-clock/infrastructure/verification.json) covers actual PostgreSQL/HTTP
+[Current local verification](evidence/aws-readiness/restore-parameters/local/verification.json) and [infrastructure checks](evidence/aws-readiness/free-retention/infrastructure/verification.json) cover actual PostgreSQL/HTTP
 regressions, new local SQL fixture tests, mocked controller/guard fault tests, pinned Terraform
-validation/mock tests and static security checks. The separate native guard record demonstrates actual arming and restricted checker execution. Native RDS/PITR, scheduled cleanup and effective runtime-deletion permissions remain unexecuted. The first real creates were rejected because 14-day retention exceeds this account's Free-plan limit. The acceptance lane now pins the minimum nonzero one-day retention; production retention is unchanged. A zero-day configuration is rejected because it disables automated backups/PITR. Public evidence must contain only sanitized results and hashed
+validation/mock tests and static security checks. The [native SQL record](evidence/aws-readiness/native-sql/README.md)
+separately records actual arming, RDS provisioning, fixture execution, rejected PITR and cleanup.
+Full application acceptance and native restored-state verification remain incomplete. The first
+real creates were rejected because 14-day retention exceeds this account's Free-plan limit.
+The acceptance lane pins one-day retention; production retention is unchanged. A zero-day
+configuration is rejected because it disables automated backups/PITR. Public evidence contains sanitized results and hashed
 resource references, never credentials, raw plans or private account/network identifiers.
 
 AWS documents that [RDS deletes its managed owner secret with the instance](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-secrets-manager.html)
 and that [PITR creates a new instance](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_PIT.html).
-Those service contracts guide the implementation; only future executed results can establish
-that this account completed the intended recovery experiment.
+Those service contracts guide the implementation; the observed Free-plan quota rejection
+means this account did not complete the intended recovery experiment.

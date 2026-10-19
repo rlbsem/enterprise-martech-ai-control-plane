@@ -10,7 +10,7 @@ Built for integration challenges across multi-brand operators, PE-backed portfol
 
 **Example failure:** The receiving system commits an action, but its acknowledgment is lost. Instead of assuming failure and sending a new action, the control plane checks the stable effect ID, recognizes the existing receipt and preserves one downstream effect. After a database restore, services remain closed until recovered state agrees with independently held downstream receipts. These are tested controls in the published implementation, not claims of measured client savings.
 
-**Start with the [executed proof](docs/evidence/report.md), [enterprise workload results](docs/evidence/enterprise-workload.json), and [database recovery design](docs/cloud-operations.md).** The implementation includes deployable AWS infrastructure, distinct service identities, immutable releases and a fail-closed recovery gate.
+**Start with the [executed proof](docs/evidence/report.md), [enterprise workload results](docs/evidence/enterprise-workload.json), and [database recovery design](docs/cloud-operations.md).** The implementation includes defined AWS infrastructure, distinct service identities, immutable releases and a fail-closed recovery gate.
 
 ![Control-plane architecture](docs/diagrams/01-control-plane.svg)
 
@@ -43,15 +43,17 @@ Delivery is **at least once with idempotent effects under the downstream adapter
 
 ## AWS operating architecture
 
-**AWS readiness update:** [Local tests and static infrastructure checks](docs/evidence/aws-readiness/implementation/README.md)
-cover the hardened release, startup and restore boundaries. A bounded read-only collector
-is ready for an authorized deployment. [Native acceptance](docs/aws-native-acceptance.md)
-and [cost/teardown review](docs/aws-cost-review.md) remain pending native execution and explicit
-cost approval; these records do not claim a deployed AWS environment.
+**Native AWS result:** [Executed SQL and the actual PITR blocker](docs/evidence/aws-readiness/native-sql/README.md)
+document two private RDS databases, independently committed receipts, exact duplicate read-back,
+matching original ledgers and effective read-only permission denials. AWS rejected the third
+concurrent database needed for PITR at this account's Free-plan instance limit. **Native PITR
+and restored-state recovery acceptance remain incomplete.** No Paid upgrade was attempted.
+[Local tests and static infrastructure checks](docs/evidence/aws-readiness/implementation/README.md)
+remain distinct from this native execution and from the unexecuted production design.
 [Ohio preflight](docs/evidence/aws-readiness/ohio/README.md) independently confirmed
 regional access and corrected the earlier Canadian-region denial diagnosis. The
 [separate Single-AZ/PITR proposal](docs/aws-ohio-acceptance.md) preserves the production
-architecture. The [executable Ohio fixture, isolated Terraform and independent cleanup guard](docs/aws-ohio-execution.md) are implemented and locally tested. The [isolated guard and image bootstrap have deployed and passed native arming/checker and exact image read-back checks](docs/evidence/aws-readiness/guard-native/README.md). The [native RDS runtime has deployed](docs/evidence/aws-readiness/free-retention/README.md) with [restricted-owner bootstrap corrected](docs/evidence/aws-readiness/rds-bootstrap/README.md). Native SQL reconciliation passed; the [PITR stage uses a corrected service-window reader](docs/evidence/aws-readiness/restore-window/README.md), and recovery acceptance remains in progress.
+architecture. The [executable Ohio fixture, isolated Terraform and independent cleanup guard](docs/aws-ohio-execution.md) are implemented and locally tested. The [isolated guard and image bootstrap deployed and passed native arming/checker and exact image read-back checks](docs/evidence/aws-readiness/guard-native/README.md). The [native RDS runtime deployed](docs/evidence/aws-readiness/free-retention/README.md) with [restricted-owner bootstrap corrected](docs/evidence/aws-readiness/rds-bootstrap/README.md). Native SQL reconciliation passed; actual recovery requests and their limitations are preserved in the [native evidence](docs/evidence/aws-readiness/native-sql/README.md).
 The [minimal acceptance assessment](docs/aws-minimal-acceptance.md) explains which
 recovery tests can run without ACM, custom DNS, an ALB or a workstation VPN.
 

@@ -1,0 +1,16 @@
+{
+  "github_run": 39170995855,
+  "artifact_id": 12152218810,
+  "archive_sha256": "d0c767c0b2f249fc54cc2ee8c6fe825a3f84a9b0668be350d094bc34301f43ab",
+  "source_commit": "8e8acaa4df0f43c71500b7777c0c9163d7d5b625",
+  "image_manifest_digest": "sha256:5cf80401a6d259d82ed08c4ccee2896a611b27a10ea8997bb215ee28a704bac3",
+  "config_digest": "sha256:51cd5fdf7222ac595e5d5ef5727cb2a708630785f15d40a86dd4af08eda467a0",
+  "layers_verified": 17,
+  "platform": "linux/amd64",
+  "source_label_verified": true,
+  "at": "2026-10-18T22:12:51.873081+00:00",
+  "registry_exact_manifest_readback": true,
+  "ecr_describe_digest_verified": true,
+  "ecr_upload": "EXECUTED_EXACT_READBACK_VERIFIED",
+  "successful_acceptance_checkpoint_tasks_reference_this_digest": true
+}
