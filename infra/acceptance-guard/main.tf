@@ -44,7 +44,7 @@ locals {
   deadline_policy       = var.cleanup_at == null ? "three_hours_from_guard_apply_start" : "fixed_deadline"
   functions             = toset(["watchdog", "checker"])
   runtime_tag           = { StringEquals = { "aws:ResourceTag/AcceptanceRun" = var.run_id } }
-  read_actions          = ["sts:GetCallerIdentity", "rds:DescribeDBInstances", "rds:DescribeDBSnapshots", "rds:DescribeDBInstanceAutomatedBackups", "rds:DescribeDBSubnetGroups", "rds:DescribeDBParameterGroups", "ecs:DescribeClusters", "ecs:ListTasks", "ecs:ListTaskDefinitions", "ecr:DescribeRepositories", "ecr:DescribeImages", "secretsmanager:ListSecrets", "logs:DescribeLogGroups", "kms:ListKeys", "kms:DescribeKey", "kms:ListResourceTags", "ec2:DescribeVpcs", "ec2:DescribeVpcEndpoints", "ec2:DescribeNetworkInterfaces", "ec2:DescribeRouteTables", "ec2:DescribeSecurityGroups", "ec2:DescribeSubnets", "iam:ListRoles"]
+  read_actions          = ["sts:GetCallerIdentity", "rds:DescribeDBInstances", "rds:DescribeDBSnapshots", "rds:DescribeDBInstanceAutomatedBackups", "rds:ListTagsForResource", "rds:DescribeDBSubnetGroups", "rds:DescribeDBParameterGroups", "ecs:DescribeClusters", "ecs:ListTasks", "ecs:ListTaskDefinitions", "ecr:DescribeRepositories", "ecr:DescribeImages", "secretsmanager:ListSecrets", "logs:DescribeLogGroups", "kms:ListKeys", "kms:DescribeKey", "kms:ListResourceTags", "ec2:DescribeVpcs", "ec2:DescribeVpcEndpoints", "ec2:DescribeNetworkInterfaces", "ec2:DescribeRouteTables", "ec2:DescribeSecurityGroups", "ec2:DescribeSubnets", "iam:ListRoles"]
   trust                 = jsonencode({ Version = "2012-10-17", Statement = [{ Effect = "Allow", Principal = { Service = "lambda.amazonaws.com" }, Action = "sts:AssumeRole" }] })
 }
 resource "aws_kms_key" "guard" {

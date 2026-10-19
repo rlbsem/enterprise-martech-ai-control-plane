@@ -1,0 +1,15 @@
+{
+  "checked_at": "2026-10-19T03:04:11.646623+00:00",
+  "scope": "tracked and unignored public candidate files; no native execution attestation",
+  "text_files_checked": 403,
+  "private_account_identifiers": "not_found",
+  "credential_patterns": "not_found",
+  "new_evidence_private_paths": "not_found",
+  "production_roots": "unchanged",
+  "historical_native_sql_artifacts_verified": 22,
+  "new_infrastructure_redactions": [
+    "scanner cache path",
+    "Git author/committer email"
+  ],
+  "new_aws_resources_created": false
+}

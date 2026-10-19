@@ -1,0 +1,141 @@
+{
+  "tool": "iam-policy-autopilot",
+  "version": "0.3.0",
+  "mode": "static only; no policy upload or AWS permission simulation",
+  "scope": "candidate controller, inventory, cleanup, gate and SQL-task code; operator requirements, not deployed role grants",
+  "source_sha256": {
+    "src/controlplane/native_run.py": "9cfdbb8878b2b89e0946e1b8ef49ecd864929771c1223af2a684f5cf5ad1c315",
+    "src/controlplane/native_retained.py": "a9a6c6b306cb752b23b7680c91beb77dee6738f3d422139e9b2afdc267e4a38e",
+    "src/controlplane/native_inventory.py": "7b3131b3096e2ee85df2300e9f6c34543bc78f09d448935130fab37e5ed322eb",
+    "src/controlplane/native_watchdog.py": "d3113228f236283bd79dfd928e2be4add696260271453f9db712a0db33750e4d",
+    "src/controlplane/native_arming.py": "cc4d746a5c9238f01f8a1afee13c172d67943c5c494430d0f4a56e6c35cb1ed3",
+    "src/controlplane/native_tasks.py": "f973e72efb5348c40385a22c0047bfe23de607c97c2ec875da5614ca2f23710a",
+    "src/controlplane/cloud.py": "08fc438fdd9e4c9b97fabdde8a0eba112a08031620d9492f3429188f7a210f41"
+  },
+  "reported_actions": [
+    "ec2:DeleteNetworkInterface",
+    "ec2:DeleteRouteTable",
+    "ec2:DeleteSecurityGroup",
+    "ec2:DeleteSubnet",
+    "ec2:DeleteVpc",
+    "ec2:DeleteVpcEndpoints",
+    "ec2:DescribeInstances",
+    "ec2:DisassociateRouteTable",
+    "ecs:DeleteCluster",
+    "ecs:DeleteTaskDefinitions",
+    "ecs:DeregisterTaskDefinition",
+    "ecs:DescribeClusters",
+    "ecs:DescribeTaskDefinition",
+    "ecs:DescribeTasks",
+    "ecs:ListTasks",
+    "ecs:RunTask",
+    "ecs:StopTask",
+    "ecs:TagResource",
+    "freetier:GetAccountPlanState",
+    "iam:DeleteRole",
+    "iam:DeleteRolePolicy",
+    "iam:ListRolePolicies",
+    "iam:PassRole",
+    "kms:Decrypt",
+    "kms:DescribeKey",
+    "kms:GenerateDataKey",
+    "kms:ListResourceTags",
+    "kms:ScheduleKeyDeletion",
+    "lambda:GetFunctionConfiguration",
+    "lambda:InvokeFunction",
+    "logs:DeleteLogGroup",
+    "logs:GetLogEvents",
+    "logs:Unmask",
+    "rds:AddTagsToResource",
+    "rds:CreateDBSnapshot",
+    "rds:CreateTenantDatabase",
+    "rds:DeleteDBInstance",
+    "rds:DeleteDBInstanceAutomatedBackup",
+    "rds:DeleteDBParameterGroup",
+    "rds:DeleteDBSnapshot",
+    "rds:DeleteDBSubnetGroup",
+    "rds:DeleteTenantDatabase",
+    "rds:DescribeDBInstanceAutomatedBackups",
+    "rds:DescribeDBInstances",
+    "rds:DescribeDBSnapshots",
+    "rds:ListTagsForResource",
+    "rds:ModifyDBInstance",
+    "rds:RestoreDBInstanceToPointInTime",
+    "s3-object-lambda:GetObject",
+    "s3-object-lambda:PutObject",
+    "s3:GetObject",
+    "s3:GetObjectLegalHold",
+    "s3:GetObjectRetention",
+    "s3:GetObjectTagging",
+    "s3:GetObjectVersion",
+    "s3:PutObject",
+    "s3:PutObjectAcl",
+    "s3:PutObjectLegalHold",
+    "s3:PutObjectRetention",
+    "s3:PutObjectTagging",
+    "scheduler:GetSchedule",
+    "secretsmanager:DeleteSecret",
+    "secretsmanager:GetSecretValue",
+    "secretsmanager:PutSecretValue",
+    "sts:GetCallerIdentity"
+  ],
+  "warnings": [
+    {
+      "WarningType": "WildcardResource",
+      "Location": {
+        "PolicyIndex": 0,
+        "StatementIndex": 1
+      },
+      "Message": "Statement could not be scoped to specific resources and uses Resource \"*\". Review whether broad resource access is intended."
+    },
+    {
+      "WarningType": "WildcardResource",
+      "Location": {
+        "PolicyIndex": 0,
+        "StatementIndex": 3
+      },
+      "Message": "Statement could not be scoped to specific resources and uses Resource \"*\". Review whether broad resource access is intended."
+    },
+    {
+      "WarningType": "WildcardResource",
+      "Location": {
+        "PolicyIndex": 0,
+        "StatementIndex": 4
+      },
+      "Message": "Statement could not be scoped to specific resources and uses Resource \"*\". Review whether broad resource access is intended."
+    },
+    {
+      "WarningType": "WildcardResource",
+      "Location": {
+        "PolicyIndex": 0,
+        "StatementIndex": 6
+      },
+      "Message": "Statement could not be scoped to specific resources and uses Resource \"*\". Review whether broad resource access is intended."
+    },
+    {
+      "WarningType": "WildcardResource",
+      "Location": {
+        "PolicyIndex": 0,
+        "StatementIndex": 7
+      },
+      "Message": "Statement could not be scoped to specific resources and uses Resource \"*\". Review whether broad resource access is intended."
+    },
+    {
+      "WarningType": "WildcardResource",
+      "Location": {
+        "PolicyIndex": 0,
+        "StatementIndex": 14
+      },
+      "Message": "Statement could not be scoped to specific resources and uses Resource \"*\". Review whether broad resource access is intended."
+    },
+    {
+      "WarningType": "WildcardResource",
+      "Location": {
+        "PolicyIndex": 0,
+        "StatementIndex": 20
+      },
+      "Message": "Statement could not be scoped to specific resources and uses Resource \"*\". Review whether broad resource access is intended."
+    }
+  ],
+  "review": "Dynamic service mappings and conditional service dependencies require manual review. Wildcards in generated baseline are not accepted as deployed grants. Scoped guard policies remain authoritative; analyzer does not establish SCP or Free-plan entitlement."
+}

@@ -13,8 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--verification-record', default='docs/evidence/aws-readiness/restore-parameters/local/verification.json')
-    parser.add_argument('--infrastructure-record', default='docs/evidence/aws-readiness/free-retention/infrastructure/verification.json')
+    parser.add_argument('--verification-record', default='docs/evidence/aws-readiness/retained-two-instance/local/verification.json')
+    parser.add_argument('--infrastructure-record', default='docs/evidence/aws-readiness/retained-two-instance/infrastructure/verification.json')
     args = parser.parse_args()
     names = subprocess.check_output(['git', 'ls-files', '--cached', '--others', '--exclude-standard'],
                                     cwd=ROOT, text=True).splitlines()
@@ -54,6 +54,12 @@ def main():
     for name, expected in infrastructure['source_sha256'].items():
         if hashlib.sha256((ROOT/name).read_bytes().replace(b'\r\n', b'\n')).hexdigest() != expected:
             errors.append(f'Stale infrastructure proof: {name}')
+    for name in ('native-sql', 'retained-two-instance'):
+        manifest = ROOT/'docs/evidence/aws-readiness'/name/'artifact-manifest.json'
+        for target, expected in json.loads(manifest.read_text())['files'].items():
+            path = ROOT/target
+            if not path.is_file() or hashlib.sha256(path.read_bytes().replace(b'\r\n', b'\n')).hexdigest() != expected:
+                errors.append(f'Stale evidence artifact: {target}')
     if errors:
         raise SystemExit('\n'.join(errors))
     print(json.dumps({'markdown_links': link_count, 'source_bindings': len(record['source_sha256']),

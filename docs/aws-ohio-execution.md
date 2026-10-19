@@ -1,6 +1,11 @@
 # Isolated Ohio native acceptance implementation
 
-**Native SQL passed; native PITR is blocked by the Free-plan instance limit.** The isolated
+**Current recovery candidate:** [two-instance retained-backup PITR](aws-retained-pitr.md).
+It is implemented and locally tested, not natively executed or authorized. The historical
+three-instance procedure and estimates below explain the preserved quota failure; use the
+new candidate's explicit destructive-transition gates and approval stages for a future run.
+
+**Native SQL passed; the original native PITR attempt hit the Free-plan instance limit.** The isolated
 guard, real CI image and two private RDS databases deployed. Bootstrap, exact receipt replay,
 original-state reconciliation and effective read-only mutation denials executed successfully.
 The actual third-instance restore request was rejected. See the [executed results and precise
@@ -114,7 +119,7 @@ not public environment variables in GitHub logs.
 
 ## Evidence boundaries and verification
 
-[Current local verification](evidence/aws-readiness/restore-parameters/local/verification.json) and [infrastructure checks](evidence/aws-readiness/free-retention/infrastructure/verification.json) cover actual PostgreSQL/HTTP
+[Current local verification](evidence/aws-readiness/retained-two-instance/local/verification.json) and [infrastructure checks](evidence/aws-readiness/retained-two-instance/infrastructure/verification.json) cover actual PostgreSQL/HTTP
 regressions, new local SQL fixture tests, mocked controller/guard fault tests, pinned Terraform
 validation/mock tests and static security checks. The [native SQL record](evidence/aws-readiness/native-sql/README.md)
 separately records actual arming, RDS provisioning, fixture execution, rejected PITR and cleanup.

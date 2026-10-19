@@ -48,6 +48,10 @@ document two private RDS databases, independently committed receipts, exact dupl
 matching original ledgers and effective read-only permission denials. AWS rejected the third
 concurrent database needed for PITR at this account's Free-plan instance limit. **Native PITR
 and restored-state recovery acceptance remain incomplete.** No Paid upgrade was attempted.
+The [two-instance retained-backup recovery candidate](docs/aws-retained-pitr.md) is now implemented
+and locally tested. It deletes only a separately approved disposable control instance before
+restoring its retained backup, preserving the independent receipt database. It has not executed
+in AWS; account-specific retained-backup eligibility and destructive execution require review.
 [Local tests and static infrastructure checks](docs/evidence/aws-readiness/implementation/README.md)
 remain distinct from this native execution and from the unexecuted production design.
 [Ohio preflight](docs/evidence/aws-readiness/ohio/README.md) independently confirmed

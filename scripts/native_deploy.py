@@ -27,6 +27,16 @@ def review_plan(plan, phase):
             forbidden.append(resource["address"])
     if forbidden:
         raise ValueError("Only reviewed root creates/no-ops allowed; never update/delete existing resources")
+    databases = [r for r in plan["resource_changes"] if r.get("type") == "aws_db_instance"]
+    if phase == "runtime" and databases:
+        expected = {'aws_db_instance.store["control"]', 'aws_db_instance.store["receipts"]'}
+        if {r["address"] for r in databases} != expected:
+            raise ValueError("Exactly two planned native databases required")
+        output = plan["output_changes"]["manifest"]["after"]
+        if (output.get("recovery_strategy") != "retained-two-instance-v1"
+                or output.get("maximum_concurrent_instances") != 2
+                or output.get("source_deletion_scope") != "disposable_synthetic_control_only"):
+            raise ValueError("Plan must explicitly bind the two-instance destructive recovery protocol")
     return len(plan["resource_changes"])
 
 

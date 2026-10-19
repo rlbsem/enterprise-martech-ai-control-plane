@@ -204,6 +204,7 @@ resource "aws_db_instance" "store" {
   vpc_security_group_ids          = [aws_security_group.database[each.key].id]
   parameter_group_name            = aws_db_parameter_group.tls.name
   backup_retention_period         = 1
+  delete_automated_backups        = each.key != "control"
   deletion_protection             = true
   skip_final_snapshot             = true
   copy_tags_to_snapshot           = true
@@ -296,10 +297,14 @@ resource "aws_ecs_task_definition" "native" {
 }
 output "manifest" {
   value = { account = var.account_id, region = "us-east-2", run = var.run_id, cleanup_at = var.cleanup_at, backup_retention_days = 1, database_name = "csaacceptance",
-    image       = "${aws_ecr_repository.image.repository_url}@${var.image_digest}", commit = var.source_commit,
-    tasks       = { for k, t in aws_ecs_task_definition.native : k => t.arn }, cluster = aws_ecs_cluster.runtime.arn,
-    control_db  = aws_db_instance.store["control"].identifier, downstream_db = aws_db_instance.store["receipts"].identifier,
-    task_subnet = aws_subnet.private[0].id, task_groups = { for k, g in aws_security_group.task : k => g.id },
+    image                 = "${aws_ecr_repository.image.repository_url}@${var.image_digest}", commit = var.source_commit,
+    tasks                 = { for k, t in aws_ecs_task_definition.native : k => t.arn }, cluster = aws_ecs_cluster.runtime.arn,
+    control_db            = aws_db_instance.store["control"].identifier, downstream_db = aws_db_instance.store["receipts"].identifier,
+    task_subnet           = aws_subnet.private[0].id, task_groups = { for k, g in aws_security_group.task : k => g.id },
+    recovery_strategy     = "retained-two-instance-v1", maximum_concurrent_instances = 2,
+    source_deletion_scope = "disposable_synthetic_control_only", verification_contract = "receipt-ledger-sha256-v1",
+    guard_bucket          = data.aws_lambda_function.watchdog.environment[0].variables["GUARD_BUCKET"],
+    guard_key             = data.aws_lambda_function.watchdog.environment[0].variables["GUARD_KEY_ARN"],
   schedule = var.schedule_name, watchdog = var.watchdog_name, guard_code_sha256 = var.guard_code_sha256 }
 }
 

@@ -1,0 +1,9 @@
+acceptance.tftest.hcl... in progress
+  run "isolated_private_lane"... pass
+  run "unarmed_rejected"... pass
+  run "retained_two_instance_contract"... pass
+  run "mutable_image_rejected"... pass
+acceptance.tftest.hcl... tearing down
+acceptance.tftest.hcl... pass
+
+Success! 4 passed, 0 failed.

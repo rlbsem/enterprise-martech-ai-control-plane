@@ -42,6 +42,13 @@ run "identity_rejected" {
   expect_failures = [var.run_id]
   # Valid names are not authority. Account/Free-plan/deadline checks are independently exercised in Python.
 }
+run "retained_backup_cleanup_is_tag_scoped" {
+  command = plan
+  assert {
+    condition     = contains(local.read_actions, "rds:ListTagsForResource") && anytrue([for statement in jsondecode(aws_iam_role_policy.cleanup.policy).Statement : try(statement.Action == "rds:DeleteDBInstanceAutomatedBackup" && statement.Resource == "arn:aws:rds:us-east-2:${var.account_id}:auto-backup:*" && statement.Condition.StringEquals["aws:ResourceTag/AcceptanceRun"] == var.run_id, false)])
+    error_message = "Retained backup cleanup must read ownership and keep its resource-tag restriction."
+  }
+}
 run "deployment_clock_starts_at_apply" {
   command = apply
   variables { cleanup_at = null }

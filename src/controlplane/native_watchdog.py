@@ -36,6 +36,8 @@ def cleanup_pass(inventory, clients):
             elif kind == "snapshot" and row["state"] == "available":
                 clients["rds"].delete_db_snapshot(DBSnapshotIdentifier=identifier)
             elif kind == "backup" and row["state"] == "retained":
+                if not row.get("run_tag_verified"):
+                    raise RuntimeError("Retained backup cleanup ownership not established")
                 clients["rds"].delete_db_instance_automated_backup(DbiResourceId=identifier)
             elif kind == "repository":
                 clients["ecr"].delete_repository(repositoryName=identifier, force=True)

@@ -138,9 +138,13 @@ def test_effective_reader_denials():
             c.execute("DROP OWNED BY native_fixture_reader; DROP ROLE native_fixture_reader")
 
 
-def test_independent_armed_gate():
+@pytest.mark.parametrize("retained", [False, True])
+def test_independent_armed_gate(retained):
     m = manifest()
-    c, _, _ = armed_clients(m)
+    c, fn, _ = armed_clients(m)
+    if retained:
+        m.update(recovery_strategy="retained-two-instance-v1", guard_bucket="pinned-private-bucket", guard_key="pinned-key")
+        fn["Environment"]["Variables"].update(GUARD_BUCKET=m["guard_bucket"], GUARD_KEY_ARN=m["guard_key"])
     assert armed_gate(m, c)["watchdog_armed"]
 
 
@@ -158,11 +162,17 @@ def test_independent_armed_gate():
         "vpc",
         "disposition",
         "retry",
+        "wrong_checkpoint_bucket",
+        "wrong_checkpoint_key",
     ],
 )
 def test_arming_fail_closed(fault):
     m = manifest()
     c, fn, checker = armed_clients(m)
+    if fault.startswith("wrong_checkpoint"):
+        m.update(recovery_strategy="retained-two-instance-v1", guard_bucket="pinned-private-bucket", guard_key="pinned-key")
+        fn["Environment"]["Variables"].update(GUARD_BUCKET=m["guard_bucket"], GUARD_KEY_ARN=m["guard_key"])
+        m["guard_bucket" if fault.endswith("bucket") else "guard_key"] = "different-storage"
     if fault == "paid":
         c["freetier"].get_account_plan_state.return_value["accountPlanType"] = "PAID"
     if fault == "low_credit":

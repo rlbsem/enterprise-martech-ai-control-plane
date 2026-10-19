@@ -1,0 +1,198 @@
+{
+  "executed_at": "2026-10-19T02:52:02.799415+00:00",
+  "scope": "static analysis and mocked Terraform; no AWS API calls",
+  "terraform_version": "1.13.5",
+  "trivy_version": "0.75.0",
+  "checks": [
+    {
+      "command": [
+        "terraform.exe",
+        "fmt",
+        "-check",
+        "-recursive",
+        "infra"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "terraform.exe",
+        "-chdir=infra/foundation",
+        "init",
+        "-backend=false",
+        "-input=false",
+        "-lockfile=readonly"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "terraform.exe",
+        "-chdir=infra/foundation",
+        "validate",
+        "-no-color"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "terraform.exe",
+        "-chdir=infra/aws",
+        "init",
+        "-backend=false",
+        "-input=false",
+        "-lockfile=readonly"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "terraform.exe",
+        "-chdir=infra/aws",
+        "validate",
+        "-no-color"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "terraform.exe",
+        "-chdir=infra/acceptance-guard",
+        "init",
+        "-backend=false",
+        "-input=false",
+        "-lockfile=readonly"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "terraform.exe",
+        "-chdir=infra/acceptance-guard",
+        "validate",
+        "-no-color"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "terraform.exe",
+        "-chdir=infra/acceptance-runtime",
+        "init",
+        "-backend=false",
+        "-input=false",
+        "-lockfile=readonly"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "terraform.exe",
+        "-chdir=infra/acceptance-runtime",
+        "validate",
+        "-no-color"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "terraform.exe",
+        "-chdir=infra/aws",
+        "test",
+        "-no-color"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "terraform.exe",
+        "-chdir=infra/acceptance-guard",
+        "test",
+        "-no-color"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "terraform.exe",
+        "-chdir=infra/acceptance-runtime",
+        "test",
+        "-no-color"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "trivy.exe",
+        "config",
+        "--severity",
+        "HIGH,CRITICAL",
+        "--exit-code",
+        "1",
+        "--tf-vars",
+        "infra/testing/static.tfvars.json",
+        "--format",
+        "json",
+        "--output",
+        "docs\\evidence\\aws-readiness\\retained-two-instance\\infrastructure\\security.json",
+        "infra"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "trivy.exe",
+        "fs",
+        "--scanners",
+        "secret",
+        "--exit-code",
+        "1",
+        "--skip-dirs",
+        ".local",
+        "--skip-dirs",
+        "node_modules",
+        "--skip-dirs",
+        "work",
+        "--skip-dirs",
+        ".git",
+        "--skip-dirs",
+        "infra/acceptance-guard/.terraform",
+        "--skip-dirs",
+        "infra/acceptance-runtime/.terraform",
+        "--skip-dirs",
+        "infra/aws/.terraform",
+        "--skip-dirs",
+        "infra/foundation/.terraform",
+        "--format",
+        "json",
+        "--output",
+        "docs\\evidence\\aws-readiness\\retained-two-instance\\infrastructure\\secrets.json",
+        "."
+      ],
+      "exit_code": 0
+    }
+  ],
+  "source_sha256": {
+    "infra/acceptance-guard/.terraform.lock.hcl": "2364e1a11b99453fde1f6b25792375af322c39f40df1be0b1279c37cef50f016",
+    "infra/acceptance-guard/acceptance.tftest.hcl": "018e1bcb95303d80664bfa273816929eea41621c07d913bf3a4e7392bd020205",
+    "infra/acceptance-guard/main.tf": "fbe71f807992e29afac8ebb524f3a05b1e06fa8ed8e39f90ba13e1a290223966",
+    "infra/acceptance-runtime/.terraform.lock.hcl": "2364e1a11b99453fde1f6b25792375af322c39f40df1be0b1279c37cef50f016",
+    "infra/acceptance-runtime/acceptance.tftest.hcl": "9177dcc80ec7a393400adef072354da11d2bff951835546a5955102b7caa9cd2",
+    "infra/acceptance-runtime/main.tf": "03e1c21badfa99b03569b303a04e85a2eda63482e6f9b9343ed095c1bc6a118c",
+    "infra/aws/.terraform.lock.hcl": "2364e1a11b99453fde1f6b25792375af322c39f40df1be0b1279c37cef50f016",
+    "infra/aws/data.tf": "57d08dd7df0b35c31688b113ebb108ff974d3fcb61b8f26854bc6644bdc5e7da",
+    "infra/aws/iam.tf": "a6e9fa226b4463957c1a3c52f1294b24b4e34d8375d004790d9787dbe84e21bd",
+    "infra/aws/network.tf": "829f8b6393baa18911de58f31e6872780d92bdb3dd55db9336895c6a8ad27b0e",
+    "infra/aws/observability.tf": "ce60e1fdbdf979dac17f7296065d95140faa094d9213c34b38229428499711ee",
+    "infra/aws/outputs.tf": "dff670116d4e061ddb16c3d83e4a87b64fce030874db428d771ff45850bff9cb",
+    "infra/aws/runtime.tf": "80312b2cf0897c518edb06fe3008ca67e4b449be9a5f0a791c50f64624048fd9",
+    "infra/aws/tests/security.tftest.hcl": "ff45f25ef4dd20032e15142a5d2ed676db25bc60568bb7e3ecc0d90ab8fd6661",
+    "infra/aws/variables.tf": "c9fa1f3bf0d0a4e035a539de1b3017181a72974e42143e3f5a9e06082f4551ac",
+    "infra/aws/versions.tf": "10bb129143ad0fac36e3a9ea13dd11a25187a6fa8665d5ea6a1f10e10c71231b",
+    "infra/foundation/.terraform.lock.hcl": "2364e1a11b99453fde1f6b25792375af322c39f40df1be0b1279c37cef50f016",
+    "infra/foundation/main.tf": "770c8ddbd175a653d5d429ebc858ee11f7893649cf7581001ba4f05e6e76d0c4",
+    "infra/README.md": "c63ea6d467eafd0cf38ebd9f4083f176e3daf11989b8843e1051125615e99dbc",
+    "infra/testing/README.md": "dedb00917fefe5855482b624f3727753067906ad638a94f4fecc9d0068ac399a",
+    "infra/testing/static.tfvars.json": "07f2ecd47d61ec50e8c3314902158977f1236da66bc420fa170e1843c94d8f72"
+  }
+}

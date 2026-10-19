@@ -117,6 +117,18 @@ def permission_denials(control_dsn, remote_dsn):
     return denied
 
 
+def receipt_fingerprint(remote_dsn):
+    """Read-only content evidence for the independent ledger, not only a row count."""
+    with db.connect(remote_dsn) as connection:
+        connection.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY")
+        receipts = connection.execute(
+            "SELECT key,hash,body,receipt FROM remote.effects ORDER BY key LIMIT 1001"
+        ).fetchall()
+    if len(receipts) > 1000:
+        raise ValueError("Synthetic native receipt ledger budget exceeded")
+    return digest(receipts)
+
+
 def main():
     action = sys.argv[1]
     run = os.environ["ACCEPTANCE_RUN"]
@@ -146,6 +158,7 @@ def main():
         control = make_conninfo(os.environ["CONTROL_DSN"], host=host) if host else os.environ["CONTROL_DSN"]
         result = operations.recovery_snapshot(control, os.environ["REMOTE_DSN"])
         result["write_denials"] = permission_denials(control, os.environ["REMOTE_DSN"])
+        result["remote_ledger_sha256"] = receipt_fingerprint(os.environ["REMOTE_DSN"])
     else:
         raise ValueError("Unknown native task")
     print(json.dumps({"native_fixture": result}, default=str), flush=True)

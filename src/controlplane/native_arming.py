@@ -34,6 +34,10 @@ def armed_gate(manifest, clients):
     schedule = clients["scheduler"].get_schedule(Name=manifest["schedule"], GroupName="default")
     function = clients["lambda"].get_function_configuration(FunctionName=manifest["watchdog"])
     env = function["Environment"]["Variables"]
+    if manifest.get("recovery_strategy") == "retained-two-instance-v1" and (
+        env["GUARD_BUCKET"] != manifest["guard_bucket"] or env["GUARD_KEY_ARN"] != manifest["guard_key"]
+    ):
+        raise RuntimeError("Recovery checkpoint storage differs from independently armed guard")
     target = schedule["Target"]
     role_prefix = f"arn:aws:iam::{manifest['account']}:role/csa-native-guard/{manifest['run']}/{prefix}"
     arn = f"arn:aws:lambda:us-east-2:{manifest['account']}:function:{prefix}-watchdog"

@@ -27,6 +27,15 @@ def test_bound_includes_independent_store_restore_and_cleanup():
     assert not result['paid_plan_authorized']
 
 
+def test_retained_estimate_prices_two_slots_and_expiring_backup_without_codebuild():
+    result = MODULE.estimate(rates(), retained=True)
+    assert result['maximum_concurrent_instances'] == 2
+    assert result['items']['two_concurrent_micro_instances'] == '0.128000'
+    assert 'sixty_codebuild_cleanup_and_image_build_minutes' not in result['items']
+    assert float(result['items']['twenty_gb_retained_backup_one_day_allowance']) > 0
+    assert result['actual_usage'] == 'not_executed' and not result['hard_billing_cap']
+
+
 @pytest.mark.parametrize('hours', [0, 5, True, 1.5])
 def test_no_open_ended_acceptance_window(hours):
     with pytest.raises(ValueError):

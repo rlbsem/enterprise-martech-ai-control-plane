@@ -1,0 +1,305 @@
+{
+  "generated_at": "2026-10-19T03:02:02.933401+00:00",
+  "scope": "authenticated saved Terraform guard plan only; no apply",
+  "region": "us-east-2",
+  "run": "r2610190255a269",
+  "plan_sha256": "223d06d30140fe165cf57baa982eb541ad5651bebc4b959957279bcaa80e10ac",
+  "bundle_sha256": "881493c160811488bff57e1e2e9acd6aa88d5e56b6cbf24fbf0b3b37395d0882",
+  "managed_actions": {
+    "create": 24,
+    "update": 0,
+    "delete": 0
+  },
+  "aws_creates": 23,
+  "nonbillable_local_clock_creates": 1,
+  "resources": [
+    {
+      "address": "aws_cloudwatch_log_group.function[\"checker\"]",
+      "actions": [
+        "create"
+      ]
+    },
+    {
+      "address": "aws_cloudwatch_log_group.function[\"watchdog\"]",
+      "actions": [
+        "create"
+      ]
+    },
+    {
+      "address": "aws_cloudwatch_metric_alarm.failures",
+      "actions": [
+        "create"
+      ]
+    },
+    {
+      "address": "aws_iam_role.function[\"checker\"]",
+      "actions": [
+        "create"
+      ]
+    },
+    {
+      "address": "aws_iam_role.function[\"watchdog\"]",
+      "actions": [
+        "create"
+      ]
+    },
+    {
+      "address": "aws_iam_role.schedule",
+      "actions": [
+        "create"
+      ]
+    },
+    {
+      "address": "aws_iam_role_policy.cleanup",
+      "actions": [
+        "create"
+      ]
+    },
+    {
+      "address": "aws_iam_role_policy.function[\"checker\"]",
+      "actions": [
+        "create"
+      ]
+    },
+    {
+      "address": "aws_iam_role_policy.function[\"watchdog\"]",
+      "actions": [
+        "create"
+      ]
+    },
+    {
+      "address": "aws_iam_role_policy.schedule",
+      "actions": [
+        "create"
+      ]
+    },
+    {
+      "address": "aws_kms_key.guard",
+      "actions": [
+        "create"
+      ]
+    },
+    {
+      "address": "aws_lambda_function.guard[\"checker\"]",
+      "actions": [
+        "create"
+      ]
+    },
+    {
+      "address": "aws_lambda_function.guard[\"watchdog\"]",
+      "actions": [
+        "create"
+      ]
+    },
+    {
+      "address": "aws_lambda_function_event_invoke_config.guard[\"checker\"]",
+      "actions": [
+        "create"
+      ]
+    },
+    {
+      "address": "aws_lambda_function_event_invoke_config.guard[\"watchdog\"]",
+      "actions": [
+        "create"
+      ]
+    },
+    {
+      "address": "aws_s3_bucket.guard",
+      "actions": [
+        "create"
+      ]
+    },
+    {
+      "address": "aws_s3_bucket_lifecycle_configuration.guard",
+      "actions": [
+        "create"
+      ]
+    },
+    {
+      "address": "aws_s3_bucket_policy.guard",
+      "actions": [
+        "create"
+      ]
+    },
+    {
+      "address": "aws_s3_bucket_public_access_block.guard",
+      "actions": [
+        "create"
+      ]
+    },
+    {
+      "address": "aws_s3_bucket_server_side_encryption_configuration.guard",
+      "actions": [
+        "create"
+      ]
+    },
+    {
+      "address": "aws_s3_bucket_versioning.guard",
+      "actions": [
+        "create"
+      ]
+    },
+    {
+      "address": "aws_scheduler_schedule.cleanup",
+      "actions": [
+        "create"
+      ]
+    },
+    {
+      "address": "aws_sqs_queue.failures",
+      "actions": [
+        "create"
+      ]
+    },
+    {
+      "address": "terraform_data.deployment_clock[0]",
+      "actions": [
+        "create"
+      ]
+    }
+  ],
+  "deadline": "first guard apply start + 3h; cleanup retries end + 4h; no extension on retry",
+  "approved": false,
+  "applied": false,
+  "runtime_plan": "not generated; depends on actual armed guard",
+  "permissions": {
+    "scope": "authenticated guard plan policies; not IAM simulation or runtime operator permission proof",
+    "policies": [
+      {
+        "address": "aws_iam_role_policy.cleanup",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "rds:ModifyDBInstance",
+                "rds:DeleteDBInstance",
+                "rds:DeleteDBSnapshot",
+                "rds:DeleteDBSubnetGroup",
+                "rds:DeleteDBParameterGroup"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                "arn:aws:rds:us-east-2:<account>:db:csa-native-r2610190255a269*",
+                "arn:aws:rds:us-east-2:<account>:snapshot:csa-native-r2610190255a269*",
+                "arn:aws:rds:us-east-2:<account>:subgrp:csa-native-r2610190255a269*",
+                "arn:aws:rds:us-east-2:<account>:pg:csa-native-r2610190255a269*"
+              ]
+            },
+            {
+              "Action": "rds:DeleteDBInstanceAutomatedBackup",
+              "Condition": {
+                "StringEquals": {
+                  "aws:ResourceTag/AcceptanceRun": "r2610190255a269"
+                }
+              },
+              "Effect": "Allow",
+              "Resource": "arn:aws:rds:us-east-2:<account>:auto-backup:*"
+            },
+            {
+              "Action": [
+                "ecs:StopTask",
+                "ecs:DeleteCluster",
+                "ecs:DeregisterTaskDefinition",
+                "ecs:DeleteTaskDefinitions"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                "arn:aws:ecs:us-east-2:<account>:cluster/csa-native-r2610190255a269",
+                "arn:aws:ecs:us-east-2:<account>:task/csa-native-r2610190255a269/*",
+                "arn:aws:ecs:us-east-2:<account>:task-definition/csa-native-r2610190255a269-*:*"
+              ]
+            },
+            {
+              "Action": "ecr:DeleteRepository",
+              "Effect": "Allow",
+              "Resource": "arn:aws:ecr:us-east-2:<account>:repository/csa-native-r2610190255a269"
+            },
+            {
+              "Action": "secretsmanager:DeleteSecret",
+              "Effect": "Allow",
+              "Resource": "arn:aws:secretsmanager:us-east-2:<account>:secret:csa-native-r2610190255a269/*"
+            },
+            {
+              "Action": "logs:DeleteLogGroup",
+              "Effect": "Allow",
+              "Resource": [
+                "arn:aws:logs:us-east-2:<account>:log-group:/csa-native/r2610190255a269/*:*",
+                "arn:aws:logs:us-east-2:<account>:log-group:/aws/rds/instance/csa-native-r2610190255a269-*/postgresql:*"
+              ]
+            },
+            {
+              "Action": [
+                "ec2:DeleteVpcEndpoints",
+                "ec2:DeleteNetworkInterface",
+                "ec2:DeleteRouteTable",
+                "ec2:DeleteSecurityGroup",
+                "ec2:DeleteSubnet",
+                "ec2:DeleteVpc",
+                "ec2:RevokeSecurityGroupIngress",
+                "ec2:RevokeSecurityGroupEgress",
+                "ec2:DisassociateRouteTable"
+              ],
+              "Condition": {
+                "StringEquals": {
+                  "aws:ResourceTag/AcceptanceRun": "r2610190255a269"
+                }
+              },
+              "Effect": "Allow",
+              "Resource": "*"
+            },
+            {
+              "Action": [
+                "iam:ListRolePolicies",
+                "iam:DeleteRolePolicy",
+                "iam:DeleteRole"
+              ],
+              "Effect": "Allow",
+              "Resource": "arn:aws:iam::<account>:role/csa-native/r2610190255a269/*"
+            },
+            {
+              "Action": [
+                "kms:ScheduleKeyDeletion",
+                "kms:RetireGrant"
+              ],
+              "Condition": {
+                "StringEquals": {
+                  "aws:ResourceTag/AcceptanceRun": "r2610190255a269"
+                }
+              },
+              "Effect": "Allow",
+              "Resource": "arn:aws:kms:us-east-2:<account>:key/*"
+            },
+            {
+              "Action": "lambda:InvokeFunction",
+              "Effect": "Allow",
+              "Resource": "arn:aws:lambda:us-east-2:<account>:function:csa-native-r2610190255a269-checker"
+            }
+          ]
+        },
+        "policy_unknown_until_apply": false
+      },
+      {
+        "address": "aws_iam_role_policy.function[\"checker\"]",
+        "policy": null,
+        "policy_unknown_until_apply": true
+      },
+      {
+        "address": "aws_iam_role_policy.function[\"watchdog\"]",
+        "policy": null,
+        "policy_unknown_until_apply": true
+      },
+      {
+        "address": "aws_iam_role_policy.schedule",
+        "policy": null,
+        "policy_unknown_until_apply": true
+      }
+    ],
+    "unresolved_policy_source": "infra/acceptance-guard/main.tf; generated guard ARNs are unknown until apply",
+    "source_policy_blocks": [
+      "resource \"aws_iam_role_policy\" \"function\" {\n  for_each = local.functions\n  role     = aws_iam_role.function[each.key].id\n  policy = jsonencode({ Version = \"2012-10-17\", Statement = [\n    { Effect = \"Allow\", Action = local.read_actions, Resource = \"*\" },\n    { Effect = \"Allow\", Action = [\"logs:CreateLogStream\", \"logs:PutLogEvents\"], Resource = \"${aws_cloudwatch_log_group.function[each.key].arn}:*\" },\n    { Effect = \"Allow\", Action = \"s3:GetObject\", Resource = \"${aws_s3_bucket.guard.arn}/inventory/registry.json\" },\n    { Effect = \"Allow\", Action = \"s3:PutObject\", Resource = each.key == \"checker\" ? [\"${aws_s3_bucket.guard.arn}/checks/*\"] : [\"${aws_s3_bucket.guard.arn}/inventory/*\", \"${aws_s3_bucket.guard.arn}/cleanup/*\"] },\n    { Effect = \"Allow\", Action = [\"kms:Decrypt\", \"kms:GenerateDataKey\"], Resource = aws_kms_key.guard.arn, Condition = { StringEquals = { \"kms:ViaService\" = \"s3.us-east-2.amazonaws.com\" } } },\n    { Effect = \"Allow\", Action = \"sqs:SendMessage\", Resource = aws_sqs_queue.failures.arn }\n  ] })\n}",
+      "resource \"aws_iam_role_policy\" \"cleanup\" {\n  role = aws_iam_role.function[\"watchdog\"].id\n  policy = jsonencode({ Version = \"2012-10-17\", Statement = [\n    { Effect = \"Allow\", Action = [\"rds:ModifyDBInstance\", \"rds:DeleteDBInstance\", \"rds:DeleteDBSnapshot\", \"rds:DeleteDBSubnetGroup\", \"rds:DeleteDBParameterGroup\"], Resource = [for type in [\"db\", \"snapshot\", \"subgrp\", \"pg\"] : \"arn:aws:rds:us-east-2:${var.account_id}:${type}:${local.name}*\"] },\n    { Effect = \"Allow\", Action = \"rds:DeleteDBInstanceAutomatedBackup\", Resource = \"arn:aws:rds:us-east-2:${var.account_id}:auto-backup:*\", Condition = { StringEquals = { \"aws:ResourceTag/AcceptanceRun\" = var.run_id } } },\n    { Effect = \"Allow\", Action = [\"ecs:StopTask\", \"ecs:DeleteCluster\", \"ecs:DeregisterTaskDefinition\", \"ecs:DeleteTaskDefinitions\"], Resource = [\"arn:aws:ecs:us-east-2:${var.account_id}:cluster/${local.name}\", \"arn:aws:ecs:us-east-2:${var.account_id}:task/${local.name}/*\", \"arn:aws:ecs:us-east-2:${var.account_id}:task-definition/${local.name}-*:*\"] },\n    { Effect = \"Allow\", Action = \"ecr:DeleteRepository\", Resource = \"arn:aws:ecr:us-east-2:${var.account_id}:repository/${local.name}\" },\n    { Effect = \"Allow\", Action = \"secretsmanager:DeleteSecret\", Resource = \"arn:aws:secretsmanager:us-east-2:${var.account_id}:secret:${local.name}/*\" },\n    { Effect = \"Allow\", Action = \"logs:DeleteLogGroup\", Resource = [\"arn:aws:logs:us-east-2:${var.account_id}:log-group:/csa-native/${var.run_id}/*:*\", \"arn:aws:logs:us-east-2:${var.account_id}:log-group:/aws/rds/instance/${local.name}-*/postgresql:*\"] },\n    { Effect = \"Allow\", Action = [\"ec2:DeleteVpcEndpoints\", \"ec2:DeleteNetworkInterface\", \"ec2:DeleteRouteTable\", \"ec2:DeleteSecurityGroup\", \"ec2:DeleteSubnet\", \"ec2:DeleteVpc\", \"ec2:RevokeSecurityGroupIngress\", \"ec2:RevokeSecurityGroupEgress\", \"ec2:DisassociateRouteTable\"], Resource = \"*\", Condition = local.runtime_tag },\n    { Effect = \"Allow\", Action = [\"iam:ListRolePolicies\", \"iam:DeleteRolePolicy\", \"iam:DeleteRole\"], Resource = \"arn:aws:iam::${var.account_id}:role/csa-native/${var.run_id}/*\" },\n    { Effect = \"Allow\", Action = [\"kms:ScheduleKeyDeletion\", \"kms:RetireGrant\"], Resource = \"arn:aws:kms:us-east-2:${var.account_id}:key/*\", Condition = local.runtime_tag },\n    { Effect = \"Allow\", Action = \"lambda:InvokeFunction\", Resource = \"arn:aws:lambda:us-east-2:${var.account_id}:function:${local.name}-checker\" }\n  ] })\n}",
+      "resource \"aws_iam_role_policy\" \"schedule\" {\n  role = aws_iam_role.schedule.id\n  policy = jsonencode({ Version = \"2012-10-17\", Statement = [\n    { Effect = \"Allow\", Action = \"lambda:InvokeFunction\", Resource = aws_lambda_function.guard[\"watchdog\"].arn },\n    { Effect = \"Allow\", Action = \"sqs:SendMessage\", Resource = aws_sqs_queue.failures.arn }\n  ] })\n}"
+    ]
+  }
+}

@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RATES = ROOT / 'docs/evidence/aws-readiness/ohio/public-rates.json'
 
 
-def estimate(document, hours=4):
+def estimate(document, hours=4, *, retained=False):
     if type(hours) is not int or not 1 <= hours <= 4:
         raise ValueError('Acceptance window must be one to four whole hours')
     if document['region'] != 'us-east-2':
@@ -38,11 +38,22 @@ def estimate(document, hours=4):
         'scheduler_and_independent_check_allowance_not_metered': Decimal('0.10'),
         'residual_retention_allowance_not_metered': Decimal('0.25'),
     }
+    if retained:
+        for name in ('three_single_az_micro_instances', 'sixty_gb_gp3',
+                     'sixty_gb_additional_backup_allowance', 'sixty_codebuild_cleanup_and_image_build_minutes'):
+            del items[name]
+        items.update({
+            'two_concurrent_micro_instances': 2 * h * rates['rds_instance_hour'],
+            'forty_gb_gp3': 40 * h / month * rates['rds_gp3_gb_month'],
+            'forty_gb_active_backup_allowance': 40 * h / month * rates['rds_backup_gb_month'],
+            'twenty_gb_retained_backup_one_day_allowance': 20 * 24 / month * rates['rds_backup_gb_month'],
+        })
     total = sum(items.values())
     allowance = Decimal('5.00')
     if total > allowance:
         raise ValueError('Modeled profile exceeds the five-credit planning allowance')
-    return {'profile': 'ohio-free-single-az-pitr-v1', 'region': 'us-east-2',
+    return {'profile': 'ohio-retained-two-instance-v1' if retained else 'ohio-free-single-az-pitr-v1',
+            'maximum_concurrent_instances': 2 if retained else 3, 'region': 'us-east-2',
             'status': 'PROPOSED_NOT_AUTHORIZED_NOT_DEPLOYED', 'hours': hours,
             'currency': 'USD_equivalent_AWS_credit_consumption',
             'items': {key: str(value.quantize(Decimal('0.000001'))) for key, value in items.items()},
@@ -58,8 +69,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--rates', type=Path, default=RATES)
     parser.add_argument('--hours', type=int, default=4)
+    parser.add_argument('--retained', action='store_true')
     args = parser.parse_args()
-    print(json.dumps(estimate(json.loads(args.rates.read_text()), args.hours), indent=2))
+    print(json.dumps(estimate(json.loads(args.rates.read_text()), args.hours, retained=args.retained), indent=2))
 
 
 if __name__ == '__main__':

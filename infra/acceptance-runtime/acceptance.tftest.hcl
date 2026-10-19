@@ -9,7 +9,10 @@ mock_provider "aws" {
   mock_data "aws_lambda_function" {
     defaults = {
       code_sha256 = "approved-guard"
-      environment = [{ variables = { RUN_ID = "test2026" } }]
+      environment = [{ variables = {
+        RUN_ID        = "test2026", GUARD_BUCKET = "csa-native-test2026-guard-123456789012",
+        GUARD_KEY_ARN = "arn:aws:kms:us-east-2:123456789012:key/11111111-1111-1111-1111-111111111111"
+      } }]
     }
   }
 }
@@ -40,6 +43,13 @@ run "unarmed_rejected" {
   command = plan
   variables { operator_armed_schedule_verified = false }
   expect_failures = [aws_vpc.runtime]
+}
+run "retained_two_instance_contract" {
+  command = plan
+  assert {
+    condition     = length(aws_db_instance.store) == 2 && !aws_db_instance.store["control"].delete_automated_backups && aws_db_instance.store["receipts"].delete_automated_backups && output.manifest.maximum_concurrent_instances == 2 && output.manifest.recovery_strategy == "retained-two-instance-v1" && output.manifest.source_deletion_scope == "disposable_synthetic_control_only" && output.manifest.verification_contract == "receipt-ledger-sha256-v1"
+    error_message = "The native lane must retain source backups and declare the explicit two-instance protocol."
+  }
 }
 run "mutable_image_rejected" {
   command = plan

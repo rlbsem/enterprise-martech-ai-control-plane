@@ -11,6 +11,7 @@ import time
 import boto3
 
 from .native_arming import armed_gate
+from .native_retained import RetainedRecovery, STRATEGY
 
 
 def validate_manifest(m):
@@ -23,6 +24,14 @@ def validate_manifest(m):
     if m.get("database_name") != "csaacceptance":
         raise ValueError("Isolated acceptance database name required")
     prefix = "csa-native-" + m["run"]
+    if m.get("recovery_strategy") is not None:
+        if (m["recovery_strategy"] != STRATEGY or m.get("maximum_concurrent_instances") != 2
+                or m.get("source_deletion_scope") != "disposable_synthetic_control_only"
+                or m.get("verification_contract") != "receipt-ledger-sha256-v1"
+                or m.get("guard_bucket") != f"{prefix}-guard-{m['account']}"
+                or not re.fullmatch(f"arn:aws:kms:us-east-2:{m['account']}:key/[a-f0-9-]{{36}}",
+                                    m.get("guard_key", ""))):
+            raise ValueError("Explicit retained-backup protocol, private guard and two-instance bound required")
     if m["control_db"] != prefix + "-control" or m["downstream_db"] != prefix + "-receipts":
         raise ValueError("Independent exact database identities required")
     if m["cluster"] != f"arn:aws:ecs:us-east-2:{m['account']}:cluster/{prefix}":
@@ -45,10 +54,17 @@ def validate_manifest(m):
 
 
 class NativeRun:
-    def __init__(self, manifest, clients):
+    def __init__(self, manifest, clients, *, allow_source_deletion=False, checkpoint_dir=None):
         self.m, self.c = manifest, clients
         self.prefix = validate_manifest(manifest)
         self.records = []
+        self.allow_source_deletion, self.checkpoint_dir = allow_source_deletion, checkpoint_dir
+        self.writes_frozen = False
+        if manifest.get("recovery_strategy") == STRATEGY and (
+            not allow_source_deletion or checkpoint_dir is None
+            or not Path(checkpoint_dir).resolve().is_relative_to(Path(__file__).resolve().parents[2] / ".local")
+        ):
+            raise ValueError("Retained recovery requires separate deletion approval and private .local checkpoints")
 
     def gate(self):
         return armed_gate(self.m, self.c)
@@ -65,6 +81,8 @@ class NativeRun:
                 raise RuntimeError("Write-capable tasks are not quiescent")
 
     def task(self, name, *, extra=None, expected_exit=0):
+        if self.writes_frozen and name != "verify":
+            raise RuntimeError("Writers are frozen for retained recovery")
         self.gate()
         self.drained()
         ecs = self.c["ecs"]
@@ -212,6 +230,8 @@ class NativeRun:
         if not initial["safe_to_resume"] or initial["local_intents"] != 0 or initial["remote_effects"] != 0:
             raise RuntimeError("Fresh isolated ledgers required; do not reuse a partially executed run")
         baseline = datetime.fromisoformat(self.task("baseline")["baseline_at"])
+        if self.m.get("recovery_strategy") == STRATEGY:
+            RetainedRecovery(self).wait_window(baseline)
         fixture = self.task("control")
         receipt = self.task("receipt", extra={"FIXTURE_JSON": json.dumps(fixture)})
         replay = self.task("receipt", extra={"FIXTURE_JSON": json.dumps(fixture)})
@@ -225,6 +245,8 @@ class NativeRun:
     def _recover_from_baseline(self, baseline):
         # The normal run captures this timestamp before intent creation. An operator
         # continuation must independently revalidate its original executed checkpoint.
+        if self.m.get("recovery_strategy") == STRATEGY:
+            return RetainedRecovery(self).execute(baseline)
         self.gate()
         self.drained()
         source, remote = self.database(self.m["control_db"]), self.database(self.m["downstream_db"])
@@ -314,6 +336,8 @@ def main():
     p.add_argument("--approved-sha256", required=True)
     p.add_argument("--output", type=Path, required=True)
     p.add_argument("--execute", action="store_true")
+    p.add_argument("--approve-retained-source-deletion", action="store_true")
+    p.add_argument("--private-checkpoints", type=Path)
     a = p.parse_args()
     raw = a.manifest.read_bytes()
     if not a.execute or hashlib.sha256(raw).hexdigest() != a.approved_sha256 or a.output.exists():
@@ -323,9 +347,24 @@ def main():
     s = boto3.Session(region_name="us-east-2")
     c = {
         name: s.client(name, region_name="us-east-1" if name == "freetier" else "us-east-2")
-        for name in ("sts", "freetier", "ecs", "rds", "logs", "scheduler", "lambda")
+        for name in ("sts", "freetier", "ecs", "rds", "logs", "scheduler", "lambda", "s3", "kms")
     }
-    runner = NativeRun(m, c)
+    runner = NativeRun(m, c, allow_source_deletion=a.approve_retained_source_deletion,
+                       checkpoint_dir=a.private_checkpoints)
+    if a.private_checkpoints:
+        if not a.private_checkpoints.resolve().is_relative_to(Path(__file__).resolve().parents[2] / ".local"):
+            p.error("Request receipt logs require a private .local directory")
+        a.private_checkpoints.mkdir(parents=True, exist_ok=True)
+
+        def receipt(http_response, parsed, model, **kwargs):
+            row = {"at": datetime.now(UTC).isoformat(), "service": model.service_model.service_name,
+                   "operation": model.name, "request_id": parsed.get("ResponseMetadata", {}).get("RequestId"),
+                   "http_status": http_response.status_code, "error_code": parsed.get("Error", {}).get("Code")}
+            with (a.private_checkpoints / "aws-request-receipts.jsonl").open("a") as stream:
+                stream.write(json.dumps(row) + "\n")
+
+        for client in c.values():
+            client.meta.events.register("after-call.*.*", receipt)
     try:
         result = runner.run()
     except Exception as exc:
@@ -333,12 +372,15 @@ def main():
             "status": "FAILED_NATIVE_ACCEPTANCE",
             "error_type": type(exc).__name__,
             "records": runner.records,
-            "cleanup": "scheduled_guard_remains_armed",
+            "cleanup": "independent_guard_state_and_cleanup_must_be_checked",
+            "aws_error_code": getattr(exc, "response", {}).get("Error", {}).get("Code"),
+            "aws_request_id": getattr(exc, "response", {}).get("ResponseMetadata", {}).get("RequestId"),
         }
     a.output.parent.mkdir(parents=True, exist_ok=True)
     a.output.write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps({"status": result["status"]}))
-    return 0 if result["status"] == "NATIVE_SQL_PITR_ACCEPTANCE_PASSED" else 1
+    return 0 if result["status"] in {"NATIVE_SQL_PITR_ACCEPTANCE_PASSED",
+                                    "NATIVE_RETAINED_SQL_PITR_ACCEPTANCE_PASSED"} else 1
 
 
 if __name__ == "__main__":

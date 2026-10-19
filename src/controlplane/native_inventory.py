@@ -61,7 +61,13 @@ class Inventory:
             "rds", "describe_db_instance_automated_backups", "DBInstanceAutomatedBackups"
         ):
             if backup["DBInstanceIdentifier"] in names:
-                self.add("backup", backup["DbiResourceId"], state=backup["Status"])
+                arn = backup["DBInstanceAutomatedBackupsArn"]
+                verified = False
+                if backup["Status"] == "retained":
+                    tags = self.c["rds"].list_tags_for_resource(ResourceName=arn)["TagList"]
+                    verified = {t["Key"]: t["Value"] for t in tags}.get("AcceptanceRun") == self.run
+                self.add("backup", backup["DbiResourceId"], state=backup["Status"], arn=arn,
+                         run_tag_verified=verified)
         cluster = f"arn:aws:ecs:us-east-2:{self.account}:cluster/{self.prefix}"
         clusters = self.c["ecs"].describe_clusters(clusters=[cluster]).get("clusters", [])
         for value in clusters:

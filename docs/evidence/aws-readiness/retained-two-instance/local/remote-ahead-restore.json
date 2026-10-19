@@ -1,0 +1,14 @@
+{
+  "safe_to_resume": false,
+  "local_intents": 0,
+  "remote_effects": 1,
+  "findings": [
+    {
+      "key": "9853ddf2-ce21-40a0-ac9d-ea7d37349584",
+      "reason": "remote_ahead_missing_intent"
+    }
+  ],
+  "snapshot_hash": "05c5e7989c6efb9b0aa0604720c72528ecb5545055643acae3b60179de4db742",
+  "observed_at": "2026-10-19T03:03:00.268615+00:00",
+  "scope": "quiesced databases; no changes or replay performed"
+}
