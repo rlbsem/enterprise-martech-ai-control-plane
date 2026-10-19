@@ -4,7 +4,7 @@
   "mode": "static only; no policy upload or AWS permission simulation",
   "scope": "candidate controller, inventory, cleanup, gate and SQL-task code; operator requirements, not deployed role grants",
   "source_sha256": {
-    "src/controlplane/native_run.py": "9cfdbb8878b2b89e0946e1b8ef49ecd864929771c1223af2a684f5cf5ad1c315",
+    "src/controlplane/native_run.py": "e353818622db2724fb03370ed33cd6f4ef4aac5e87148bdba644010673ea5784",
     "src/controlplane/native_retained.py": "a9a6c6b306cb752b23b7680c91beb77dee6738f3d422139e9b2afdc267e4a38e",
     "src/controlplane/native_inventory.py": "7b3131b3096e2ee85df2300e9f6c34543bc78f09d448935130fab37e5ed322eb",
     "src/controlplane/native_watchdog.py": "d3113228f236283bd79dfd928e2be4add696260271453f9db712a0db33750e4d",

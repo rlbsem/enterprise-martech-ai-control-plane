@@ -62,7 +62,7 @@ class NativeRun:
         self.writes_frozen = False
         if manifest.get("recovery_strategy") == STRATEGY and (
             not allow_source_deletion or checkpoint_dir is None
-            or not Path(checkpoint_dir).resolve().is_relative_to(Path(__file__).resolve().parents[2] / ".local")
+            or not Path(checkpoint_dir).resolve().is_relative_to(Path.cwd().resolve() / ".local")
         ):
             raise ValueError("Retained recovery requires separate deletion approval and private .local checkpoints")
 
@@ -352,7 +352,7 @@ def main():
     runner = NativeRun(m, c, allow_source_deletion=a.approve_retained_source_deletion,
                        checkpoint_dir=a.private_checkpoints)
     if a.private_checkpoints:
-        if not a.private_checkpoints.resolve().is_relative_to(Path(__file__).resolve().parents[2] / ".local"):
+        if not a.private_checkpoints.resolve().is_relative_to(Path.cwd().resolve() / ".local"):
             p.error("Request receipt logs require a private .local directory")
         a.private_checkpoints.mkdir(parents=True, exist_ok=True)
 

@@ -4,11 +4,11 @@
   "remote_effects": 1,
   "findings": [
     {
-      "key": "9853ddf2-ce21-40a0-ac9d-ea7d37349584",
+      "key": "ffafe6f0-b927-4fd8-9301-c9fec69e93a1",
       "reason": "remote_ahead_missing_intent"
     }
   ],
-  "snapshot_hash": "05c5e7989c6efb9b0aa0604720c72528ecb5545055643acae3b60179de4db742",
-  "observed_at": "2026-10-19T03:03:00.268615+00:00",
+  "snapshot_hash": "0ddd3f8edcd91fe6055e8113f01954ec4899633c8ab42d6efc7353ab45d37efa",
+  "observed_at": "2026-10-19T03:07:30.461582+00:00",
   "scope": "quiesced databases; no changes or replay performed"
 }

@@ -2,14 +2,14 @@
   "failure": "timeout_after",
   "worker_attempts": 2,
   "remote_business_effects": 1,
-  "idempotency_key": "df02ee33-90cf-4b9a-9196-b40c1a346106",
+  "idempotency_key": "3d71fc4d-e0bc-46d3-960c-c31ba5066f1d",
   "first_status": "retry",
   "final_status": "succeeded",
   "resolution": "reconciled_committed_effect",
   "receipt": {
-    "key": "df02ee33-90cf-4b9a-9196-b40c1a346106",
-    "hash": "d086fd423ffe5b5e0d2155ad1bda47861701f3bf250a7da6f50fd3d73290bc38",
-    "receipt": "72e7e1bf-4ea1-4d80-a2d3-e5d2d1e3a5b9",
-    "committed_at": "2026-10-18T23:03:11.397846-04:00"
+    "key": "3d71fc4d-e0bc-46d3-960c-c31ba5066f1d",
+    "hash": "3a67b0183d3dd6ba74c820fc81f0e517e51ed299a797461a1a6f4cad980abb03",
+    "receipt": "36763458-c6d7-4059-ae57-5d8dd0034be5",
+    "committed_at": "2026-10-18T23:07:42.255267-04:00"
   }
 }
