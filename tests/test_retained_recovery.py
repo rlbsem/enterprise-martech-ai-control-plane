@@ -39,15 +39,15 @@ def fixture(tmp_path, monkeypatch):
     source = {"DBInstanceIdentifier": m["control_db"], "DbiResourceId": "db-SOURCE",
               "DBInstanceArn": f"arn:aws:rds:us-east-2:{account}:db:{m['control_db']}",
               "KmsKeyId": key, "DBInstanceStatus": "available", "DeletionProtection": True,
-              "LatestRestorableTime": baseline + timedelta(minutes=5),
+              "LatestRestorableTime": baseline + timedelta(minutes=5), "BackupRetentionPeriod": 1,
               "DBSubnetGroup": {"DBSubnetGroupName": prefix},
               "DBParameterGroups": [{"DBParameterGroupName": prefix}],
               "VpcSecurityGroups": [{"VpcSecurityGroupId": "owned-sg"}]}
     remote = {**source, "DBInstanceIdentifier": m["downstream_db"], "DbiResourceId": "db-RECEIPTS"}
     restored = {**source, "DBInstanceIdentifier": prefix + "-restore", "DbiResourceId": "db-RESTORED", "BackupRetentionPeriod": 1,
-                "Endpoint": {"Address": "synthetic-private-restore.test"}}
+                "Endpoint": {"Address": "synthetic-private-restore.test"}, "MaxAllocatedStorage": 0}
     backup = {"DBInstanceIdentifier": m["control_db"], "DbiResourceId": source["DbiResourceId"],
-              "DBInstanceArn": source["DBInstanceArn"], "Region": "us-east-2", "Engine": "postgres",
+              "DBInstanceArn": source["DBInstanceArn"], "Region": "use2", "Engine": "postgres",
               "EngineVersion": "17.11", "AllocatedStorage": 20, "BackupRetentionPeriod": 1,
               "Encrypted": True, "KmsKeyId": key, "Status": "active",
               "DBInstanceAutomatedBackupsArn": f"arn:aws:rds:us-east-2:{account}:auto-backup:ab-SOURCE",
@@ -96,6 +96,7 @@ def fixture(tmp_path, monkeypatch):
         row = deepcopy(backup)
         if not state["source"]:
             row["Status"] = "retained" if state["backup_retained"] else "creating"
+            row.pop("BackupRetentionPeriod", None)  # Optional field omitted by real retained-backup API
         if not state["source_window"]:
             row["RestoreWindow"] = {}
         return {"DBInstanceAutomatedBackups": [row], "ResponseMetadata": {"RequestId": "offline-backup"}}
@@ -125,6 +126,7 @@ def fixture(tmp_path, monkeypatch):
                                   "ManageMasterUserPassword", "MasterUserPassword", "UseLatestRestorableTime"}
         assert not kwargs["MultiAZ"] and not kwargs["PubliclyAccessible"]
         assert kwargs["DBParameterGroupName"] == prefix and "BackupRetentionPeriod" not in kwargs
+        assert "MaxAllocatedStorage" not in kwargs
         state["restored"] = True
         assert len(databases()) == 2
         return {"ResponseMetadata": {"RequestId": "offline-restore"}}
@@ -180,6 +182,40 @@ def fixture(tmp_path, monkeypatch):
     runner = Runner()
     return SimpleNamespace(runner=runner, recovery=RetainedRecovery(runner), state=state, source=source,
                            backup=backup, snapshot=snapshot, restored=restored, baseline=baseline, rds=rds, objects=objects)
+
+
+def test_backup_accepts_regional_code_and_pinned_arn(tmp_path, monkeypatch):
+    f = fixture(tmp_path, monkeypatch)
+    r = f.recovery.backup(f.source, "active", f.baseline)
+    assert r and r["metadata"]["Region"] == "use2"
+    f.backup["Region"] = "us-east-2"
+    assert f.recovery.backup(f.source, "active", f.baseline)
+    f.backup["Region"] = "usw2"
+    with pytest.raises(RuntimeError, match="Backup metadata differs"):
+        f.recovery.backup(f.source, "active", f.baseline)
+    f.backup["Region"] = "use2"
+    f.backup["DBInstanceAutomatedBackupsArn"] = f.backup["DBInstanceAutomatedBackupsArn"].replace(
+        ":us-east-2:", ":us-west-2:")
+    with pytest.raises(RuntimeError, match="Backup metadata differs"):
+        f.recovery.backup(f.source, "active", f.baseline)
+
+
+def test_missing_retained_field_does_not_weaken_source_retention_requirement(tmp_path, monkeypatch):
+    f = fixture(tmp_path, monkeypatch)
+    f.state["source"] = False
+    assert f.recovery.backup(f.source, "retained", f.baseline)
+    f.source["BackupRetentionPeriod"] = 7
+    with pytest.raises(RuntimeError, match="Backup metadata differs"):
+        f.recovery.backup(f.source, "retained", f.baseline)
+
+
+def test_restored_unexpected_autoscaling_ceiling_fails_closed(tmp_path, monkeypatch):
+    f = fixture(tmp_path, monkeypatch)
+    f.restored["MaxAllocatedStorage"] = 100
+    with pytest.raises(RuntimeError, match="autoscaling unexpectedly enabled"):
+        f.recovery.execute(f.baseline)
+    assert not any(json.loads(v).get("phase") == "restored-fail-closed-verified"
+                   for k, v in f.objects.items() if k.startswith("recovery/"))
 
 
 def test_retained_protocol_never_needs_a_third_instance_and_preserves_receipt_content(tmp_path, monkeypatch):
