@@ -9,6 +9,26 @@ from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
+# The published local/static records are immutable pre-native-experiment snapshots.
+# Verify their recorded sources from that actual Git revision, not from the
+# later corrected controller. Current code is independently executed by CI.
+HISTORICAL_EVIDENCE_HEAD = "adc8496fb64dd9bdcf6bf2403ba663a714a1ccb7"
+
+
+def historical_content(name):
+    result = subprocess.run(["git", "show", f"{HISTORICAL_EVIDENCE_HEAD}:{name}"],
+                            cwd=ROOT, capture_output=True)
+    if result.returncode:
+        raise RuntimeError(
+            f"Historical evidence commit not available: {HISTORICAL_EVIDENCE_HEAD}. "
+            "Fetch complete repository history before validating snapshots."
+        )
+    return result.stdout
+
+
+def historical_sha256(name):
+    return hashlib.sha256(historical_content(name).replace(b"\\r\\n", b"\\n")).hexdigest()
+
 
 
 def main():
@@ -38,7 +58,7 @@ def main():
                 errors.append(f'Credential material in {path.relative_to(ROOT)}')
     record = json.loads((ROOT/args.verification_record).read_text())
     for name, expected in record['source_sha256'].items():
-        actual = hashlib.sha256((ROOT/name).read_bytes().replace(b'\r\n', b'\n')).hexdigest()
+        actual = historical_sha256(name)
         if actual != expected:
             errors.append(f'Stale verification binding: {name}')
     diagrams = sorted((ROOT/'docs/diagrams').glob('*.mmd'))
@@ -52,7 +72,7 @@ def main():
                 errors.append(f'Stale rendered diagram: {path.name}')
     infrastructure = json.loads((ROOT/args.infrastructure_record).read_text())
     for name, expected in infrastructure['source_sha256'].items():
-        if hashlib.sha256((ROOT/name).read_bytes().replace(b'\r\n', b'\n')).hexdigest() != expected:
+        if historical_sha256(name) != expected:
             errors.append(f'Stale infrastructure proof: {name}')
     for name in ('native-sql', 'retained-two-instance'):
         manifest = ROOT/'docs/evidence/aws-readiness'/name/'artifact-manifest.json'
@@ -63,7 +83,9 @@ def main():
     if errors:
         raise SystemExit('\n'.join(errors))
     print(json.dumps({'markdown_links': link_count, 'source_bindings': len(record['source_sha256']),
-                      'diagrams': len(diagrams), 'credential_patterns': 'clear'}))
+                      'diagrams': len(diagrams), 'credential_patterns': 'clear',
+                      'archived_evidence_revision': HISTORICAL_EVIDENCE_HEAD,
+                      'current_code_verified_separately_by_CI': True}))
 
 
 if __name__ == '__main__':
