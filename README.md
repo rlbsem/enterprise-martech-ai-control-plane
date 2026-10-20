@@ -14,6 +14,14 @@ Start with the [executed tests](docs/evidence/report.md), [workload results](doc
 
 ![Control-plane architecture](docs/diagrams/01-control-plane.svg)
 
+## Governing changes across business systems
+
+In multi-brand and PE-backed operating environments, my systems work has included defining field ownership across CRM, operations and finance, preserving source identities and governing lifecycle changes. An operational update should not overwrite a valid sales owner or move an advanced deal backwards.
+
+This Python/PostgreSQL control plane implements stateful middleware: canonical identity, source authority, No-Regress Logic, durable intent, fenced workers and independent receipts. Stable effect IDs and audit trails support idempotent recovery after uncertain writes. Current authorization governs new actions; an existing receipt establishes what already happened. Local tests block recovery when downstream effects outlive control state. Separate AWS evidence records native SQL checks and an available retained-backup restore; the final restored-state comparison remains unverified. These controls apply across enterprise applications and AI-enabled workflows.
+
+[Execution and recovery](docs/failures.md) · [Recorded AWS boundary](docs/evidence/aws-readiness/retained-two-instance/native-outcome/README.md)
+
 ## Engineering choices and tradeoffs
 
 - **AI can propose, not authorize.** Agents submit typed proposals. Scoped identities and a separate executor enforce field ownership, policy and credential boundaries. [Trust decisions](docs/architecture.md).
