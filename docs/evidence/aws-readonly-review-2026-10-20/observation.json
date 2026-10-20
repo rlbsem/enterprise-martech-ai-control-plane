@@ -1,0 +1,72 @@
+{
+  "scope": "point_in_time_metadata_observation_not_recovery_execution_or_billing_clearance",
+  "region": "us-east-2",
+  "reviewed_main": "575de15daaead429a754142f87992ee9907c84f1",
+  "account_plan": {
+    "type": "FREE",
+    "status": "ACTIVE",
+    "credits_available": true,
+    "exact_balance": "private_owner_report_only"
+  },
+  "primary_observation_at": "2026-10-20T16:04:19.840045+00:00",
+  "primary_counts": {
+    "rds_instances": 0,
+    "rds_snapshots": 0,
+    "rds_automated_backups": 0,
+    "ecs_clusters": 0,
+    "ecr_repositories": 0,
+    "vpc_endpoints": 0,
+    "nondefault_vpcs": 0,
+    "default_vpcs": 1,
+    "free_tier_usage_records": 0
+  },
+  "secondary_observation_at": "2026-10-20T16:05:14.329417+00:00",
+  "secondary_counts": {
+    "functions": 0,
+    "schedules": 0,
+    "roles": 0,
+    "network_interfaces": 0,
+    "db_subnet_groups": 0,
+    "task_definitions_ACTIVE": 0,
+    "task_definitions_INACTIVE": 0,
+    "task_definitions_DELETE_IN_PROGRESS": 0
+  },
+  "custom_parameter_groups": 0,
+  "customer_managed_keys": [
+    {
+      "reference_sha256": "09ede91665647bef7e9342da0baa4b0158f23cf0e144f56b5471e88d5fdee7c1",
+      "state": "PendingDeletion",
+      "deletion_date_utc": "2026-10-25T22:42:04.367000+00:00"
+    },
+    {
+      "reference_sha256": "fe21224cf0c6fca2e91f3fa8a4098289a82a45a9ad28f4f389393762a5288591",
+      "state": "PendingDeletion",
+      "deletion_date_utc": "2026-10-26T06:17:40.939000+00:00"
+    },
+    {
+      "reference_sha256": "3a0d2b9879708a924742405f542eaf4dc4f20d1e93ccc3c057d413cc934ebd48",
+      "state": "PendingDeletion",
+      "deletion_date_utc": "2026-10-26T02:20:09.721000+00:00"
+    },
+    {
+      "reference_sha256": "87f9c9d2166f584af7da35078207dd60905474644ac1f44b9d7ade99aeecf9dc",
+      "state": "PendingDeletion",
+      "deletion_date_utc": "2026-10-26T17:23:02.464000+00:00"
+    }
+  ],
+  "aws_managed_keys_excluded_from_experiment": 2,
+  "not_rechecked": [
+    "Secrets Manager pending-deletion inventory",
+    "S3 buckets and object versions",
+    "SQS queues",
+    "CloudWatch alarms",
+    "final billed usage and invoices",
+    "other AWS regions"
+  ],
+  "billing_clearance": false,
+  "native_post_restore_reconciliation": "not_recorded",
+  "production_application_acceptance": "not_executed",
+  "mutations_performed": false,
+  "credentials_or_secret_values_retrieved": false,
+  "recurring_checks_created": false
+}
