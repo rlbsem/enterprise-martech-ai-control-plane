@@ -226,7 +226,9 @@ def test_retained_protocol_never_needs_a_third_instance_and_preserves_receipt_co
     assert f.state["max_instances"] == 2 and f.runner.writes_frozen
     assert len(f.runner.records) == 3 and f.runner.records[-1]["result"]["safe_to_resume"] is False
     phases = [json.loads(v)["phase"] for k, v in f.objects.items() if k.startswith("recovery/")]
-    assert phases == ["before-source-deletion", "retained-backup-observed", "restored-fail-closed-verified"]
+    assert phases == ["before-source-deletion", "retained-backup-observed", "restored-instance-available",
+                      "restored-reconciliation-1-verified", "restored-reconciliation-2-verified",
+                      "restored-fail-closed-verified"]
     model = botocore.session.get_session().get_service_model("rds")
     for operation, method in [("DeleteDBInstance", f.rds.delete_db_instance),
                               ("RestoreDBInstanceToPointInTime", f.rds.restore_db_instance_to_point_in_time)]:
@@ -341,3 +343,91 @@ def test_receipt_fingerprint_detects_real_sql_content_change_without_new_effect(
     with db.connect(os.environ["TEST_ADMIN_DSN"]) as connection:
         connection.execute("UPDATE remote.effects SET body=body || '{\"changed\":true}'::jsonb")
     assert before != receipt_fingerprint(os.environ["REMOTE_DSN"])
+
+
+@pytest.mark.parametrize("change", [
+    {"safe_to_resume": 1}, {"safe_to_resume": "true"}, {"safe_to_resume": None},
+    {"local_intents": True}, {"remote_effects": True}, {"local_intents": 1.0},
+    {"write_denials": 2.0}, {"findings": [{"reason": "remote_ahead_missing_intent"}]},
+])
+def test_untyped_original_verdict_cannot_authorize_source_deletion(tmp_path, monkeypatch, change):
+    f = fixture(tmp_path, monkeypatch)
+    original = f.runner.task
+
+    def task(name, **kwargs):
+        return {**original(name, **kwargs), **change}
+
+    monkeypatch.setattr(f.runner, "task", task)
+    with pytest.raises(RuntimeError):
+        f.recovery.execute(f.baseline)
+    f.rds.delete_db_instance.assert_not_called()
+    f.rds.restore_db_instance_to_point_in_time.assert_not_called()
+    assert f.state["source"]
+
+
+@pytest.mark.parametrize("change", [
+    {"safe_to_resume": None}, {"safe_to_resume": 0}, {"safe_to_resume": ""},
+    {"local_intents": False}, {"remote_effects": True}, {"local_intents": 0.0},
+    {"write_denials": 2.0}, {"findings": []}, {"findings": None},
+    {"findings": [{"reason": "remote_ahead_missing_intent"}] * 2},
+    {"findings": [{"reason": "different_failure"}]},
+])
+def test_untyped_restored_verdict_never_becomes_acceptance(tmp_path, monkeypatch, change):
+    f = fixture(tmp_path, monkeypatch)
+    original = f.runner.task
+
+    def task(name, **kwargs):
+        result = original(name, **kwargs)
+        return {**result, **change} if kwargs.get("expected_exit") == 2 else result
+
+    monkeypatch.setattr(f.runner, "task", task)
+    with pytest.raises(RuntimeError):
+        f.recovery.execute(f.baseline)
+    phases = [json.loads(v)["phase"] for k, v in f.objects.items() if k.startswith("recovery/")]
+    assert phases[-1] == "restored-instance-available"
+    assert "restored-fail-closed-verified" not in phases
+
+
+@pytest.mark.parametrize("failed_attempt", [1, 2])
+def test_task_failure_preserves_available_restore_without_claiming_final_acceptance(
+    tmp_path, monkeypatch, failed_attempt
+):
+    f = fixture(tmp_path, monkeypatch)
+    original = f.runner.task
+    attempts = []
+
+    def task(name, **kwargs):
+        if kwargs.get("expected_exit") == 2:
+            attempts.append(name)
+            if len(attempts) == failed_attempt:
+                raise RuntimeError("offline verification task interruption")
+        return original(name, **kwargs)
+
+    monkeypatch.setattr(f.runner, "task", task)
+    with pytest.raises(RuntimeError, match="interruption"):
+        f.recovery.execute(f.baseline)
+    checkpoints = [json.loads(v) for k, v in f.objects.items() if k.startswith("recovery/")]
+    available = next(c for c in checkpoints if c["phase"] == "restored-instance-available")
+    assert available["restored_reconciliation"] == "not_yet_verified"
+    assert available["restored"]["DbiResourceId"] not in {f.source["DbiResourceId"], "db-REMOTE"}
+    assert not available["full_application_acceptance"]
+    phases = [c["phase"] for c in checkpoints]
+    assert ("restored-reconciliation-1-verified" in phases) == (failed_attempt == 2)
+    assert "restored-reconciliation-2-verified" not in phases
+    assert "restored-fail-closed-verified" not in phases
+
+
+def test_unverified_available_checkpoint_prevents_further_verification_tasks(tmp_path, monkeypatch):
+    f = fixture(tmp_path, monkeypatch)
+    original = f.recovery.checkpoint
+
+    def checkpoint(phase, payload):
+        if phase == "restored-instance-available":
+            f.state["bad_readback"] = True
+        return original(phase, payload)
+
+    monkeypatch.setattr(f.recovery, "checkpoint", checkpoint)
+    with pytest.raises(RuntimeError, match="read-back mismatch"):
+        f.recovery.execute(f.baseline)
+    assert len(f.runner.records) == 1  # only original-control reconciliation
+    assert not any(p["phase"].startswith("restored-reconciliation") for p in f.recovery.phases)

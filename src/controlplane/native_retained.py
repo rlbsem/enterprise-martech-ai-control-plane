@@ -101,7 +101,7 @@ class RetainedRecovery:
         response = self.c["s3"].get_object(Bucket=self.m["guard_bucket"], Key=key)
         with response["Body"] as stream:
             if stream.read(2_000_001) != raw:
-                raise RuntimeError("Cloud checkpoint read-back mismatch; source deletion refused")
+                raise RuntimeError("Cloud checkpoint read-back mismatch; further recovery actions refused")
         self.phases.append({"phase": phase, "checkpoint_sha256": sha,
                             "readback_request_id": response["ResponseMetadata"]["RequestId"]})
 
@@ -130,11 +130,34 @@ class RetainedRecovery:
 
     def verify_receipts(self, result, expected=None):
         fingerprint = result.get("remote_ledger_sha256", "")
-        if not re.fullmatch("[a-f0-9]{64}", fingerprint) or result.get("write_denials") != 2:
+        if (not isinstance(fingerprint, str) or not re.fullmatch("[a-f0-9]{64}", fingerprint)
+                or type(result.get("write_denials")) is not int or result["write_denials"] != 2):
             raise RuntimeError("Exact read-only receipt ledger fingerprint required")
         if expected is not None and fingerprint != expected:
             raise RuntimeError("Independent receipt database content changed")
         return fingerprint
+
+    def verify_reconciliation(self, result, *, restored, expected=None):
+        """A missing/falsy verdict is not an explicit fail-closed observation.
+
+        JSON bools compare equal to Python ints; require the actual SQL count
+        types and an internally consistent verdict before any destructive step
+        or successful native acceptance checkpoint.
+        """
+        if not isinstance(result, dict):
+            raise RuntimeError("Explicit typed reconciliation evidence required")
+        local = 0 if restored else 1
+        findings = result.get("findings")
+        valid_findings = findings == [] if not restored else (
+            isinstance(findings, list) and len(findings) == 1
+            and isinstance(findings[0], dict)
+            and findings[0].get("reason") == "remote_ahead_missing_intent")
+        if (result.get("safe_to_resume") is not (not restored)
+                or type(result.get("local_intents")) is not int or result["local_intents"] != local
+                or type(result.get("remote_effects")) is not int or result["remote_effects"] != 1
+                or not valid_findings):
+            raise RuntimeError("Explicit typed reconciliation evidence required")
+        return self.verify_receipts(result, expected)
 
     def execute(self, baseline):
         if not self.r.allow_source_deletion or not self.r.checkpoint_dir:
@@ -150,9 +173,7 @@ class RetainedRecovery:
         if source["DbiResourceId"] == remote["DbiResourceId"]:
             raise RuntimeError("Independent receipt recovery domain required")
         good = self.r.task("verify")
-        if not good["safe_to_resume"] or good["local_intents"] != good["remote_effects"] or good["local_intents"] != 1:
-            raise RuntimeError("Original 1/1 reconciliation required before destructive transition")
-        fingerprint = self.verify_receipts(good)
+        fingerprint = self.verify_reconciliation(good, restored=False)
         self.r.writes_frozen = True
         deadline = datetime.fromisoformat(self.m["cleanup_at"])
         if (deadline - datetime.now(UTC)).total_seconds() < 5400:
@@ -271,14 +292,20 @@ class RetainedRecovery:
         if (restored["DbiResourceId"] in {source["DbiResourceId"], remote["DbiResourceId"]}
                 or restored["KmsKeyId"] != source["KmsKeyId"]):
             raise RuntimeError("Distinct restored physical identity and original encryption key required")
-        for _ in range(2):
+        # Preserve this native stage before any application-level task can fail.
+        # Availability alone is explicitly not reconciliation or acceptance.
+        self.checkpoint("restored-instance-available", {
+            **payload, "restored": restored,
+            "restore_request_id": response["ResponseMetadata"]["RequestId"],
+            "restored_reconciliation": "not_yet_verified", "full_application_acceptance": False})
+        for attempt in range(1, 3):
             if self.r.database(self.remote)["DbiResourceId"] != remote["DbiResourceId"]:
                 raise RuntimeError("Receipt instance changed after restore")
             blocked = self.r.task("verify", extra={"RESTORED_HOST": restored["Endpoint"]["Address"]}, expected_exit=2)
-            self.verify_receipts(blocked, fingerprint)
-            if (blocked["safe_to_resume"] or blocked["local_intents"] != 0 or blocked["remote_effects"] != 1
-                    or {f["reason"] for f in blocked["findings"]} != {"remote_ahead_missing_intent"}):
-                raise RuntimeError("Native restored-control fail-closed proof not established")
+            self.verify_reconciliation(blocked, restored=True, expected=fingerprint)
+            self.checkpoint(f"restored-reconciliation-{attempt}-verified", {
+                **payload, "restored": restored, "observation": blocked,
+                "verification_attempt": attempt, "full_application_acceptance": False})
         result = {"status": "NATIVE_RETAINED_SQL_PITR_ACCEPTANCE_PASSED", "strategy": STRATEGY,
                   "full_application_acceptance": False, "original_control_deleted": True,
                   "maximum_concurrent_instances": 2, "restore_baseline": baseline.isoformat(),
