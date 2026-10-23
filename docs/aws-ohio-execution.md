@@ -1,9 +1,12 @@
 # Isolated Ohio native acceptance implementation
 
-**Current recovery candidate:** [two-instance retained-backup PITR](aws-retained-pitr.md).
-It is implemented and locally tested, not natively executed or authorized. The historical
-three-instance procedure and estimates below explain the preserved quota failure; use the
-new candidate's explicit destructive-transition gates and approval stages for a future run.
+**Recorded recovery sequence:** [two-instance retained-backup PITR](aws-retained-pitr.md).
+The approved October 19 experiment reached an available restored RDS instance, but its
+final native restored-state reconciliation was not recorded. The reconstructed controller
+corrections have local regression coverage and have not been rerun against AWS.
+See the [retained-backup outcome and teardown](evidence/aws-readiness/retained-two-instance/native-outcome/README.md).
+The historical three-instance procedure and estimates below explain the earlier quota
+failure. Any future run requires a new reviewed plan and explicit authorization.
 
 **Native SQL passed; the original native PITR attempt hit the Free-plan instance limit.** The isolated
 guard, real CI image and two private RDS databases deployed. Bootstrap, exact receipt replay,
@@ -119,7 +122,7 @@ not public environment variables in GitHub logs.
 
 ## Evidence boundaries and verification
 
-[Current local verification](evidence/aws-readiness/retained-two-instance/local/verification.json) and [infrastructure checks](evidence/aws-readiness/retained-two-instance/infrastructure/verification.json) cover actual PostgreSQL/HTTP
+[Historical candidate verification](evidence/aws-readiness/retained-two-instance/local/verification.json) and [infrastructure checks](evidence/aws-readiness/retained-two-instance/infrastructure/verification.json) cover actual PostgreSQL/HTTP
 regressions, new local SQL fixture tests, mocked controller/guard fault tests, pinned Terraform
 validation/mock tests and static security checks. The [native SQL record](evidence/aws-readiness/native-sql/README.md)
 separately records actual arming, RDS provisioning, fixture execution, rejected PITR and cleanup.
@@ -131,5 +134,6 @@ resource references, never credentials, raw plans or private account/network ide
 
 AWS documents that [RDS deletes its managed owner secret with the instance](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-secrets-manager.html)
 and that [PITR creates a new instance](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_PIT.html).
-Those service contracts guide the implementation; the observed Free-plan quota rejection
-means this account did not complete the intended recovery experiment.
+Those service contracts guide the implementation. The first restore request hit the
+instance quota; the later retained-backup run reached restore availability without the
+required final reconciliation. Neither result establishes full recovery acceptance.
