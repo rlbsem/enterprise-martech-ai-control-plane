@@ -1,8 +1,11 @@
 # Ohio Free-plan database/PITR acceptance proposal
 
-**Original proposal; later execution is recorded separately.** The bounded smaller lane
-was subsequently approved and executed through native SQL verification; the actual PITR
-request was blocked by the Free-plan instance limit. See [executed results and teardown](evidence/aws-readiness/native-sql/README.md).
+**Historical proposal; execution results are recorded separately.** The first run passed
+native SQL verification but its third-instance PITR request hit the Free-plan quota.
+The subsequent two-instance retained-backup run reached an available restored RDS instance;
+its final native restored-state reconciliation was not recorded. See the
+[first execution](evidence/aws-readiness/native-sql/README.md) and
+[retained-backup outcome and teardown](evidence/aws-readiness/retained-two-instance/native-outcome/README.md).
 No Paid-plan upgrade or out-of-pocket expense is authorized. The existing Canadian-region production Terraform, release manifest guards,
 Multi-AZ witness and all historical evidence remain unchanged.
 
@@ -54,7 +57,7 @@ The narrower lane needs its own reviewed configuration and manifest. Do **not** 
 `infra/aws` to Ohio, relax `Release` region validation, or run the production
 `aws_acceptance` collector against a smaller topology and call its missing checks passed.
 That collector intentionally expects the production service topology and Multi-AZ.
-The [isolated implementation and execution procedure](aws-ohio-execution.md) now provide separate Terraform roots, a native fixture/PITR executor and an independent scheduled guard. They have not been deployed.
+The [isolated implementation and execution procedure](aws-ohio-execution.md) provides separate Terraform roots, a native fixture/PITR executor and an independent scheduled guard. These components were deployed for the bounded experiments; their recorded results do not establish full application acceptance.
 
 ## Native experiment and independent facts
 
@@ -137,5 +140,10 @@ inventory, private versioned evidence, synthetic disposal and independent guard 
 
 All prior discovery, cost v1 and local records remain historical evidence. The new
 [implementation records](evidence/aws-readiness/implementation/README.md) bind that implementation checkpoint.
-Native SQL verification and resource operations subsequently executed with explicit approval;
-PITR completion and delayed billing clearance remain incomplete. PR #4 remains draft and unmerged.
+Native SQL verification and resource operations subsequently executed with explicit approval.
+[PR #4](https://github.com/rlbsem/enterprise-martech-ai-control-plane/pull/4) merged on
+October 19, 2026 at `c786b73a3085b120121eb2656a9fce009bd8e1d0`. The retained-backup
+restore reached `available`, but the final native fail-closed comparison and delayed
+billing clearance remain unverified. Pending-deletion resources are described in the
+[dated closeout](evidence/aws-readiness/retained-two-instance/native-outcome/README.md);
+this document supplies no new account observation or execution authorization.

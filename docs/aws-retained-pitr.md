@@ -1,6 +1,8 @@
 # Retained-backup PITR with two concurrent instances
 
-**Implemented and locally tested; not executed in AWS.** The earlier [native SQL result](evidence/aws-readiness/native-sql/README.md) and its rejected third-instance restore remain unchanged. This candidate replaces only that isolated experiment's recovery sequence. Production infrastructure and its recovery runbook are unchanged.
+**Executed through native restore availability; final reconciliation unverified.** The approved October 19, 2026 run restored the disposable control database from retained automated backups without exceeding two concurrent instances. The final native restored-control comparison was not recorded, so the recovery acceptance gate did not pass. [Recorded outcome, code provenance and teardown](evidence/aws-readiness/retained-two-instance/native-outcome/README.md).
+
+The earlier [native SQL result](evidence/aws-readiness/native-sql/README.md) and its rejected third-instance restore remain unchanged. This sequence replaces only that isolated experiment's recovery path. Production infrastructure and its recovery runbook are unchanged. The procedure and approval estimates below describe that historical candidate; they authorize no new execution. Reconstructed service-contract fixes have regression coverage but have not been rerun against AWS.
 
 ## Documented mechanism and eligibility limits
 
@@ -10,7 +12,7 @@ For this same-region, deleted-source case, `RestoreDBInstanceToPointInTime` acce
 
 Deletion must explicitly set **`DeleteAutomatedBackups=false`**; its default is destructive to backups. Deletion protection must first be removed. Once instance deletion begins, it cannot be cancelled. The proposed synthetic experiment sets `SkipFinalSnapshot=true`: this deliberately sacrifices the disposable source and adds no manual snapshot. This is a bounded portfolio experiment, not production backup guidance. [Delete API](https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_DeleteDBInstance.html).
 
-The prior run established Ohio access, two permitted micro instances and one-day retention. General AWS documentation supports Free-plan micro RDS use, but does not establish this account's retained-backup feature entitlement. There is no restore `DryRun` API, and IAM analysis cannot establish Free-plan/SCP eligibility. **Retained recovery remains a native acceptance requirement, not a verified Free-plan guarantee.** If retention or restore is rejected, preserve the real error, perform approved cleanup and report failure; never upgrade the account. [RDS getting started](https://docs.aws.amazon.com/AmazonRDS/latest/gettingstartedguide/create-instance-overview.html) · [Free-plan conditions](https://docs.aws.amazon.com/hands-on/latest/control-your-costs-free-tier-budgets/control-your-costs-free-tier-budgets.html).
+The first run established Ohio access, two permitted micro instances and one-day retention; the later run observed retained-backup restore availability on that account. This is a dated execution result, not a guarantee of current or general Free-plan eligibility. There is no restore `DryRun` API, and IAM analysis cannot establish Free-plan/SCP eligibility. **Full native recovery acceptance remains incomplete.** If a future authorized retention or restore request is rejected, preserve the real error, perform approved cleanup and report failure; never upgrade the account. [RDS getting started](https://docs.aws.amazon.com/AmazonRDS/latest/gettingstartedguide/create-instance-overview.html) · [Free-plan conditions](https://docs.aws.amazon.com/hands-on/latest/control-your-costs-free-tier-budgets/control-your-costs-free-tier-budgets.html).
 
 ## Executable sequence and destructive-transition gates
 
@@ -60,4 +62,4 @@ python scripts/repo_check.py
 python scripts/estimate_ohio_acceptance.py --retained
 ```
 
-These commands run no cloud provisioning. [Checked local and infrastructure evidence](evidence/aws-readiness/retained-two-instance/README.md) separates SDK fakes, actual local PostgreSQL execution, read-only AWS observation and the still-unexecuted native recovery candidate.
+These commands run no cloud provisioning. [Checked local and infrastructure evidence](evidence/aws-readiness/retained-two-instance/README.md) remains bound to its original pre-execution revision. The [native outcome](evidence/aws-readiness/retained-two-instance/native-outcome/README.md) separately records restore availability and the missing fail-closed comparison; current hosted CI tests the reconstructed controller without executing AWS operations.
