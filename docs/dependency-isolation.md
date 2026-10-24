@@ -47,6 +47,6 @@ python scripts/isolation_acceptance.py --admin postgresql://postgres@127.0.0.1:5
 python scripts/check_isolation.py work/new-isolation/observations.json
 ```
 
-Use a new output directory for every run. The connection in this example is an isolated local administrator, not an instruction to use a vendor or business database. The protocol records exact source hashes and rejects source changes during execution. The 30-second/100-proposal smoke profile is a harness check and does not substitute for sustained acceptance. Full observations distinguish offered, admitted, rejected and terminal work; rejected admission is not a successful delivery.
+Use a new output directory for every run. The connection in this example is an isolated local administrator, not an instruction to use a vendor or business database. The protocol records exact source hashes and rejects source changes during execution. The 60-second/100-proposal CI smoke profile is a harness check and does not substitute for sustained acceptance. Full observations distinguish offered, admitted, rejected and terminal work; rejected admission is not a successful delivery.
 
 The separate native AWS archive keeps its original limits, including the missing native post-restore fail-closed result. This extension does not contact AWS, perform inference, send prospect communications or establish production SLOs.

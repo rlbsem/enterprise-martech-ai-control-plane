@@ -44,7 +44,7 @@ jobs:
           python scripts/local_demo.py
       - name: Independent destination-capacity smoke execution
         run: |
-          python scripts/isolation_acceptance.py --admin postgresql://postgres:local-admin-only@127.0.0.1:5432/control_test --output work/isolation-ci --duration 30 --proposals 100 --fault mixed
+          python scripts/isolation_acceptance.py --admin postgresql://postgres:local-admin-only@127.0.0.1:5432/control_test --output work/isolation-ci --duration 60 --proposals 100 --fault mixed
           mkdir -p work/ci-evidence/isolation
           cp work/isolation-ci/protocol.json work/isolation-ci/observations.json work/isolation-ci/result.json work/ci-evidence/isolation/
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -52,6 +52,17 @@ jobs:
         with:
           name: postgres-http-proof
           path: work/ci-evidence
+          if-no-files-found: warn
+      - name: Retain smoke observations even when its acceptance gate fails
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: destination-capacity-observations
+          path: |
+            work/isolation-ci/protocol.json
+            work/isolation-ci/observations.json
+            work/isolation-ci/result.json
+            work/isolation-ci/cleanup.json
           if-no-files-found: warn
   container-demo:
     runs-on: ubuntu-latest
