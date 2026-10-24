@@ -131,7 +131,7 @@ def main():
             "",
         ]
     target = HERE / "timeline.md"
-    target.write_text("\n".join(rows) + "\n", encoding="utf-8", newline="\n")
+    target.write_text("\n".join(rows).rstrip() + "\n", encoding="utf-8", newline="\n")
     files = [Path(__file__), target] + list((HERE / "runs").glob("run-*/observations.json.gz"))
     manifest = {p.relative_to(HERE).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in files}
     (HERE / "timeline-manifest.json").write_text(

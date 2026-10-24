@@ -64,4 +64,3 @@ Protocol times identify scheduled injection boundaries. Receiver journals identi
 | 2026-10-24T01:15:45.594+00:00 | 303.588 | Independent ledgers reconciled | safe_to_resume=true; exact healthy, affected and legacy reader scope |
 
 [Observations](runs/run-3/observations.json.gz) · [Protocol](runs/run-3/protocol.json) · [Results](runs/run-3/summary.json)
-
