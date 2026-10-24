@@ -81,7 +81,7 @@ services:
   verify:
     build: .
     profiles: ["test"]
-    command: ["python", "scripts/verify.py", "/app/docs/evidence"]
+    command: ["python", "scripts/verify.py", "/app/work/container-evidence"]
     environment:
       TEST_ADMIN_DSN: postgresql://postgres:local-admin-only@postgres:5432/control_test
     depends_on:

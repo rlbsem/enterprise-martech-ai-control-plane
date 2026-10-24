@@ -30,14 +30,20 @@ The proposal contract still contains no destination URL. Trusted deployment conf
 - Backlog admission is serialized per destination and counts pending jobs and unexpired approval reservations. Duplicate requests are resolved before the capacity check. A full destination cannot consume another destination's admission allowance. Terminal requeue requires another capacity check.
 - Existing approval expiry, source revision, consent, immutable payload, retry exhaustion and lease fencing remain in force. The registry and routing configuration are trusted administrator state; this is not a hostile-process sandbox.
 
+[Executed results and incident timelines](evidence/dependency-isolation/README.md).
+
+The four qualifying runs use a 300-second window, 5,000 proposed actions and a ten-request fixed-window budget. Mixed faults return HTTP 429 in the first half of the injection window and HTTP 503 in the second. Isolated workers poll every 50 milliseconds while the original single-destination mode keeps its 500-millisecond idle poll. Capacity is fixed before worker startup.
+
+Recovery with registered destinations requires readers for every configured destination plus the preserved `__legacy__` ledger. Supplying a single reader fails closed. All writers must be quiesced for this comparison; it does not establish a shared transactional snapshot across independent databases.
+
 ## Reproduction and evidence
 
-The acceptance runner uses only loopback PostgreSQL and HTTP. It creates uniquely named disposable databases, starts separate destination and worker processes, writes a workload protocol before traffic, retains independently observed requests/effects, and drops only its generated databases in finally cleanup. Runtime databases, credentials and raw subprocess logs remain under ignored `work/`.
+The process-resource observer supports Windows and Linux. The acceptance runner uses only loopback PostgreSQL and HTTP. It creates uniquely named disposable databases, starts separate destination and worker processes, writes a workload protocol before traffic, retains independently observed requests/effects, and drops only its generated databases in finally cleanup. Runtime databases, credentials and raw subprocess logs remain under ignored `work/`.
 
 After the existing local bootstrap has provisioned the restricted synthetic roles, run from the repository root using the installed dependencies:
 
 ```text
-python scripts/isolation_acceptance.py --admin postgresql://postgres@127.0.0.1:5432/postgres --output work/new-isolation --duration 300 --proposals 5000 --fault 429
+python scripts/isolation_acceptance.py --admin postgresql://postgres@127.0.0.1:5432/postgres --output work/new-isolation --duration 300 --proposals 5000 --request-limit 10 --fault mixed
 python scripts/check_isolation.py work/new-isolation/observations.json
 ```
 

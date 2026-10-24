@@ -1,0 +1,15 @@
+{
+  "before": "Opportunity",
+  "incoming": "MQL",
+  "decision": {
+    "status": "processed",
+    "customer_id": "9c5e35da-138e-4b9d-9b02-bcbb8fcb4880",
+    "revision": 3,
+    "decisions": {
+      "lifecycle": "lifecycle_regression"
+    },
+    "exception_id": 1
+  },
+  "final": "Opportunity",
+  "queued_actions": 0
+}

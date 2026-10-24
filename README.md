@@ -10,7 +10,7 @@ Field ownership blocks unauthorized overwrites. Permission and approval are chec
 
 **Failure case:** A downstream system commits an action but loses its acknowledgment. The control plane looks up the stable effect ID and finds the existing receipt rather than issuing a second effect. After a database restore, independent receipts must reconcile before services can resume.
 
-Start with the [executed tests](docs/evidence/report.md), [workload results](docs/evidence/enterprise-workload.json) and [recovery design](docs/cloud-operations.md). AWS infrastructure, service identities and release controls are defined separately from the isolated native acceptance run.
+Start with the [current executed tests](docs/evidence/dependency-isolation/software/report.md), [workload results](docs/evidence/enterprise-workload.json) and [recovery design](docs/cloud-operations.md). AWS infrastructure, service identities and release controls are defined separately from the isolated native acceptance run.
 
 ![Control-plane architecture](docs/diagrams/01-control-plane.svg)
 
@@ -28,6 +28,14 @@ This Python/PostgreSQL control plane implements stateful middleware: canonical i
 - **Receipts govern retries.** A timeout does not establish whether an effect committed. The system saves the intent and effect ID before dispatch, checks the receiver's receipt and revalidates authority before another attempt. Delivery is **at least once with idempotent effects under the receiver contract**. [Failure semantics](docs/failures.md).
 - **Recovery requires reconciliation.** A restored control database may predate committed downstream effects. Local remote-ahead tests block resumption when those states disagree. [Recovery design](docs/cloud-operations.md) · [Recorded blocked case](docs/evidence/remote-ahead-restore.json).
 - **Identity safety limits throughput.** A global admission lock simplifies resolution at the cost of concurrency. Measured synthetic throughput and criteria for pooling or partitioning are documented. [Capacity boundaries](docs/capacity.md).
+
+## Measured behavior under overload
+
+The destination-capacity extension keeps one unavailable integration from consuming every worker or turning a shared request allowance into one allowance per process. A finite owner-to-destination registry, immutable routing, PostgreSQL-coordinated permits and bounded admission preserve the original outbox and receipt contract.
+
+Four actual five-minute runs offered **20,000 synthetic proposals** to separate local HTTP receivers. All **8,353 admitted actions** reconciled to one effect each; **11,647 proposals were explicitly rejected at the backlog limit**. Three runs injected sustained HTTP 429/503 faults while the healthy destination continued. Shared budgets, concurrency, alert readback, worker-death recovery and exact destination reconciliation remain inspectable. These are measured local operating limits, not production capacity or cloud acceptance.
+
+[Executed results and incident timelines](docs/evidence/dependency-isolation/README.md) · [Capacity semantics and reproduction](docs/dependency-isolation.md).
 
 ## The invariants
 
@@ -78,7 +86,7 @@ A successful database restore alone is insufficient. Downstream effects can be n
 
 | Validation layer | Purpose and observed result |
 |---|---|
-| Exact correctness suite | Original 68 tests retained, plus cloud authority, restore comparison and release-gate cases; real PostgreSQL and separate HTTP processes. |
+| Exact correctness suite | 323 current tests, preserving the original invariants and adding shared capacity, routed recovery, evidence and permission checks; real PostgreSQL and separate HTTP processes. |
 | Enterprise workload | 1,000 customer accounts, 1,000 intents, four worker processes, 1,200 attempts; 950 unique effects, 50 intended permanent rejections, 50 lost acknowledgements reconciled, zero duplicate effects. |
 | Measured local run | 19.3 seconds admission; 55.5 seconds drain; 18.0 intents/second during drain. HTTP admission p95: 63 ms. |
 | Production capacity model | Explicit connection budgets, admission-lock limits, worker concurrency, retention, failure domains and scaling decision points. |
@@ -113,7 +121,7 @@ python -m pip install --no-deps --no-build-isolation -e .
 # CONTROL_ADMIN_DSN: a disposable demo database you own.
 python scripts/local_demo.py
 # TEST_ADMIN_DSN: a separate disposable database ending in _test.
-python scripts/verify.py
+python scripts/verify.py work/local-proof
 ```
 
 The verifier deliberately recreates its test schemas. [Local operations](docs/operations.md) supplies exact environment examples. [Workload instructions](docs/capacity.md) use a separate empty database. Infrastructure validation needs Terraform 1.13.5 and Trivy 0.75.0, **no AWS credentials**:

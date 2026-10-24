@@ -81,10 +81,11 @@ def test_concurrent_permits_and_reserved_receipt_capacity():
     for token in permits:
         if token:
             capacity.release(route, token, False)
+    # Pin the stored bucket ahead: the backward-clock clamp preserves it across real second boundaries.
     route["requests_per_second"] = 3
     with db.connect() as c:
         c.execute(
-            "UPDATE cp.capacity_state SET window_id=floor(extract(epoch FROM clock_timestamp())),used=2,next_probe='-infinity'"
+            "UPDATE cp.capacity_state SET window_id=floor(extract(epoch FROM clock_timestamp()))+60,used=2,next_probe='-infinity'"
         )
     assert capacity.acquire(route, "dispatch") is None
     assert capacity.acquire(route, "receipt") is not None
