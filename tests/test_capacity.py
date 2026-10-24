@@ -285,3 +285,50 @@ def test_scoped_worker_executes_without_registry_write(monkeypatch):
     ]:
         with pytest.raises(psycopg.Error), db.connect() as c:
             c.execute(statement)
+
+
+def test_successful_lookup_does_not_cooldown_its_required_post():
+    """Regression: a fast 404 lookup must leave capacity for its following POST."""
+    configure(limit=10, concurrency=2)
+    route = {"id": "healthy", "requests_per_second": 10, "concurrency": 2}
+    token = capacity.acquire(route, "receipt")
+    assert token
+    capacity.release(route, token, False)
+    with db.connect() as c:
+        state = c.execute("""SELECT next_probe<=last_served AS ready FROM cp.capacity_state
+            WHERE destination='healthy' """).fetchone()
+    assert state["ready"], "successful receipt lookup introduced an unintended cooldown"
+    dispatch = capacity.acquire(route, "dispatch")
+    assert dispatch
+    capacity.release(route, dispatch, False)
+
+
+def test_preserved_pacing_counterexample(evidence):
+    import importlib.util
+    from pathlib import Path
+
+    path = (
+        Path(__file__).resolve().parents[1]
+        / "docs/evidence/dependency-isolation/portability-fix/source-v2/capacity.py"
+    )
+    spec = importlib.util.spec_from_file_location("controlplane.preserved_capacity", path)
+    old = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(old)
+    configure(limit=10, concurrency=2)
+    route = {"id": "healthy", "requests_per_second": 10, "concurrency": 2}
+    token = old.acquire(route, "receipt")
+    old.release(route, token, False)
+    with db.connect() as c:
+        actual = c.execute("""SELECT next_probe>last_served AS unnecessary_delay,
+            extract(epoch FROM next_probe-last_served) AS seconds
+            FROM cp.capacity_state WHERE destination='healthy' """).fetchone()
+    assert actual["unnecessary_delay"] and float(actual["seconds"]) > 0
+    # Separate clock_timestamp calls can differ by a microsecond; positivity proves the defect.
+    evidence(
+        "preserved-pacing-counterexample",
+        {
+            "old_successful_lookup_adds_delay": True,
+            "measured_delay_seconds": float(actual["seconds"]),
+            "boundary": "local PostgreSQL counterexample; no vendor execution",
+        },
+    )

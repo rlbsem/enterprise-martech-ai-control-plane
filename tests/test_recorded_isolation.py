@@ -16,6 +16,9 @@ def test_recorded_runs_and_recovered_alerts():
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         for name, expected in manifest["files"].items():
             assert hashlib.sha256((manifest_path.parent / name).read_bytes()).hexdigest() == expected
+    source_map = json.loads(
+        (evidence / "portability-fix/historical-source-map.json").read_text(encoding="utf-8")
+    )["files"]
     paths = sorted((evidence / "runs").glob("run-*/observations.json.gz"))
     assert len(paths) == 4
     for path in paths:
@@ -24,7 +27,9 @@ def test_recorded_runs_and_recovered_alerts():
         protocol = record["protocol"]
         assert protocol["duration_seconds"] == 300 and protocol["proposals"] == 5000
         for name, expected in protocol["source_sha256"].items():
-            assert hashlib.sha256((root / name).read_bytes()).hexdigest() == expected, name
+            assert hashlib.sha256((root / source_map.get(name, name)).read_bytes()).hexdigest() == expected, (
+                name
+            )
         if protocol["fault"] == "healthy":
             continue
         lane = record["destinations"]["affected"]

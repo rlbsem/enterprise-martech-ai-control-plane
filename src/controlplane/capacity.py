@@ -160,8 +160,8 @@ def acquire(route, kind):
             (token, route["id"], state["now_window"], kind),
         )
         c.execute(
-            """UPDATE cp.capacity_state SET window_id=%s,used=%s,last_served=clock_timestamp(),
-            next_probe=clock_timestamp()+interval '0.05 seconds' WHERE destination=%s""",
+            """UPDATE cp.capacity_state SET window_id=%s,used=%s,last_served=clock_timestamp()
+            WHERE destination=%s""",
             (state["now_window"], used + 1, route["id"]),
         )
         return token

@@ -87,7 +87,13 @@ def check(record):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("record", type=Path)
+    parser.add_argument(
+        "--source-map",
+        type=Path,
+        help="Explicit archived-source mapping; never substitutes execution results",
+    )
     args = parser.parse_args()
+    source_map = json.loads(args.source_map.read_text(encoding="utf-8"))["files"] if args.source_map else {}
     if args.record.is_dir():
         manifest = json.loads((args.record / "artifact-manifest.json").read_text(encoding="utf-8"))
         for name, expected in manifest["files"].items():
@@ -100,7 +106,7 @@ if __name__ == "__main__":
         for path in sorted(args.record.glob("run-*/observations.json.gz")):
             record = json.loads(gzip.decompress(path.read_bytes()))
             for name, expected in record["protocol"]["source_sha256"].items():
-                source = Path(name).resolve()
+                source = Path(source_map.get(name, name)).resolve()
                 if not source.is_relative_to(Path.cwd().resolve()):
                     raise ValueError("unsafe source path")
                 if hashlib.sha256(source.read_bytes()).hexdigest() != expected:
