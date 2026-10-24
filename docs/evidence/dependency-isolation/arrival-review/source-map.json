@@ -1,0 +1,7 @@
+{
+  "source_commit": "b176cf3be3d8f606f0c6729bfc7e37878318a9a3",
+  "files": {
+    "scripts/check_isolation.py": "docs/evidence/dependency-isolation/arrival-review/source/check_isolation.py",
+    "scripts/report_isolation.py": "docs/evidence/dependency-isolation/arrival-review/source/report_isolation.py"
+  }
+}

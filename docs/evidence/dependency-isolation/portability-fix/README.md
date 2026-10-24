@@ -9,7 +9,7 @@
 | Outage repetition 2 | 2,909 | 2,091 | 274 |
 | Outage repetition 3 | 2,870 | 2,130 | 292 |
 
-All **12,035 admitted jobs** completed with one exact matching effect; **7,965 offers** were explicitly rejected at the bounded backlog. The independent checker found zero duplicate effects, substituted destinations, unaccounted jobs, shared-budget violations or client-concurrency violations. The budget is ten request permits per fixed UTC epoch-second per destination, including receipt GETs; dispatch can use at most nine. Client concurrency is two and backlog is bounded at 128 per destination.
+All **12,035 admitted jobs** completed with one exact matching effect; **7,965 offers** were explicitly rejected at the bounded backlog. The independent checker found zero duplicate effects, substituted destinations, unaccounted jobs, permit-issuance budget violations or client-concurrency violations. The budget is ten request permits per fixed UTC epoch-second per destination, including receipt GETs; dispatch can use at most nine. Client concurrency is two and backlog is bounded at 128 per destination. Receiver journals separately peak at **11 arrivals per UTC second**, with **eight buckets above ten across six destination/run combinations**. Permit compliance does not guarantee compliance with a strict provider-arrival or rolling-window quota. [Exact rate analysis](../arrival-review/README.md).
 
 [Recorded incident timelines](timeline.md) · [Complete summaries](runs/summary.json) · [Protocols and compressed observations](runs/README.md) · [Current software verification](software/verification.json) · [Operating contract](../../../dependency-isolation.md).
 
@@ -21,7 +21,9 @@ The [original four runs](../runs/README.md), [323-test software record](../softw
 
 ## Software verification
 
-The unchanged baseline passed **298 tests**. The [current complete verifier](software/verification.json) passed **328 tests with zero failures and zero skips**, separately from sustained acceptance. [Individual cases](software/tests.xml), the [actual killed-worker/30.1-second permit-expiry record](software/bound-worker-death.json), and the [preserved pacing counterexample](software/preserved-pacing-counterexample.json) remain inspectable. The original 1,000-intent/four-worker baseline workload produced 950 effects, 50 expected permanent rejections, 50 reconciliations and zero duplicates; it is not part of the 20,000-offer isolation table.
+The unchanged baseline passed **298 tests**. The [pre-correction complete verifier](software/verification.json) passed **328 tests with zero failures and zero skips**, separately from sustained acceptance. [Individual cases](software/tests.xml), the [actual killed-worker/30.1-second permit-expiry record](software/bound-worker-death.json), and the [preserved pacing counterexample](software/preserved-pacing-counterexample.json) remain inspectable. The original 1,000-intent/four-worker baseline workload produced 950 effects, 50 expected permanent rejections, 50 reconciliations and zero duplicates; it is not part of the 20,000-offer isolation table.
+
+The [rate-evidence correction](../arrival-review/README.md#verification) has separate current regression metadata and CI; the original 328-test report remains unchanged.
 
 ## Independent evidence and limits
 
@@ -38,8 +40,10 @@ Use the existing locked dependencies and isolated local PostgreSQL bootstrap. Ru
 ```text
 python scripts/isolation_acceptance.py --admin postgresql://postgres@127.0.0.1:5432/postgres --output work/new-healthy --duration 300 --proposals 5000 --request-limit 10 --fault healthy
 python scripts/isolation_acceptance.py --admin postgresql://postgres@127.0.0.1:5432/postgres --output work/new-mixed --duration 300 --proposals 5000 --request-limit 10 --fault mixed
-python scripts/check_isolation.py docs/evidence/dependency-isolation/portability-fix/runs
+python scripts/check_isolation.py docs/evidence/dependency-isolation/portability-fix/runs --source-map docs/evidence/dependency-isolation/arrival-review/source-map.json
 python scripts/check_isolation.py docs/evidence/dependency-isolation/runs --source-map docs/evidence/dependency-isolation/portability-fix/historical-source-map.json
 ```
+
+The offline checker/reporting correction uses an explicit source map for the original checker and reporter. All runtime files still match their recorded hashes. Archived `budget_violations` fields describe permit issuance only, not receiver arrivals.
 
 The 60-second/100-proposal Linux CI smoke is a separate harness check. It does not substitute for the sustained executions. Current CI and local software results are reported separately; archived records are never rewritten to claim a later runtime passed.

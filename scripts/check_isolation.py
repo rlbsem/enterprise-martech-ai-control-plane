@@ -5,7 +5,65 @@ import gzip
 import hashlib
 from collections import Counter
 import json
+import math
 from pathlib import Path
+
+
+def rate_observations(record):
+    """Compare database-assigned permit windows with receiver UTC arrival buckets.
+
+    Arrival counts are observations, not a second acceptance contract. A permit
+    from an earlier window can arrive alongside the next window's requests.
+    """
+    limit = record["protocol"]["requests_per_second"]
+    grants = {grant["token"]: grant for grant in record["grants"]}
+    destinations = {}
+    configured = set(record["destinations"]) | {grant["destination"] for grant in grants.values()}
+    for destination in sorted(configured):
+        lane = record["destinations"].get(destination, {"requests": []})
+        issuance = Counter(
+            grant["window_id"] for grant in grants.values() if grant["destination"] == destination
+        )
+        arrivals = {}
+        for request in lane["requests"]:
+            arrivals.setdefault(math.floor(request["at"]), []).append(request)
+        over = []
+        for second, requests in sorted(arrivals.items()):
+            if len(requests) > limit:
+                windows = Counter(grants[request["permit"]]["window_id"] for request in requests)
+                over.append({
+                    "receiver_utc_epoch_second": second,
+                    "requests": len(requests),
+                    "permit_windows": [
+                        {"window_id": window, "requests": count}
+                        for window, count in sorted(windows.items())
+                    ],
+                })
+        destinations[destination] = {
+            "permit_issuance_max_per_assigned_window": max(issuance.values(), default=0),
+            "permit_issuance_buckets_above_limit": sum(count > limit for count in issuance.values()),
+            "receiver_arrival_max_per_utc_second": max(map(len, arrivals.values()), default=0),
+            "receiver_arrival_buckets_above_limit": len(over),
+            "receiver_arrival_over_limit_buckets": over,
+        }
+    return {
+        "limit_per_destination_per_second": limit,
+        "permit_window_definition": "database-assigned grant.window_id; acceptance contract",
+        "arrival_window_definition": "floor(receiver request.at), UTC epoch seconds; observational only",
+        "permit_issuance_max_per_assigned_window": max(
+            (lane["permit_issuance_max_per_assigned_window"] for lane in destinations.values()), default=0
+        ),
+        "permit_issuance_buckets_above_limit": sum(
+            lane["permit_issuance_buckets_above_limit"] for lane in destinations.values()
+        ),
+        "receiver_arrival_max_per_utc_second": max(
+            (lane["receiver_arrival_max_per_utc_second"] for lane in destinations.values()), default=0
+        ),
+        "receiver_arrival_buckets_above_limit": sum(
+            lane["receiver_arrival_buckets_above_limit"] for lane in destinations.values()
+        ),
+        "destinations": destinations,
+    }
 
 
 def check(record):
@@ -15,7 +73,7 @@ def check(record):
     grants = {p["token"]: p for p in record["grants"]}
     assert len(grants) == len(record["grants"]), "duplicate permit"
     buckets = Counter((p["destination"], p["window_id"]) for p in grants.values())
-    assert max(buckets.values(), default=0) <= protocol["requests_per_second"], "shared budget exceeded"
+    assert max(buckets.values(), default=0) <= protocol["requests_per_second"], "permit issuance budget exceeded"
     sent = []
     receipts = {}
     for destination, lane in record["destinations"].items():
@@ -74,13 +132,16 @@ def check(record):
             assert delivered == record["alerts"], "alert readback mismatch"
             assert any(a["state"] == "firing" for a in delivered), "no actual alert"
             assert delivered[-1]["state"] == "cleared", "alert never cleared"
+    rates = rate_observations(record)
     return {
         "status": "passed",
+        "rate_acceptance_contract": "database_assigned_fixed_window_permit_issuance",
         "accepted": record["accepted"],
         "rejected": record["rejected"],
         "effects": sum(j["status"] == "succeeded" for j in record["jobs"]),
         "healthy_successes_during_fault": during,
-        "budget_violations": 0,
+        "permit_issuance_violations": rates["permit_issuance_buckets_above_limit"],
+        "rate_observations": rates,
         "duplicate_effects": 0,
         "unaccounted_jobs": 0,
     }

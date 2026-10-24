@@ -1,6 +1,8 @@
 # Original dependency-isolation acceptance archive
 
-[Current corrected-runtime acceptance](portability-fix/README.md). The results below are preserved observations of implementation `7103c63`; they are not proof of the later liveness correction.
+[Current corrected-runtime acceptance](portability-fix/README.md). Archived `budget_violations` fields refer to database permit windows, not absolute receiver-arrival limits. [Separate receiver-arrival review of the later qualifying runs](arrival-review/README.md).
+
+The results below are preserved observations of implementation `7103c63`; they are not proof of the later liveness correction.
 
 **Executed locally on PostgreSQL 17.11 with separate HTTP receivers and four worker processes.** One healthy baseline and three mixed-outage repetitions each offered 5,000 synthetic proposals over a declared five-minute window. The receiver request journals and effect ledgers were read independently after workers stopped.
 
@@ -11,7 +13,7 @@
 | Outage repetition 2 | 1,912 | 3,088 | 298 |
 | Outage repetition 3 | 2,081 | 2,919 | 281 |
 
-All admitted jobs completed with exactly one matching destination effect. The checker found zero duplicate effects, substituted destinations, unaccounted jobs, client-concurrency violations or shared-budget violations. Each run reached its configured **10 total request permits per epoch-second per destination**. Receipt GETs consume that budget too; dispatch can use at most nine permits. Backlog is bounded at 128 per destination. The offered load intentionally exceeds the useful delivery capacity; rejected proposals are not counted as successful actions.
+All admitted jobs completed with exactly one matching destination effect. The checker found zero duplicate effects, substituted destinations, unaccounted jobs, client-concurrency violations or permit-issuance budget violations. Each run reached its configured **10 total request permits per epoch-second per destination**. Receipt GETs consume that budget too; dispatch can use at most nine permits. Backlog is bounded at 128 per destination. The offered load intentionally exceeds the useful delivery capacity; rejected proposals are not counted as successful actions.
 
 [Incident timelines](timeline.md) · [Complete run summaries](runs/summary.json) · [Protocols, observations and checks](runs/README.md) · [Operating contract](../../dependency-isolation.md).
 
