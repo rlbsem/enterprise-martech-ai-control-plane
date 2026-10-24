@@ -38,13 +38,38 @@ def compare_receipts(jobs, receipts):
 
 def recovery_snapshot(control_dsn, remote_dsn):
     # Both services MUST already be quiesced. Two databases have no shared snapshot clock.
+    if isinstance(remote_dsn, dict):
+        return destination_snapshot(control_dsn, remote_dsn)
     with db.connect(control_dsn) as c, db.connect(remote_dsn) as r:
         for connection in (c, r):
             connection.execute('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY')
+        if c.execute('SELECT 1 FROM cp.destinations LIMIT 1').fetchone():
+            raise ValueError('all_destination_readers_required')
         jobs = c.execute('SELECT id,status,mutation,uncertain,remote_result FROM cp.jobs ORDER BY id').fetchall()
         receipts = r.execute('SELECT key,hash,receipt FROM remote.effects ORDER BY key').fetchall()
     return {**compare_receipts(jobs, receipts), 'observed_at': datetime.now(UTC).isoformat(),
             'scope': 'quiesced databases; no changes or replay performed'}
+
+
+def destination_snapshot(control_dsn, readers):
+    """Exact configured scope plus the preserved legacy ledger; all writers must be closed."""
+    with db.connect(control_dsn) as c:
+        c.execute('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY')
+        expected = {r['id'] for r in c.execute('SELECT id FROM cp.destinations')} | {'__legacy__'}
+        if set(readers) != expected:
+            raise ValueError('all_destination_readers_required')
+        jobs = c.execute('''SELECT j.id,j.status,j.mutation,j.uncertain,j.remote_result,
+            coalesce(r.destination,'__legacy__') AS destination FROM cp.jobs j
+            LEFT JOIN cp.job_routes r USING(id) ORDER BY j.id''').fetchall()
+    lanes = {}
+    for name in sorted(readers):
+        with db.connect(readers[name]) as c:
+            c.execute('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY')
+            receipts = c.execute('SELECT key,hash,receipt FROM remote.effects ORDER BY key').fetchall()
+        lanes[name] = compare_receipts([j for j in jobs if j['destination'] == name], receipts)
+    return {'safe_to_resume': all(lane['safe_to_resume'] for lane in lanes.values()),
+            'destinations': lanes, 'observed_at': datetime.now(UTC).isoformat(),
+            'scope': 'quiesced databases; exact destination scope including legacy; read only'}
 
 
 def queue_metrics(dsn=None):

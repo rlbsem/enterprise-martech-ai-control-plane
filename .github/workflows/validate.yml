@@ -42,6 +42,11 @@ jobs:
         run: |
           python -c "import os,psycopg; c=psycopg.connect(os.environ['TEST_ADMIN_DSN'],autocommit=True); c.execute('CREATE DATABASE control_workload'); c.close()"
           python scripts/local_demo.py
+      - name: Independent destination-capacity smoke execution
+        run: |
+          python scripts/isolation_acceptance.py --admin postgresql://postgres:local-admin-only@127.0.0.1:5432/control_test --output work/isolation-ci --duration 30 --proposals 100 --fault mixed
+          mkdir -p work/ci-evidence/isolation
+          cp work/isolation-ci/protocol.json work/isolation-ci/observations.json work/isolation-ci/result.json work/ci-evidence/isolation/
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:

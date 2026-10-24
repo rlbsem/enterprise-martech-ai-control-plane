@@ -5,7 +5,7 @@ from uuid import uuid4
 
 from psycopg.types.json import Jsonb
 
-from . import db
+from . import capacity, db
 from .policy import POLICY, POLICY_HASH, action_decision, digest, field_decision
 
 
@@ -109,10 +109,12 @@ def propose(actor, command):
                 return {"status": "conflict"}
             return {"id": str(previous["id"]), "decision": previous["decision"], "reason": previous["reason"]}
         decision, reason = action_decision(command.action, row["state"], row["revision"], command.expected_revision)
+        destination = capacity.admission(c, row["state"].get("owner")) if decision != "deny" else None
         c.execute("""INSERT INTO cp.proposals(id,customer_id,actor,hash,body,policy_hash,revision,decision,reason,expires_at)
                      VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,clock_timestamp()+%s * interval '1 second')""",
                   (command.request_id, command.customer_id, actor, digest(body), Jsonb(body), POLICY_HASH,
                    command.expected_revision, decision, reason, POLICY["proposal_ttl_seconds"]))
+        capacity.bind(c, command.request_id, destination)
         if decision == "allow":
             c.execute("INSERT INTO cp.jobs(id,status) VALUES (%s,'ready')", (command.request_id,))
         elif decision == "deny":
@@ -184,6 +186,7 @@ def resolve(actor, exception_id, command):
             job = c.execute("SELECT * FROM cp.jobs WHERE id=%s FOR UPDATE", (ex["subject"],)).fetchone()
             if not job or job["status"] != "dead":
                 raise ValueError("job_not_dead")
+            capacity.readmission(c, job["id"])
             # Preserve payload and idempotency key. New attempt budget, not new permission.
             c.execute("UPDATE cp.jobs SET status='retry',attempts=0,available_at=clock_timestamp() WHERE id=%s",
                       (ex["subject"],))

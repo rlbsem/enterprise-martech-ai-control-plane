@@ -8,17 +8,19 @@ from uuid import uuid4
 import httpx
 from psycopg.types.json import Jsonb
 
-from . import db, operations
+from . import capacity, db, operations
 from .policy import POLICY, digest
 from .service import valid_proposal
 
 
 def claim(lease_seconds=30):
     with db.connect() as c:
-        job = c.execute("""SELECT * FROM cp.jobs WHERE
+        job = c.execute("""SELECT j.* FROM cp.jobs j LEFT JOIN cp.job_routes route USING(id)
+          LEFT JOIN cp.capacity_state cap ON cap.destination=route.destination WHERE (
           (status IN ('ready','retry') AND available_at<=clock_timestamp()) OR
           (status='leased' AND lease_until<=clock_timestamp())
-          ORDER BY available_at,id FOR UPDATE SKIP LOCKED LIMIT 1""").fetchone()
+           ) AND (cap.next_probe IS NULL OR cap.next_probe<=clock_timestamp())
+          ORDER BY cap.last_served NULLS FIRST,available_at,j.id FOR UPDATE OF j SKIP LOCKED LIMIT 1""").fetchone()
         if not job:
             return None
         token = uuid4()
@@ -80,11 +82,20 @@ def prepare(job):
 
 
 def execute(job):
-    url = os.environ["DOWNSTREAM_URL"].rstrip("/")
-    token = os.environ["EXECUTOR_TOKEN"]
+    try:
+        route = capacity.destination(job)
+    except ValueError as exc:
+        finish(job, 'blocked', str(exc))
+        return
+    url = (route["url"] if route else os.environ["DOWNSTREAM_URL"]).rstrip("/")
+    token = os.environ[route["credential_env"] if route else "EXECUTOR_TOKEN"]
     timeout = float(os.environ.get("REMOTE_TIMEOUT", "2"))
+    if route and not 0 < timeout <= 5:
+        raise ValueError("capacity_requires_bounded_timeout")
     with httpx.Client(base_url=url, headers={"Authorization": f"Bearer {token}"}, timeout=timeout,
                       trust_env=False) as client:
+        if route:
+            client = capacity.Client(client, route)
         try:
             if job["uncertain"]:
                 response = client.get(f"/effects/{job['id']}")
@@ -129,15 +140,22 @@ def execute(job):
 def once():
     job = claim()
     if job:
-        execute(job)
+        try:
+            execute(job)
+        except capacity.Deferred:
+            capacity.defer(job, False)
     return job is not None
 
 
 def run():
     last_heartbeat = 0
+    with db.connect() as c:
+        isolated = bool(c.execute('SELECT 1 FROM cp.destinations LIMIT 1').fetchone())
+    # Feature configuration is fixed before workers start. Keep legacy polling unchanged.
+    idle_seconds = 0.05 if isolated else 0.5
     while True:
         if os.environ.get("ENABLE_METRICS") == "1" and time.monotonic() - last_heartbeat >= 30:
             operations.emit({"WorkerPoll": 1}, "worker", os.environ["ENVIRONMENT"])
             last_heartbeat = time.monotonic()
         if not once():
-            time.sleep(0.5)
+            time.sleep(idle_seconds)
