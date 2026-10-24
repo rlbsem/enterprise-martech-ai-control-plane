@@ -30,9 +30,9 @@ The proposal contract still contains no destination URL. Trusted deployment conf
 - Backlog admission is serialized per destination and counts pending jobs and unexpired approval reservations. Duplicate requests are resolved before the capacity check. A full destination cannot consume another destination's admission allowance. Terminal requeue requires another capacity check.
 - Existing approval expiry, source revision, consent, immutable payload, retry exhaustion and lease fencing remain in force. The registry and routing configuration are trusted administrator state; this is not a hostile-process sandbox.
 
-[Executed results and incident timelines](evidence/dependency-isolation/README.md).
+[Executed results and incident timelines](evidence/dependency-isolation/portability-fix/README.md).
 
-The four qualifying runs use a 300-second window, 5,000 proposed actions and a ten-request fixed-window budget. Mixed faults return HTTP 429 in the first half of the injection window and HTTP 503 in the second. Isolated workers poll every 50 milliseconds while the original single-destination mode keeps its 500-millisecond idle poll. Capacity is fixed before worker startup.
+The current qualification declares a local PostgreSQL server with 100 connections and 128 MiB shared buffers; the earlier resource-limited abort is retained separately. The four qualifying runs use a 300-second window, 5,000 proposed actions and a ten-request fixed-window budget. Mixed faults return HTTP 429 in the first half of the injection window and HTTP 503 in the second. Isolated workers poll every 50 milliseconds while the original single-destination mode keeps its 500-millisecond idle poll. Capacity is fixed before worker startup.
 
 Recovery with registered destinations requires readers for every configured destination plus the preserved `__legacy__` ledger. Supplying a single reader fails closed. All writers must be quiesced for this comparison; it does not establish a shared transactional snapshot across independent databases.
 
@@ -47,6 +47,6 @@ python scripts/isolation_acceptance.py --admin postgresql://postgres@127.0.0.1:5
 python scripts/check_isolation.py work/new-isolation/observations.json
 ```
 
-Use a new output directory for every run. The connection in this example is an isolated local administrator, not an instruction to use a vendor or business database. The protocol records exact source hashes and rejects source changes during execution. The 60-second/100-proposal CI smoke profile is a harness check and does not substitute for sustained acceptance. Full observations distinguish offered, admitted, rejected and terminal work; rejected admission is not a successful delivery.
+Use a new output directory for every run. The connection in this example is an isolated local administrator, not an instruction to use a vendor or business database. The protocol records exact source hashes and rejects source changes during execution. The 60-second/100-proposal CI smoke profile is a harness check and does not substitute for sustained acceptance. Full observations distinguish offered, admitted, rejected and terminal work. Immutable claim audits minus final consumed attempts count scheduler deferrals in this harness, which never resets attempts through administrative requeue; business retries are separate. Historical observations without exported claim counts do not establish a deferral total; rejected admission is not a successful delivery.
 
 The separate native AWS archive keeps its original limits, including the missing native post-restore fail-closed result. This extension does not contact AWS, perform inference, send prospect communications or establish production SLOs.

@@ -1,0 +1,110 @@
+{
+  "status": "passed",
+  "accepted": 2822,
+  "rejected": 2178,
+  "effects": 2822,
+  "healthy_successes_during_fault": 296,
+  "budget_violations": 0,
+  "duplicate_effects": 0,
+  "unaccounted_jobs": 0,
+  "destinations": {
+    "healthy": {
+      "offered": 2500,
+      "accepted": 1555,
+      "rejected": 945,
+      "terminal_outcomes": {
+        "succeeded": 1555
+      },
+      "never_dispatched": 0,
+      "scheduler_deferrals": 1322,
+      "jobs_with_scheduler_deferral": 444,
+      "business_retries": 2,
+      "admission_ms_all_offers": {
+        "p50": 31.000000017229468,
+        "p95": 47.0000000204891,
+        "p99": 125.0
+      },
+      "time_to_first_dispatch_ms": {
+        "p50": 15237.162590026855,
+        "p95": 47655.69615364075,
+        "p99": 86109.8644733429
+      },
+      "time_to_terminal_ms_all_admitted": {
+        "p50": 15332.197904586792,
+        "p95": 48146.827936172485,
+        "p99": 86215.03615379333
+      },
+      "unfinished": 0,
+      "useful_effects_per_second": 5.183333333333334,
+      "request_methods": {
+        "POST": 1555,
+        "GET": 695
+      },
+      "http_status": {
+        "201": 1555,
+        "404": 693,
+        "200": 2
+      },
+      "requests_per_effect": 1.4469453376205788,
+      "observed_queue_age_seconds": {
+        "p50": 63.295971,
+        "p95": 115.559231,
+        "p99": 122.444499
+      }
+    },
+    "affected": {
+      "offered": 2500,
+      "accepted": 1267,
+      "rejected": 1233,
+      "terminal_outcomes": {
+        "succeeded": 1267
+      },
+      "never_dispatched": 0,
+      "scheduler_deferrals": 422,
+      "jobs_with_scheduler_deferral": 301,
+      "business_retries": 50,
+      "admission_ms_all_offers": {
+        "p50": 31.000000017229468,
+        "p95": 47.0000000204891,
+        "p99": 125.0
+      },
+      "time_to_first_dispatch_ms": {
+        "p50": 15074.877738952637,
+        "p95": 67844.58136558533,
+        "p99": 95418.81847381592
+      },
+      "time_to_terminal_ms_all_admitted": {
+        "p50": 15178.951978683472,
+        "p95": 79802.1969795227,
+        "p99": 97499.03702735901
+      },
+      "unfinished": 0,
+      "useful_effects_per_second": 4.223333333333334,
+      "request_methods": {
+        "POST": 1310,
+        "GET": 379
+      },
+      "http_status": {
+        "201": 1267,
+        "404": 372,
+        "429": 24,
+        "503": 24,
+        "200": 2
+      },
+      "requests_per_effect": 1.3330702446724547,
+      "observed_queue_age_seconds": {
+        "p50": 57.788565,
+        "p95": 121.422853,
+        "p99": 131.859121
+      }
+    }
+  },
+  "resources": {
+    "application_cpu_seconds_sampled": 9.734375,
+    "maximum_sampled_application_rss_bytes": 99655680,
+    "maximum_cluster_connections": 9,
+    "scope": "1-second samples; application harness/workers/receivers only; PostgreSQL CPU/memory excluded; cluster connections can include concurrent tests; unsampled peaks and final CPU tails excluded"
+  },
+  "scheduler_deferral_definition": "Claim audit count minus final attempts; scheduler deferral alone decrements attempts. Valid for this quiesced harness, which never administratively requeues/reset attempts. Null means the historical record did not export claim counts.",
+  "latency_definition": "Nearest-rank percentiles. Terminal latency includes all accepted outcomes; queue latency counts dispatched jobs and separately reports never-dispatched jobs. Queue-age samples describe the oldest pending job, not per-person business latency."
+}

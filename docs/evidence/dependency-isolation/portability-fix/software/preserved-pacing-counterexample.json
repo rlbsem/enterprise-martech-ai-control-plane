@@ -1,0 +1,5 @@
+{
+  "old_successful_lookup_adds_delay": true,
+  "measured_delay_seconds": 0.05,
+  "boundary": "local PostgreSQL counterexample; no vendor execution"
+}

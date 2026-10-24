@@ -10,7 +10,7 @@ Field ownership blocks unauthorized overwrites. Permission and approval are chec
 
 **Failure case:** A downstream system commits an action but loses its acknowledgment. The control plane looks up the stable effect ID and finds the existing receipt rather than issuing a second effect. After a database restore, independent receipts must reconcile before services can resume.
 
-Start with the [current executed tests](docs/evidence/dependency-isolation/software/report.md), [workload results](docs/evidence/enterprise-workload.json) and [recovery design](docs/cloud-operations.md). AWS infrastructure, service identities and release controls are defined separately from the isolated native acceptance run.
+Start with the [current executed tests](docs/evidence/dependency-isolation/portability-fix/software/report.md), [workload results](docs/evidence/enterprise-workload.json) and [recovery design](docs/cloud-operations.md). AWS infrastructure, service identities and release controls are defined separately from the isolated native acceptance run.
 
 ![Control-plane architecture](docs/diagrams/01-control-plane.svg)
 
@@ -33,9 +33,9 @@ This Python/PostgreSQL control plane implements stateful middleware: canonical i
 
 The destination-capacity extension keeps one unavailable integration from consuming every worker or turning a shared request allowance into one allowance per process. A finite owner-to-destination registry, immutable routing, PostgreSQL-coordinated permits and bounded admission preserve the original outbox and receipt contract.
 
-Four actual five-minute runs offered **20,000 synthetic proposals** to separate local HTTP receivers. All **8,353 admitted actions** reconciled to one effect each; **11,647 proposals were explicitly rejected at the backlog limit**. Three runs injected sustained HTTP 429/503 faults while the healthy destination continued. Shared budgets, concurrency, alert readback, worker-death recovery and exact destination reconciliation remain inspectable. These are measured local operating limits, not production capacity or cloud acceptance.
+Four actual five-minute runs offered **20,000 synthetic proposals** to separate local HTTP receivers. All **12,035 admitted actions** reconciled to one effect each; **7,965 proposals were explicitly rejected at the backlog limit**. Three runs injected sustained HTTP 429/503 faults while the healthy destination continued. Shared budgets, concurrency, alert readback, worker-death recovery and exact destination reconciliation remain inspectable. These are measured local operating limits, not production capacity or cloud acceptance.
 
-[Executed results and incident timelines](docs/evidence/dependency-isolation/README.md) · [Capacity semantics and reproduction](docs/dependency-isolation.md).
+[Executed results and incident timelines](docs/evidence/dependency-isolation/portability-fix/README.md) · [Capacity semantics and reproduction](docs/dependency-isolation.md).
 
 ## The invariants
 
