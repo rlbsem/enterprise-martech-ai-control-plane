@@ -1,0 +1,8 @@
+{
+  "source_commit": "bec9308",
+  "files": {
+    "scripts/check_isolation.py": "docs/evidence/dependency-isolation/portability-fix/pre-resource-adjustment/check_isolation.py",
+    "scripts/isolation_acceptance.py": "docs/evidence/dependency-isolation/portability-fix/source-v2/isolation_acceptance.py",
+    "scripts/report_isolation.py": "docs/evidence/dependency-isolation/portability-fix/source-v2/report_isolation.py"
+  }
+}

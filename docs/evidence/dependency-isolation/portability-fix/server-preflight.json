@@ -1,0 +1,12 @@
+{
+  "observed_at": "2026-10-24T16:44:49.678205+00:00",
+  "settings": {
+    "max_connections": "100",
+    "shared_buffers": "128MB",
+    "remaining_client_sessions": 1
+  },
+  "simultaneous_probe_connections": 32,
+  "probe_successes": 32,
+  "scope": "Local resource preflight before fresh qualification; not provider acceptance",
+  "change": "Task-local server restarted from max_connections=25/shared_buffers=400kB to standard 100/128MB. Application source, quotas, load and correctness gates unchanged."
+}

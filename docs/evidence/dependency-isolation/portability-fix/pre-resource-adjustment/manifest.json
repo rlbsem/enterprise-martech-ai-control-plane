@@ -1,0 +1,15 @@
+{
+  "format": "raw SHA-256",
+  "files": {
+    "check_isolation.py": "a12a6a2f6c4adb992a1e218be58b9748c92b9ed600e54b9a327de4b48e8d63f8",
+    "failed-mixed/cleanup.json": "4e2d8ae13c119d6d85539ecf3e684a7a95fa2e4cc6c566273dee0128102c53af",
+    "failed-mixed/failure.json": "30ced8578981bbdaaa408294d9fb236d1030a16a7865d34d82ac5648cec21508",
+    "failed-mixed/partial-receiver-journals.json.gz": "f3ba4eedecf7fb66c644ab701f50f9ae27119b027fbafa97336c4e67792e5cba",
+    "failed-mixed/protocol.json": "75f7e090775d52221c64b25bad26e6b991b800cd83a6e1e8fc8c628ff084d3bf",
+    "healthy/cleanup.json": "4e2d8ae13c119d6d85539ecf3e684a7a95fa2e4cc6c566273dee0128102c53af",
+    "healthy/observations.json.gz": "2c002c0daea0efa603f5cc673079f35ef95c3c2608306a281cf7cefb1da708c6",
+    "healthy/protocol.json": "8742330170d5a6f6f2a14d280e686393452d05568fd0fd8ecf9bb6a47242546e",
+    "healthy/result.json": "3d40d2436859720cc903bd947b311193ae4aa5a7d8e89f545aec8cddcda171ee",
+    "source-map.json": "c6f46c8c6d84f0e7e50dc53ea000c7a65d0c87f477f71995b6c58c0fa738e767"
+  }
+}

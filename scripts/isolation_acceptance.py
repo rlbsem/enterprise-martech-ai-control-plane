@@ -285,6 +285,8 @@ def main():
         with db.connect(dsns["control"]) as c:
             jobs = c.execute("""SELECT j.id,j.status,j.attempts,j.reason,r.destination,
                 j.remote_result->>'receipt' AS receipt,j.mutation,
+                (SELECT count(*) FROM cp.audit a WHERE a.subject=j.id::text
+                 AND a.kind='claim') AS claims,
                 extract(epoch FROM p.created_at) AS created_at,
                 (SELECT extract(epoch FROM max(a.at)) FROM cp.audit a WHERE a.subject=j.id::text
                  AND a.kind='execution_result') AS completed_at

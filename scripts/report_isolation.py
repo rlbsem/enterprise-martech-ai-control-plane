@@ -41,6 +41,11 @@ def summarize(record):
             "rejected": sum(a["status"] == "overloaded" for a in offers),
             "terminal_outcomes": dict(outcomes),
             "never_dispatched": sum(j["id"] not in first for j in jobs),
+            "scheduler_deferrals": sum(j["claims"] - j["attempts"] for j in jobs)
+            if all("claims" in j for j in jobs) else None,
+            "jobs_with_scheduler_deferral": sum(j["claims"] > j["attempts"] for j in jobs)
+            if all("claims" in j for j in jobs) else None,
+            "business_retries": sum(max(0, j["attempts"] - 1) for j in jobs),
             "admission_ms_all_offers": percentiles([a["latency_ms"] for a in offers]),
             "time_to_first_dispatch_ms": percentiles(queue),
             "time_to_terminal_ms_all_admitted": percentiles(terminal),
@@ -71,6 +76,11 @@ def summarize(record):
         "scope": "1-second samples; application harness/workers/receivers only; PostgreSQL CPU/memory excluded; "
         "cluster connections can include concurrent tests; unsampled peaks and final CPU tails excluded",
     }
+    result["scheduler_deferral_definition"] = (
+        "Claim audit count minus final attempts; scheduler deferral alone decrements attempts. "
+        "Valid for this quiesced harness, which never administratively requeues/reset attempts. "
+        "Null means the historical record did not export claim counts."
+    )
     result["latency_definition"] = (
         "Nearest-rank percentiles. Terminal latency includes all accepted outcomes; "
     )

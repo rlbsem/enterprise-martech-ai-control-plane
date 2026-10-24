@@ -31,6 +31,8 @@ def check(record):
             receipts[receipt["key"]] = (destination, receipt)
     assert len(sent) == len(set(sent)), "permit replay"
     for job in record["jobs"]:
+        if "claims" in job:
+            assert job["claims"] >= job["attempts"] >= 1, "invalid scheduler deferral accounting"
         remote = receipts.pop(job["id"], None)
         if job["status"] == "succeeded":
             assert remote and remote[0] == job["destination"], "wrong/missing destination receipt"

@@ -34,7 +34,7 @@ def test_complete_fixture():
 
 
 @pytest.mark.parametrize(
-    "fault", ["permit", "destination", "hash", "receipt", "unfinished", "duplicate", "quota"]
+    "fault", ["permit", "destination", "hash", "receipt", "unfinished", "duplicate", "quota", "claims"]
 )
 def test_checker_rejects_corrupted_execution(fault):
     record = deepcopy(fixture())
@@ -50,6 +50,8 @@ def test_checker_rejects_corrupted_execution(fault):
         record["jobs"][0]["status"] = "retry"
     if fault == "duplicate":
         record["destinations"]["healthy"]["requests"] *= 2
+    if fault == "claims":
+        record["jobs"][0].update(claims=0, attempts=1)
     if fault == "quota":
         record["grants"] += [
             {"token": str(i), "destination": "healthy", "window_id": 1, "kind": "dispatch"} for i in range(2)

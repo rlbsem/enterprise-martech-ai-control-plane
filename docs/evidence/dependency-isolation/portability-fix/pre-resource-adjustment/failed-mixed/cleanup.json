@@ -1,0 +1,5 @@
+{
+  "created_databases": 3,
+  "remaining_generated_databases": 0,
+  "method": "separate post-drop catalog connection; exact generated names"
+}

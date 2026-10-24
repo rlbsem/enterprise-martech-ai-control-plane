@@ -1,0 +1,10 @@
+{
+  "observed_at": "2026-10-24T16:33:23.1379972Z",
+  "scope": "Current local qualification host; observed during corrected-runtime runs, not a reconstructed baseline resource measurement",
+  "cpu_model": "AMD Ryzen 9 9950X3D 16-Core Processor          ",
+  "logical_processors": 32,
+  "physical_cores": 16,
+  "total_physical_memory_bytes": 33457201152,
+  "local_postgresql_version": "17.11",
+  "limitations": "Uncontrolled workstation load; PostgreSQL CPU/RSS and unsampled peaks excluded from per-run process samples"
+}

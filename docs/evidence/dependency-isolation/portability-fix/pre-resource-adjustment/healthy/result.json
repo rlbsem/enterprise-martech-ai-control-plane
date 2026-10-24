@@ -1,0 +1,10 @@
+{
+  "status": "passed",
+  "accepted": 3363,
+  "rejected": 1637,
+  "effects": 3363,
+  "healthy_successes_during_fault": 397,
+  "budget_violations": 0,
+  "duplicate_effects": 0,
+  "unaccounted_jobs": 0
+}

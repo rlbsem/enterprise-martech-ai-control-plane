@@ -44,3 +44,36 @@ def test_recorded_runs_and_recovered_alerts():
             r["method"] == "POST" and r["status"] in (200, 201) and protocol["fault_end"] <= r["at"] <= clear
             for r in lane["requests"]
         )
+
+
+def test_corrected_recorded_runs_match_current_runtime():
+    root = Path(__file__).resolve().parents[1]
+    evidence = root / "docs/evidence/dependency-isolation/portability-fix"
+    for name in ("runs/artifact-manifest.json", "timeline-manifest.json"):
+        path = evidence / name
+        for relative, expected in json.loads(path.read_text(encoding="utf-8"))["files"].items():
+            assert hashlib.sha256((path.parent / relative).read_bytes()).hexdigest() == expected
+    paths = sorted((evidence / "runs").glob("run-*/observations.json.gz"))
+    assert len(paths) == 4
+    for index, path in enumerate(paths):
+        record = json.loads(gzip.decompress(path.read_bytes()))
+        assert check(record)["status"] == "passed"
+        assert all(j["claims"] >= j["attempts"] for j in record["jobs"])
+        assert any(j["claims"] > j["attempts"] for j in record["jobs"])
+        protocol = record["protocol"]
+        assert protocol["duration_seconds"] == 300 and protocol["proposals"] == 5000
+        assert protocol["fault"] == ("healthy" if index == 0 else "mixed")
+        for source, expected in protocol["source_sha256"].items():
+            assert hashlib.sha256((root / source).read_bytes()).hexdigest() == expected, source
+        cleanup = json.loads((path.parent / "cleanup.json").read_text(encoding="utf-8"))
+        assert cleanup["created_databases"] == 3 and cleanup["remaining_generated_databases"] == 0
+        if index:
+            lane = record["destinations"]["affected"]
+            assert {429, 503}.issubset({request["status"] for request in lane["requests"]})
+            clear = record["destinations"]["healthy"]["alerts"][-1]
+            assert clear["state"] == "cleared"
+            assert any(
+                request["method"] == "POST" and request["status"] in (200, 201)
+                and protocol["fault_end"] <= request["at"] <= clear["at"]
+                for request in lane["requests"]
+            )
