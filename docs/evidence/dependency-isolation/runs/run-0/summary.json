@@ -1,0 +1,99 @@
+{
+  "status": "passed",
+  "accepted": 2285,
+  "rejected": 2715,
+  "effects": 2285,
+  "healthy_successes_during_fault": 246,
+  "budget_violations": 0,
+  "duplicate_effects": 0,
+  "unaccounted_jobs": 0,
+  "destinations": {
+    "healthy": {
+      "offered": 2500,
+      "accepted": 1138,
+      "rejected": 1362,
+      "terminal_outcomes": {
+        "succeeded": 1138
+      },
+      "never_dispatched": 0,
+      "admission_ms_all_offers": {
+        "p50": 31.000000017229468,
+        "p95": 77.9999999795109,
+        "p99": 140.9999999741558
+      },
+      "time_to_first_dispatch_ms": {
+        "p50": 18221.964836120605,
+        "p95": 71228.93595695496,
+        "p99": 109061.05256080627
+      },
+      "time_to_terminal_ms_all_admitted": {
+        "p50": 18345.262050628662,
+        "p95": 71426.47504806519,
+        "p99": 109262.4740600586
+      },
+      "unfinished": 0,
+      "useful_effects_per_second": 3.7933333333333334,
+      "request_methods": {
+        "POST": 1138,
+        "GET": 537
+      },
+      "http_status": {
+        "201": 1138,
+        "404": 537
+      },
+      "requests_per_effect": 1.4718804920913884,
+      "observed_queue_age_seconds": {
+        "p50": 100.950539,
+        "p95": 142.069861,
+        "p99": 151.372715
+      }
+    },
+    "affected": {
+      "offered": 2500,
+      "accepted": 1147,
+      "rejected": 1353,
+      "terminal_outcomes": {
+        "succeeded": 1147
+      },
+      "never_dispatched": 0,
+      "admission_ms_all_offers": {
+        "p50": 31.000000017229468,
+        "p95": 78.00000000861473,
+        "p99": 141.00000000325963
+      },
+      "time_to_first_dispatch_ms": {
+        "p50": 18021.639108657837,
+        "p95": 71762.91227340698,
+        "p99": 111785.45713424683
+      },
+      "time_to_terminal_ms_all_admitted": {
+        "p50": 18140.97285270691,
+        "p95": 71849.49994087219,
+        "p99": 111891.31093025208
+      },
+      "unfinished": 0,
+      "useful_effects_per_second": 3.8233333333333333,
+      "request_methods": {
+        "POST": 1147,
+        "GET": 542
+      },
+      "http_status": {
+        "201": 1147,
+        "404": 542
+      },
+      "requests_per_effect": 1.4725370531822144,
+      "observed_queue_age_seconds": {
+        "p50": 110.312962,
+        "p95": 178.349738,
+        "p99": 188.700205
+      }
+    }
+  },
+  "resources": {
+    "application_cpu_seconds_sampled": 10.515625,
+    "maximum_sampled_application_rss_bytes": 99565568,
+    "maximum_cluster_connections": 10,
+    "scope": "1-second samples; application harness/workers/receivers only; PostgreSQL CPU/memory excluded; cluster connections can include concurrent tests; unsampled peaks and final CPU tails excluded"
+  },
+  "latency_definition": "Nearest-rank percentiles. Terminal latency includes all accepted outcomes; queue latency counts dispatched jobs and separately reports never-dispatched jobs. Queue-age samples describe the oldest pending job, not per-person business latency."
+}

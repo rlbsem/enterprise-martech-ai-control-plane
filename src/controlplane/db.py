@@ -33,6 +33,15 @@ def migrate(dsn):
         if not row:
             c.execute(sql)
             c.execute("INSERT INTO public.schema_migrations VALUES (1,%s)", (digest(sql),))
+        upgrade = Path(__file__).with_name("capacity.sql").read_text(encoding="utf-8")
+        applied = c.execute("SELECT hash FROM public.schema_migrations WHERE version=2").fetchone()
+        if applied and applied["hash"] != digest(upgrade):
+            raise RuntimeError("Applied migration 2 changed")
+        if not applied:
+            c.execute(upgrade)
+            c.execute("INSERT INTO public.schema_migrations VALUES (2,%s)", (digest(upgrade),))
+        from .capacity import grants
+        grants(c)
         c.execute("INSERT INTO cp.policies VALUES (%s,%s) ON CONFLICT DO NOTHING", (POLICY_HASH, Jsonb(POLICY)))
 
 

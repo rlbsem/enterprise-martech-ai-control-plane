@@ -1,0 +1,13 @@
+{
+  "status": "failed",
+  "error_type": "psycopg.OperationalError",
+  "server_error": "FATAL: sorry, too many clients already",
+  "failure_phase": "synthetic proposal admission",
+  "qualification_withheld": true,
+  "old_max_connections": 25,
+  "old_shared_buffers": "400kB",
+  "related_server_log": "Windows shared-memory reservation error 487 observed; causal attribution not established",
+  "source_commit": "bec9308",
+  "cleanup": "separate post-drop catalog query confirmed all three exact generated databases absent",
+  "boundary": "partial receiver journals only; no complete final ledger export exists for this aborted run"
+}
