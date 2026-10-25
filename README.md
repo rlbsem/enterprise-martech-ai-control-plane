@@ -1,6 +1,6 @@
 # Enterprise MarTech / AI Control Plane
 
-CRM, consent, scoring and revenue systems can all change customer state. The control plane determines which source owns each fact, which customer an event belongs to, whether a state transition is valid and whether an action is still authorized at execution time.
+**Business impact:** Give PE sponsors and multi-brand operators a shared integration backbone that connects acquisitions, protects authoritative customer and financial records, and makes exceptions accountable without replacing every operating company's software. CRM, consent, scoring and revenue systems may all update state; the control plane decides who owns each fact, which customer it belongs to and whether the action is still authorized.
 
 **Tools execute. The control layer determines what is true.**
 
@@ -16,7 +16,7 @@ Start with the [current executed tests](docs/evidence/dependency-isolation/arriv
 
 ## Governing changes across business systems
 
-**Professional application:** I have designed and delivered shared integration and governance infrastructure for **private equity sponsors and multi-brand operating companies**, connecting acquired businesses through centralized control layers without requiring every company to abandon its existing software. This public Python/PostgreSQL implementation demonstrates the stateful execution, source authority, identity resolution and recovery controls applied in those environments. Field ownership and No-Regress Logic prevent operational updates from overwriting authoritative sales owners or moving advanced deals backwards.
+**Professional application:** I have designed and delivered shared integration and governance infrastructure for **private equity sponsors and multi-brand operators**. Their acquired businesses retain their own CRMs, operational platforms and financial systems, while the shared control layer enables consistent identities, governed updates, portfolio visibility and recoverable synchronization. This public Python/PostgreSQL system makes the underlying field ownership, No-Regress Logic, independent receipts and crash recovery inspectable.
 
 This Python/PostgreSQL control plane implements stateful middleware: canonical identity, source authority, No-Regress Logic, durable intent, fenced workers and independent receipts. Stable effect IDs and audit trails support idempotent recovery after uncertain writes. Current authorization governs new actions; an existing receipt establishes what already happened. Local tests block recovery when downstream effects outlive control state. Separate AWS evidence records native SQL checks and an available retained-backup restore; the final restored-state comparison remains unverified. These controls apply across enterprise applications and AI-enabled workflows.
 
