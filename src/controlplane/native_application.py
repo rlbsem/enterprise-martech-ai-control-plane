@@ -12,6 +12,47 @@ from .native_retained import RetainedRecovery
 
 
 class ApplicationRecovery(RetainedRecovery):
+    def select_quiescent_point(self, observed_at, label):
+        """Choose actual restorable time after commits, not a pre-backup timestamp.
+
+        No writer may run while selecting a later point. Whole seconds plus a
+        two-second commit margin avoid a service truncating fractional time
+        before the observed transaction. Original task timestamps stay intact.
+        """
+        if observed_at.tzinfo is None:
+            raise ValueError("Aware post-commit observation required")
+        minimum = observed_at.astimezone(UTC).replace(microsecond=0) + timedelta(seconds=2)
+        for _ in range(60):
+            self.r.gate()
+            self.r.drained()
+            source = self.r.database(self.control)
+            response = self.rds.describe_db_instance_automated_backups(DbiResourceId=source["DbiResourceId"])
+            rows = response.get("DBInstanceAutomatedBackups", [])
+            if len(rows) > 1:
+                raise RuntimeError("Ambiguous recovery-point backup identity")
+            earliest = rows[0].get("RestoreWindow", {}).get("EarliestTime") if rows else None
+            if earliest is not None:
+                if not isinstance(earliest, datetime) or earliest.tzinfo is None:
+                    raise RuntimeError("Aware service recovery window required")
+                point = max(minimum, earliest.astimezone(UTC).replace(microsecond=0) + timedelta(seconds=1))
+                window = self.backup(source, "active", point)
+                if window:
+                    self.checkpoint(
+                        label + "-quiescent-point-selected",
+                        {
+                            "application_observed_at": observed_at.isoformat(),
+                            "selected_point": point.isoformat(),
+                            "backup_window": window["metadata"]["RestoreWindow"],
+                            "backup_request_id": window["request_id"],
+                            "source_resource_id": source["DbiResourceId"],
+                            "quiescent": True,
+                            "time_selection": "whole-second point after commit observation and earliest usable backup",
+                        },
+                    )
+                    return point, source, window
+            time.sleep(15)
+        raise RuntimeError("Active backup window not established for a quiescent post-commit recovery point")
+
     def require_headroom(self, seconds):
         self.r.gate()
         if (datetime.fromisoformat(self.m["cleanup_at"]) - datetime.now(UTC)).total_seconds() < seconds:
@@ -213,15 +254,16 @@ class ApplicationRecovery(RetainedRecovery):
             raise RuntimeError("Both initial managed owner-secret identities required")
         self.r.task("bootstrap")
         first = self.r.task("baseline")
-        point1 = datetime.fromisoformat(first["recovery_point"])
+        first_observed = datetime.fromisoformat(first["recovery_point"])
         if first.get("terminated_worker") is not True or first["comparison"]["remote_effects"] != 3:
             raise RuntimeError("Actual application baseline/worker interruption required")
-        self.wait_window(point1)
+        point1, _, _ = self.select_quiescent_point(first_observed, "behind")
         second = self.r.task("control")
-        point2 = datetime.fromisoformat(second["recovery_point"])
+        point2, source, backup = self.select_quiescent_point(
+            datetime.fromisoformat(second["recovery_point"]), "matching"
+        )
         if not point1 < point2 or second["comparison"]["remote_effects"] != 5:
             raise RuntimeError("Strictly later complete application checkpoint required")
-        source, backup = self.wait_window(point2)
         if not self.backup(source, "active", point1):
             raise RuntimeError("Earlier application checkpoint not in source PITR window")
         initial = self.r.task("verify")

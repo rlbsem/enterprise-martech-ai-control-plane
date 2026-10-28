@@ -121,7 +121,8 @@ def application_fixture(tmp_path, monkeypatch):
         return row
 
     f.runner.database = database
-    point1, point2 = f.baseline, f.baseline + timedelta(seconds=10)
+    observed1, observed2 = f.baseline, f.baseline + timedelta(seconds=10)
+    point1, point2 = [p.replace(microsecond=0) + timedelta(seconds=2) for p in (observed1, observed2)]
     f.state.update(generations=0, bad_comparison=False, deleted=[])
 
     def modify(**kw):
@@ -172,7 +173,7 @@ def application_fixture(tmp_path, monkeypatch):
             result = {"bootstrap": "complete"}
         elif name in {"baseline", "control"}:
             result = {
-                "recovery_point": (point1 if name == "baseline" else point2).isoformat(),
+                "recovery_point": (observed1 if name == "baseline" else observed2).isoformat(),
                 "source_database": "f" * 64,
                 "terminated_worker": True,
                 "comparison": {"remote_effects": 3 if name == "baseline" else 5},
@@ -277,6 +278,31 @@ def test_offline_controller_does_not_delete_without_exact_backup_window(tmp_path
     f.state["source_window"] = False
     with pytest.raises(RuntimeError, match="backup window not established"):
         controller.execute()
+    f.rds.delete_db_instance.assert_not_called()
+
+
+def test_point_selection_can_follow_first_available_backup_without_rewriting_task_time(tmp_path, monkeypatch):
+    f, controller = application_fixture(tmp_path, monkeypatch)
+    observed = f.baseline
+    earliest = observed + timedelta(seconds=60)
+    f.backup["RestoreWindow"]["EarliestTime"] = earliest
+    point, _, _ = controller.select_quiescent_point(observed, "unit-selection")
+    assert point.microsecond == 0 and point > earliest and point > observed
+    assert point < f.backup["RestoreWindow"]["LatestTime"]
+    assert observed == f.baseline
+    f.rds.delete_db_instance.assert_not_called()
+
+
+def test_recovery_point_cannot_be_selected_while_runtime_is_active(tmp_path, monkeypatch):
+    f, controller = application_fixture(tmp_path, monkeypatch)
+
+    def active():
+        raise RuntimeError("runtime still active")
+
+    f.runner.drained = active
+    with pytest.raises(RuntimeError, match="runtime still active"):
+        controller.select_quiescent_point(f.baseline, "unit-selection")
+    f.rds.describe_db_instance_automated_backups.assert_not_called()
     f.rds.delete_db_instance.assert_not_called()
 
 
