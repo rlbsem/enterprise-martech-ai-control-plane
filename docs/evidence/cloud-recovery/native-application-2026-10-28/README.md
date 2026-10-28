@@ -4,33 +4,13 @@
 
 ## Executed recovery sequence
 
-Two point-in-time restores, two deliberate decisions. The first **correctly blocked unsafe execution**; the second resumed only after fresh verification.
+Two RDS point-in-time restores, two independently verified outcomes. The earlier restore **correctly blocked unsafe replay** when restored control state was behind completed downstream effects. A distinct later restore resumed only after fresh proof and authorization checks.
 
-```mermaid
-%%{init: {"theme":"base","themeVariables":{"background":"#10101D","primaryColor":"#2A2A3D","primaryTextColor":"#F0F0FF","primaryBorderColor":"#7C7CAF","lineColor":"#B8B8FF","textColor":"#F0F0FF","secondaryColor":"#181825","tertiaryColor":"#2E2E45","fontFamily":"IBM Plex Sans, Arial, sans-serif","fontSize":"15px","edgeLabelBackground":"#10101D"}}}%%
-flowchart TB
-  subgraph First["RESTORE 01  |  SAFETY CHECK"]
-    direction LR
-    Early["AWS RDS PITR #1<br/>3 restored intents"] --> CompareEarly{"5 independent receipts<br/>Do they match?"}
-    CompareEarly -->|No| Block["EXPECTED BLOCK<br/>No unsafe replay"]
-  end
-  subgraph Second["RESTORE 02  |  VERIFIED RESUMPTION"]
-    direction LR
-    Later["AWS RDS PITR #2<br/>5 intents / 5 receipts"] --> Proof["Fresh proof + approval<br/>Consent and worker checks"]
-    Proof --> Final["SAFE RESUMPTION<br/>6 intents / 6 effects<br/>Zero duplicates"]
-  end
-  First --> Second
-  classDef stage fill:#2A2A3D,stroke:#B8B8FF,color:#F0F0FF,stroke-width:1.6px
-  classDef decision fill:#2E2E45,stroke:#E3BC7F,color:#F0F0FF,stroke-width:2px
-  classDef hold fill:#30252E,stroke:#D98EA3,color:#F0F0FF,stroke-width:2.5px
-  classDef release fill:#20352E,stroke:#81C5B0,color:#F0F0FF,stroke-width:2.5px
-  class Early,Later,Proof stage
-  class CompareEarly decision
-  class Block hold
-  class Final release
-```
+[![Recovery diagram: first PITR finds 3 intents against 5 independent effects and blocks execution; later PITR reconciles 5 intents and receipts, requires fresh approval, and independently verifies 6 intents and 6 effects without duplicates.](recovery-overview.svg)](recovery-overview.svg)
 
-*Both restores used distinct control generations and the same independent receipt database, with no more than two RDS instances concurrently. Native AWS RDS recovery used synthetic one-off Fargate application tasks; this does not establish full production ECS/HTTPS/Multi-AZ acceptance. Detailed evidence follows.*
+[Open the diagram full size](recovery-overview.svg) · [Recovery architecture](../../../cloud-recovery.md)
+
+*The same independent receipt database remained unchanged across both restores. This is bounded actual AWS RDS acceptance with synthetic one-off Fargate application tasks, not full production ECS/HTTPS/Multi-AZ acceptance. Detailed executed records follow.*
 
 | Executed stage | Observed result |
 |---|---|
