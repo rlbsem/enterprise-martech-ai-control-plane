@@ -82,6 +82,14 @@ A successful database restore alone is insufficient. Downstream effects can be n
 
 [Restore and reconciliation runbook](docs/cloud-operations.md) · [Recovery diagram](docs/diagrams/06-database-restore.svg) · [Executed remote-ahead case](docs/evidence/remote-ahead-restore.json)
 
+## Operational Recovery and Business Integrity
+
+The recovery coordinator closes work admission and dispatch, binds a restore to its exact deployment/database identities, compares independent receipts and requires fresh evidence before controlled resumption. Stored pass reports cannot reopen execution. Current consent/privacy observations must be reapplied through their authoritative source before recovery can authorize new work.
+
+The [executed local recovery harness](docs/cloud-recovery.md) uses actual PostgreSQL database snapshots, separate HTTP processes and a killed worker. It demonstrates blocked remote-ahead recovery, receipt/hash conflicts, missing acknowledgments, stale approval rejection and safe resumption without duplicate synthetic effects. The complete regression suite passes 356 tests. [Evidence and source preservation](docs/evidence/cloud-recovery/README.md).
+
+These local results do not close the [previous native post-restore verification gap](docs/evidence/aws-readiness/retained-two-instance/native-outcome/README.md). Native AWS acceptance and full production deployment remain separate, explicitly scoped verification boundaries.
+
 ## Workload and capacity
 
 | Validation layer | Purpose and observed result |

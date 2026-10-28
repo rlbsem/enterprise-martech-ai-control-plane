@@ -16,6 +16,11 @@ def compare_receipts(jobs, receipts):
     remote = {str(r['key']): r for r in receipts}
     findings = []
     for key, receipt in sorted(remote.items()):
+        # SQL snapshots include the independently persisted business body, not just
+        # the sender's asserted hash. Minimal legacy in-memory comparisons remain compatible.
+        if 'body' in receipt and digest(receipt['body']) != receipt['hash']:
+            findings.append({'key': key, 'reason': 'receipt_body_hash_conflict'})
+    for key, receipt in sorted(remote.items()):
         job = local.get(key)
         if not job:
             findings.append({'key': key, 'reason': 'remote_ahead_missing_intent'})
@@ -46,7 +51,7 @@ def recovery_snapshot(control_dsn, remote_dsn):
         if c.execute('SELECT 1 FROM cp.destinations LIMIT 1').fetchone():
             raise ValueError('all_destination_readers_required')
         jobs = c.execute('SELECT id,status,mutation,uncertain,remote_result FROM cp.jobs ORDER BY id').fetchall()
-        receipts = r.execute('SELECT key,hash,receipt FROM remote.effects ORDER BY key').fetchall()
+        receipts = r.execute('SELECT key,hash,body,receipt FROM remote.effects ORDER BY key').fetchall()
     return {**compare_receipts(jobs, receipts), 'observed_at': datetime.now(UTC).isoformat(),
             'scope': 'quiesced databases; no changes or replay performed'}
 
@@ -65,11 +70,23 @@ def destination_snapshot(control_dsn, readers):
     for name in sorted(readers):
         with db.connect(readers[name]) as c:
             c.execute('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY')
-            receipts = c.execute('SELECT key,hash,receipt FROM remote.effects ORDER BY key').fetchall()
+            receipts = c.execute('SELECT key,hash,body,receipt FROM remote.effects ORDER BY key').fetchall()
         lanes[name] = compare_receipts([j for j in jobs if j['destination'] == name], receipts)
     return {'safe_to_resume': all(lane['safe_to_resume'] for lane in lanes.values()),
             'destinations': lanes, 'observed_at': datetime.now(UTC).isoformat(),
             'scope': 'quiesced databases; exact destination scope including legacy; read only'}
+
+
+def runtime_acceptance_snapshot(control_dsn, remote_dsn):
+    """Deployment acceptance is stricter than a closed recovery comparison."""
+    result = recovery_snapshot(control_dsn, remote_dsn)
+    with db.connect(control_dsn) as c:
+        gate = c.execute('SELECT mode,epoch,session_id FROM cp.recovery_gate WHERE singleton').fetchone()
+    result['execution_gate'] = {**gate, 'session_id': str(gate['session_id']) if gate['session_id'] else None}
+    if gate['mode'] != 'open':
+        result['safe_to_resume'] = False
+        result.setdefault('findings', []).append({'reason': 'execution_gate_closed'})
+    return result
 
 
 def queue_metrics(dsn=None):

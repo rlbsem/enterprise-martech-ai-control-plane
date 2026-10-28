@@ -1,0 +1,26 @@
+{
+  "source_revision": "0f934d6b14f2cb23fc88f4c33a65ba3034133847",
+  "scope": "Exact prior runtime bytes for immutable historical workload source bindings; not a new workload execution",
+  "files": {
+    "src/controlplane/db.py": {
+      "path": "docs/evidence/cloud-recovery/prior-runtime/db.py",
+      "sha256": "2d409dcff0cc15e7a1c6461a0ae0da9da9c4528fd4f227e2e3483e6a8fb0c800"
+    },
+    "src/controlplane/worker.py": {
+      "path": "docs/evidence/cloud-recovery/prior-runtime/worker.py",
+      "sha256": "bf9d75172b80f56dc0dd409c359e1124453581fa2e2d7ec1263b4bd55584a56c"
+    },
+    "src/controlplane/service.py": {
+      "path": "docs/evidence/cloud-recovery/prior-runtime/service.py",
+      "sha256": "cd9efa1dcd2f1d4c816c49f89a4fbc7cbe7b839f6675faf93b3d81f153151eed"
+    },
+    "src/controlplane/operations.py": {
+      "path": "docs/evidence/cloud-recovery/prior-runtime/operations.py",
+      "sha256": "aca62af2f9a4cc4fe4d58be09108719db6fa7cbc2dcf6f0c43b031a5d098b629"
+    },
+    "src/controlplane/cloud.py": {
+      "path": "docs/evidence/cloud-recovery/prior-runtime/cloud.py",
+      "sha256": "08fc438fdd9e4c9b97fabdde8a0eba112a08031620d9492f3429188f7a210f41"
+    }
+  }
+}
