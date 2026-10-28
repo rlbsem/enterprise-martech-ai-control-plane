@@ -2,6 +2,12 @@
 
 **Actual AWS acceptance passed in us-east-2 on October 28, 2026.** Two sequential retained-backup RDS restores demonstrate why a restored database must reconcile with independent business effects before execution can reopen. All customer records, permissions changes and effects are synthetic.
 
+## Executed recovery sequence
+
+![Native AWS recovery sequence: an earlier RDS restore with 3 intents versus 5 independent receipts blocks execution; a distinct later restore reconciles, rechecks authorization and consent, then independently verifies 6 intents and 6 effects with zero duplicates.](recovery-sequence.svg)
+
+*This diagram summarizes the recorded sequence, not a proposed deployment topology. The independent receipt database remained the same physical generation across both restores; the second restore used a different control generation. See the stage evidence and limitations below.*
+
 | Executed stage | Observed result |
 |---|---|
 | Source permissions preflight | Real coordinator operations rolled back; empty ledgers unchanged; API/receiver health and empty worker poll passed; two reader writes denied |
