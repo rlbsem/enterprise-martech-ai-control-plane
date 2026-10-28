@@ -1,0 +1,16 @@
+{
+  "observed_at": "2026-10-28T01:14:11.828167+00:00",
+  "scope": "Authenticated read-only AWS Core; no resource creation or local CLI authentication",
+  "region": "us-east-2",
+  "plan": "FREE",
+  "plan_status": "ACTIVE",
+  "usd_credit_headroom_at_least_20": true,
+  "orderable_postgres_17_11_t4g_micro_gp3": true,
+  "minimum_storage_gb": 20,
+  "fargate_on_demand_vcpu_quota": 12,
+  "rds_instances": 0,
+  "retained_automated_backups": 0,
+  "manual_snapshots": 0,
+  "native_application_recovery": "not_executed",
+  "billing_clearance": false
+}

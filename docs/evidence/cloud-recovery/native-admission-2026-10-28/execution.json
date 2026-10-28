@@ -1,0 +1,18 @@
+{
+  "schema": "cloud-recovery-admission-outcome.v1",
+  "run": "a26102817199672",
+  "source_commit": "ae36f604e4e2521c219dd13fec9e721b6420f17e",
+  "status": "ABORTED_DURING_PROVISIONING",
+  "native_application_acceptance": false,
+  "application_tasks_executed": false,
+  "retained_restores_executed": 0,
+  "guard_arming_passed": true,
+  "guard_started_at": "2026-10-28T17:29:00Z",
+  "fixed_cleanup_at": "2026-10-28T20:29:00Z",
+  "runtime_approval_plan_sha256": "e77feb8c0b9359bd01d471fe524a983e1ac612ca8f0b4c4608bc60091fa50ff7",
+  "reason": "Approval delay left fewer than the existing 9000 seconds required at ApplicationRecovery.execute entry. Operator pre-deployment check incorrectly required only 7200 seconds. Partial Terraform apply was interrupted; existing safety checks and fixed deadline were not changed.",
+  "private_runtime_apply_log_sha256": "440017b5787fa562bf59c99c9d7198a18ca2aad5b748392bb833b7db3659ef1e",
+  "private_outcome_sha256": "0e9543e5ed375c7c8efb8a32f4263eb9d373c20d4626dbf362d2ebe9e40f694a",
+  "cleanup": "In progress; see separate teardown observations, never infer resource absence from this abort",
+  "historical_evidence": "Earlier native results retain their original bytes and conclusions"
+}

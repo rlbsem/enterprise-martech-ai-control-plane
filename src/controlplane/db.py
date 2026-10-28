@@ -42,12 +42,27 @@ def migrate(dsn):
             c.execute("INSERT INTO public.schema_migrations VALUES (2,%s)", (digest(upgrade),))
         from .capacity import grants
         grants(c)
+        recovery = Path(__file__).with_name("recovery.sql").read_text(encoding="utf-8")
+        applied = c.execute("SELECT hash FROM public.schema_migrations WHERE version=3").fetchone()
+        if applied and applied["hash"] != digest(recovery):
+            raise RuntimeError("Applied migration 3 changed")
+        if not applied:
+            c.execute(recovery)
+            c.execute("INSERT INTO public.schema_migrations VALUES (3,%s)", (digest(recovery),))
+        for role in ("control_api", "control_worker"):
+            if c.execute("SELECT 1 FROM pg_roles WHERE rolname=%s", (role,)).fetchone():
+                c.execute(psycopg.sql.SQL("GRANT EXECUTE ON FUNCTION cp.execution_open() TO {}")
+                          .format(psycopg.sql.Identifier(role)))
         c.execute("INSERT INTO cp.policies VALUES (%s,%s) ON CONFLICT DO NOTHING", (POLICY_HASH, Jsonb(POLICY)))
 
 
 def audit(c, actor, kind, subject, detail):
     c.execute("INSERT INTO cp.audit(actor,kind,subject,policy_hash,detail) VALUES (%s,%s,%s,%s,%s)",
               (actor, kind, str(subject), POLICY_HASH, Jsonb(detail)))
+
+
+def execution_open(c):
+    return c.execute("SELECT cp.execution_open() AS allowed").fetchone()["allowed"]
 
 
 def exception(c, category, subject, detail):

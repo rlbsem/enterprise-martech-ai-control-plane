@@ -1,0 +1,10 @@
+{
+  "source_revision": "58fc9837e3fd05e0d0fab2a1029b31d56c842e4d",
+  "scope": "Original October 28 controller bytes; historical native failure remains unchanged",
+  "files": {
+    "src/controlplane/native_application.py": {
+      "path": "docs/evidence/cloud-recovery/native-controller-source-archive/native_application.py",
+      "sha256": "fa6dff1613242b8f778296e9e75b218ac6f8b9aae3a6702f2a267df5ec0eaff3"
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "archive_sha256": "cbd12c2f47abbd39e90b7dad7db8b4117555d3a0bbfbf92bc5cad7590817e4a0",
+  "image_manifest_digest": "sha256:286b7a73e50605ee02e02a1311078066d7bd35d9b89d5c570e32840f63ce863b",
+  "source_commit": "413f8d9a3559bfcddf903985ff0166071871e865",
+  "branch_head": "413f8d9a3559bfcddf903985ff0166071871e865",
+  "workflow_run": 40615317533,
+  "all_oci_blobs_verified": true
+}

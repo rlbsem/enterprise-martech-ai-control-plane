@@ -1,0 +1,186 @@
+[
+  {
+    "phase": "application-before-source-deletion",
+    "at": "2026-10-28T20:27:47.656713+00:00",
+    "private_original_sha256": "5fcff43a9e6d64ec7e0ac23ae9eba6da44244a2d5c6254ae5029193b1c5671f6",
+    "independent_comparison": {
+      "execution_gate": {
+        "epoch": 0,
+        "mode": "open",
+        "session_id": null
+      },
+      "findings": [],
+      "local_intents": 5,
+      "observed_at": "2026-10-28T20:27:14.110290+00:00",
+      "remote_effects": 5,
+      "remote_ledger_sha256": "3dd187801800c3576fbd16c53b8dd45db6fb2abe2d6ad8df9646778df74f9fd5",
+      "safe_to_resume": true,
+      "scope": "quiesced databases; no changes or replay performed",
+      "snapshot_hash": "8b6f6b2b0d46ae0b1cd43af7a08d3eef9ec8cbb8ab98e0d993505559d8ca84d8",
+      "write_denials": 2
+    }
+  },
+  {
+    "phase": "application-behind-independently-blocked",
+    "at": "2026-10-28T20:46:16.760206+00:00",
+    "private_original_sha256": "d4a19e6279733fb34db35709442f926766a26ae1778d6a7850cd2344b0800dbe",
+    "result": {
+      "remote_ledger_sha256": "3dd187801800c3576fbd16c53b8dd45db6fb2abe2d6ad8df9646778df74f9fd5",
+      "resume_refused": "fresh_safe_proof_required",
+      "stage": "behind_blocked",
+      "verification": {
+        "binding_hash": "0d6e00e6cbf0eb023a41428ed66166bbac39933e14475851792214eff3ad9f2a",
+        "control_fingerprint": "a192a347f2a39435b4210cf88c76a124f87fd78b4204bacd339de74c2fcb2b22",
+        "findings": [
+          {
+            "key": "86b6e827-de0f-4c02-9788-7466f291866b",
+            "reason": "remote_ahead_missing_intent"
+          },
+          {
+            "key": "91c09287-0cff-4f53-9196-9383b7190caa",
+            "reason": "remote_ahead_missing_intent"
+          }
+        ],
+        "local_intents": 3,
+        "observed_at": "2026-10-28T20:44:30.985125+00:00",
+        "policy_hash": "f6360ddf381e1f14bd52be2d5cf3163fe39bc8034a7371f3321568a8d8646c39",
+        "proof_id": "166d17c1-5638-45fe-98cb-de6890ea91f0",
+        "quiescence": {
+          "observed_at": "2026-10-28T20:44:30.858382+00:00",
+          "quiescent": true,
+          "registered_runtime": [
+            {
+              "exited": true,
+              "pid": 7,
+              "service": "api"
+            }
+          ]
+        },
+        "remote_effects": 5,
+        "safe_to_resume": false,
+        "scope": "quiesced databases; no changes or replay performed",
+        "snapshot_hash": "d91968d5345cb6fe33b551d6cd665ef1272107e278cf1165a8ae285def2152ce"
+      },
+      "worker_claimed": false,
+      "workflow": "application-recovery-v1"
+    },
+    "independent": {
+      "execution_gate": {
+        "epoch": 1,
+        "mode": "closed",
+        "session_id": "4e3fc0b8-d255-4b81-adf9-5b57da29f8b5"
+      },
+      "findings": [
+        {
+          "key": "86b6e827-de0f-4c02-9788-7466f291866b",
+          "reason": "remote_ahead_missing_intent"
+        },
+        {
+          "key": "91c09287-0cff-4f53-9196-9383b7190caa",
+          "reason": "remote_ahead_missing_intent"
+        },
+        {
+          "reason": "execution_gate_closed"
+        }
+      ],
+      "local_intents": 3,
+      "observed_at": "2026-10-28T20:45:37.911824+00:00",
+      "remote_effects": 5,
+      "remote_ledger_sha256": "3dd187801800c3576fbd16c53b8dd45db6fb2abe2d6ad8df9646778df74f9fd5",
+      "safe_to_resume": false,
+      "scope": "quiesced databases; no changes or replay performed",
+      "snapshot_hash": "d91968d5345cb6fe33b551d6cd665ef1272107e278cf1165a8ae285def2152ce",
+      "write_denials": 2
+    }
+  },
+  {
+    "phase": "application-execution-claimed",
+    "at": "2026-10-28T20:15:25.112058+00:00",
+    "private_original_sha256": "f16db86ae4b062b42bb1b9d7c3c188c6e76faa5fc788df214e41c7ce95eec2ad"
+  },
+  {
+    "phase": "application-recovery-independently-accepted",
+    "at": "2026-10-28T21:04:17.659922+00:00",
+    "private_original_sha256": "4e072b1dcb7e1c510f7eb07a102c04edfd95f31a53ef57b7caedd855c20365ea"
+  },
+  {
+    "phase": "behind-quiescent-point-selected",
+    "at": "2026-10-28T20:22:52.415763+00:00",
+    "private_original_sha256": "567f38b752be5bb9ad6fe3274df9770e18132f716875d7dd1a83a8572e174a79",
+    "application_observed_at": "2026-10-28T20:18:21.890576+00:00",
+    "selected_point": "2026-10-28T20:18:23+00:00",
+    "backup_window": {
+      "EarliestTime": "2026-10-28 20:11:49.637000+00:00",
+      "LatestTime": "2026-10-28 20:19:07+00:00"
+    },
+    "backup_request_id": "19f4cd12-1a06-4e2f-bbc7-7b68752558cd",
+    "quiescent": true,
+    "time_selection": "whole-second point after commit observation and earliest usable backup"
+  },
+  {
+    "phase": "behind-rds-available",
+    "at": "2026-10-28T20:43:55.569498+00:00",
+    "private_original_sha256": "e9147d1df59db9c71e8fe7cab1d43e9d6f2a6f1f08ff67d69d506a98007be596",
+    "restore_point": "2026-10-28T20:18:23+00:00",
+    "request_id": "e061269c-1cf6-46a7-817e-21c9db7c041e",
+    "database_restore_seconds": 850.6794674999983,
+    "application_recovery": "not_yet_verified",
+    "database_generation_reference": "6d56402cf6a11fc384af5df8a3be86dc559d26199de3024e4ca3518f8e4ece47"
+  },
+  {
+    "phase": "delete-intent-[private-reference-sha256:6d56402cf6a11fc384af5df8a3be86dc559d26199de3024e4ca3518f8e4ece47]",
+    "at": "2026-10-28T20:46:24.599286+00:00",
+    "private_original_sha256": "1d447e4877d0f229ed22e72a610069b3c26fb37ca8f477ff49ecc77b0b235d45"
+  },
+  {
+    "phase": "delete-intent-[private-reference-sha256:a559e9a59fd5458a8ede10fa8ead87dcb873889d30d98a7035c0e227e543ae8f]",
+    "at": "2026-10-28T20:27:55.482206+00:00",
+    "private_original_sha256": "57e286f077a3d958327a337536617ea1ae76d7b9bbd5e58446971ba2d2ca9bd2"
+  },
+  {
+    "phase": "matching-quiescent-point-selected",
+    "at": "2026-10-28T20:26:48.585366+00:00",
+    "private_original_sha256": "35afec61626a2707c8d1338cd0e577c02532bb252dbd00a4b46fd16967ffa1a4",
+    "application_observed_at": "2026-10-28T20:23:30.919198+00:00",
+    "selected_point": "2026-10-28T20:23:32+00:00",
+    "backup_window": {
+      "EarliestTime": "2026-10-28 20:11:49.637000+00:00",
+      "LatestTime": "2026-10-28 20:24:07+00:00"
+    },
+    "backup_request_id": "5420fb44-b045-4acd-a596-982c7332d703",
+    "quiescent": true,
+    "time_selection": "whole-second point after commit observation and earliest usable backup"
+  },
+  {
+    "phase": "matching-rds-available",
+    "at": "2026-10-28T21:01:26.630157+00:00",
+    "private_original_sha256": "c09060b3713f3e09c034d63a0c5ea421cd55806e0a51387ec9ad6043404f6f55",
+    "restore_point": "2026-10-28T20:23:32+00:00",
+    "request_id": "60730de2-0042-458e-a26e-91bad56e7bd5",
+    "database_restore_seconds": 796.7742210000142,
+    "application_recovery": "not_yet_verified",
+    "database_generation_reference": "1e4218e4af57c53ceda6125573bdb0e1b4a8322685037125c91251f4a55a2fc8"
+  },
+  {
+    "phase": "source-recovery-permissions-verified",
+    "at": "2026-10-28T20:17:36.704583+00:00",
+    "private_original_sha256": "be8fdfe58b4f9dbe6f9a1c95c6bcbffa6ff023173237060dff02db3d347536bf",
+    "preflight": {
+      "api_receiver_health_passed": true,
+      "comparison": {
+        "findings": [],
+        "local_intents": 0,
+        "observed_at": "2026-10-28T20:17:07.557428+00:00",
+        "remote_effects": 0,
+        "safe_to_resume": true,
+        "scope": "quiesced databases; no changes or replay performed",
+        "snapshot_hash": "3e77a5ff9346807a034b8f0439fed66d742c25c68e2d7e62152bda4c6207e6d2"
+      },
+      "empty_worker_claimed": false,
+      "recovery_operations_rolled_back": true,
+      "stage": "source_preflight_passed",
+      "workflow": "application-recovery-v1",
+      "write_denials": 2
+    }
+  }
+]

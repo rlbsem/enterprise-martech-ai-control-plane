@@ -93,15 +93,30 @@ class Inventory:
         owner_secrets = {r.get("owner_secret") for r in self.known + self.rows if r["kind"] == "database"} - {
             None
         }
+        owner_secrets |= {r["id"] for r in self.known if r["kind"] == "secret" and r.get("managed") is True}
+        observed_secrets = set()
         for secret in self.pages("secretsmanager", "list_secrets", "SecretList", IncludePlannedDeletion=True):
             tags = {t["Key"]: t["Value"] for t in secret.get("Tags", [])}
             if tags.get("AcceptanceRun") == self.run or secret["ARN"] in owner_secrets:
+                observed_secrets.add(secret["ARN"])
                 self.add(
                     "secret",
                     secret["ARN"],
                     managed=secret["ARN"] in owner_secrets,
                     state="pending_deletion" if secret.get("DeletedDate") else "active",
                 )
+        # ListSecrets is eventually consistent. Check exact known generations
+        # directly; only ResourceNotFound establishes metadata absence.
+        known_secrets = owner_secrets | {r["id"] for r in self.known if r["kind"] == "secret"}
+        for arn in sorted(known_secrets - observed_secrets):
+            try:
+                secret = self.c["secretsmanager"].describe_secret(SecretId=arn)
+            except self.c["secretsmanager"].exceptions.ResourceNotFoundException:
+                continue
+            if secret["ARN"] != arn:
+                raise RuntimeError("Known secret metadata identity mismatch")
+            self.add("secret", arn, managed=arn in owner_secrets,
+                     state="pending_deletion" if secret.get("DeletedDate") else "active")
         # Managed RDS owner secrets are recorded before deletion and archived in the guard bucket.
         for prefix in (f"/csa-native/{self.run}/", f"/aws/rds/instance/{self.prefix}-"):
             for log in self.pages("logs", "describe_log_groups", "logGroups", logGroupNamePrefix=prefix):

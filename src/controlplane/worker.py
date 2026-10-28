@@ -15,6 +15,8 @@ from .service import valid_proposal
 
 def claim(lease_seconds=30):
     with db.connect() as c:
+        if not db.execution_open(c):
+            return None
         job = c.execute("""SELECT j.* FROM cp.jobs j LEFT JOIN cp.job_routes route USING(id)
           LEFT JOIN cp.capacity_state cap ON cap.destination=route.destination WHERE (
           (status IN ('ready','retry') AND available_at<=clock_timestamp()) OR
@@ -59,6 +61,8 @@ def finish(job, status, reason, remote_result=None, uncertain=None, delay=None):
 
 def prepare(job):
     with db.connect() as c:
+        if not db.execution_open(c):
+            return None, "recovery_closed"
         p = c.execute("SELECT * FROM cp.proposals WHERE id=%s", (job["id"],)).fetchone()
         row = db.customer(c, p["customer_id"])
         current = c.execute("SELECT * FROM cp.jobs WHERE id=%s FOR UPDATE", (job["id"],)).fetchone()
@@ -112,7 +116,9 @@ def execute(job):
                     return
             mutation, reason = prepare(job)
             if reason:
-                if reason != "lease_lost":
+                if reason == "recovery_closed":
+                    finish(job, "retry", reason, delay=1)
+                elif reason != "lease_lost":
                     finish(job, "blocked", reason)
                 return
             response = client.post("/effects", headers={"Idempotency-Key": str(job["id"])}, json=mutation)

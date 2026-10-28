@@ -1,0 +1,52 @@
+{
+  "schema": "recovery-browser-proof.v1",
+  "observed_at": "2026-10-28T01:08:13.730Z",
+  "browser": "Chrome/156.0.8078.48",
+  "renderer": "actual Chromium over loopback HTTP; no image editing",
+  "source_report": "docs/evidence/cloud-recovery/local-2026-10-27/operator-report.html",
+  "source_report_sha256": "5bd7bb09b111b868b29890259122256091f79b04b7a8da4ec16ba9fa47cb6bcf",
+  "source_record": "docs/evidence/cloud-recovery/local-2026-10-27/acceptance.json",
+  "source_record_sha256": "2ad4af8fc49bc65ed240bce7ee0bfac6e2a76a23015b9489783b384dc2076823",
+  "capture_script_sha256": "e1b47720f8b4faa2d226a5c7263442b2653539a6ad37f6a6ee03d2c4432b1d52",
+  "observations": [
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 1120
+      },
+      "title": "Control Plane | Recovery acceptance",
+      "articles": 8,
+      "details": 8,
+      "horizontalOverflow": false,
+      "mainLandmarks": 1,
+      "headings": 1,
+      "status": "passed",
+      "evidenceDetailsOpened": true,
+      "keyboardSummaryAccess": true,
+      "externalRequests": 0,
+      "pageErrors": [],
+      "screenshot": "desktop.png",
+      "screenshot_sha256": "edf76116c483bdbc64cd07537748f0d752e49b7af1bbadfce080fdb3dd6ca8c2"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 1000
+      },
+      "title": "Control Plane | Recovery acceptance",
+      "articles": 8,
+      "details": 8,
+      "horizontalOverflow": false,
+      "mainLandmarks": 1,
+      "headings": 1,
+      "status": "passed",
+      "evidenceDetailsOpened": true,
+      "keyboardSummaryAccess": true,
+      "externalRequests": 0,
+      "pageErrors": [],
+      "screenshot": "mobile.png",
+      "screenshot_sha256": "5f2b46a14050e7aacf12c33d51d8d99a720a131e43901bb74e2346b5ff683b4a"
+    }
+  ],
+  "boundary": "Recorded local recovery evidence; not a live AWS application or new cloud execution"
+}

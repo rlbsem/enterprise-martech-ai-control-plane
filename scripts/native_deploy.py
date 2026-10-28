@@ -12,8 +12,26 @@ import subprocess
 import boto3
 
 from controlplane.native_arming import account_gate, armed_gate
+from controlplane.native_application import APPLICATION_START_HEADROOM_SECONDS
 
 ROOT = Path(__file__).resolve().parents[1]
+APPLICATION_PROVISIONING_ALLOWANCE_SECONDS = 900
+
+
+def runtime_deadline_gate(document, manifest, *, now=None):
+    """Reject stale application approvals before Terraform creates any resources."""
+    from datetime import UTC, datetime
+
+    workflow = document["variables"].get("acceptance_workflow", {}).get("value", "sql-fixture-v1")
+    if workflow != "application-recovery-v1":
+        return
+    deadline = datetime.fromisoformat(manifest["cleanup_at"])
+    now = now or datetime.now(UTC)
+    if deadline.tzinfo is None or now.tzinfo is None:
+        raise ValueError("Aware application deployment deadline required")
+    required = APPLICATION_START_HEADROOM_SECONDS + APPLICATION_PROVISIONING_ALLOWANCE_SECONDS
+    if (deadline - now).total_seconds() < required:
+        raise ValueError("Insufficient application deployment headroom before provisioning; retire guard")
 
 
 def review_plan(plan, phase):
@@ -88,7 +106,13 @@ def main():
         if document["variables"][key]["value"] != expected:
             p.error("Plan/manifest identity mismatch")
     if a.phase == "runtime":
-        armed_gate(manifest, clients)
+        runtime_deadline_gate(document, manifest)
+        workflow = document["variables"].get("acceptance_workflow", {}).get("value", "sql-fixture-v1")
+        if workflow not in {"sql-fixture-v1", "application-recovery-v1"}:
+            p.error("Unknown saved-plan acceptance workflow")
+        # The guard manifest predates the runtime topology. Derive the stronger
+        # credit gate from the approved plan itself, not an editable side report.
+        armed_gate({**manifest, "acceptance_workflow": workflow}, clients)
         if document["variables"]["guard_code_sha256"]["value"] != manifest["guard_code_sha256"]:
             p.error("Approved guard code mismatch")
     else:

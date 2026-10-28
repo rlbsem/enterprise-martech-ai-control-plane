@@ -25,6 +25,15 @@ run "independent_guard" {
     error_message = "Bounded guard and private independent evidence required."
   }
 }
+run "deregister_uses_supported_regional_authorization" {
+  command = plan
+  assert {
+    condition = anytrue([for statement in jsondecode(aws_iam_role_policy.cleanup.policy).Statement :
+      try(statement.Action == "ecs:DeregisterTaskDefinition" && statement.Resource == "*" && statement.Condition.StringEquals["aws:RequestedRegion"] == "us-east-2", false)
+    ])
+    error_message = "DeregisterTaskDefinition requires its own wildcard-resource action restricted to Ohio."
+  }
+}
 run "encrypted_repository_cleanup_grants" {
   command = plan
   assert {
@@ -34,6 +43,17 @@ run "encrypted_repository_cleanup_grants" {
       statement.Resource == "arn:aws:kms:us-east-2:${var.account_id}:key/*"
     ])
     error_message = "Encrypted ECR cleanup requires RetireGrant on this run's tagged runtime keys only."
+  }
+}
+run "private_logs_are_archived_without_expanding_checker_authority" {
+  command = plan
+  assert {
+    condition = anytrue([for statement in jsondecode(aws_iam_role_policy.cleanup.policy).Statement :
+      try(contains(statement.Action, "logs:GetLogEvents"), false) &&
+      try(contains(statement.Resource, "arn:aws:logs:us-east-2:${var.account_id}:log-group:/csa-native/${var.run_id}/*:*"), false) &&
+      !try(contains(statement.Resource, "*"), false)
+    ]) && strcontains(aws_iam_role_policy.function["watchdog"].policy, "/task-logs/*") && !strcontains(aws_iam_role_policy.function["checker"].policy, "/task-logs/*")
+    error_message = "Only the watchdog may archive exact-run logs; the independent checker stays read-only."
   }
 }
 run "identity_rejected" {

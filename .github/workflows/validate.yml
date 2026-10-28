@@ -72,6 +72,10 @@ jobs:
       - run: docker compose run --build --rm demo
       - name: Verify all tests from the built image
         run: docker compose --profile test run --rm verify
+      - name: Recovery scratch works with read-only root and non-root user
+        run: |
+          docker build --tag control-recovery-scratch .
+          docker run --rm --read-only control-recovery-scratch python -c "import os,pathlib; assert os.getuid()==10001; p=pathlib.Path('/recovery-work/probe'); p.write_text('synthetic'); assert p.read_text()=='synthetic'; p.unlink(); assert not os.access('/app',os.W_OK)"
       - name: Export source-bound native acceptance image without AWS access
         run: |
           mkdir -p work/native-image

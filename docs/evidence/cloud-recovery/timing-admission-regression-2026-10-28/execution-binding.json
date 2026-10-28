@@ -1,0 +1,6 @@
+{
+  "source_commit": "5fe8d3f3fa07a2db664b67f72bbcf115d99faec8",
+  "verification_sha256": "d2ff21339d6d1903c273e5c01ee3b904e76810dcf9bc71efb8391d1ef7d7f51a",
+  "source_files_verified": 101,
+  "scope": "Exact 401-test local source; not native application recovery"
+}

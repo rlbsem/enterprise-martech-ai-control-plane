@@ -10,7 +10,7 @@ Field ownership blocks unauthorized overwrites. Permission and approval are chec
 
 **Failure case:** A downstream system commits an action but loses its acknowledgment. The control plane looks up the stable effect ID and finds the existing receipt rather than issuing a second effect. After a database restore, independent receipts must reconcile before services can resume.
 
-Start with the [current executed tests](docs/evidence/dependency-isolation/arrival-review/README.md#verification), [workload results](docs/evidence/enterprise-workload.json) and [recovery design](docs/cloud-operations.md). AWS infrastructure, service identities and release controls are defined separately from the isolated native acceptance run.
+Start with [executed recovery acceptance](docs/evidence/cloud-recovery/README.md), [preserved capacity tests](docs/evidence/dependency-isolation/arrival-review/README.md#verification), [workload results](docs/evidence/enterprise-workload.json) and [recovery design](docs/cloud-operations.md). AWS infrastructure, service identities and release controls are defined separately from the isolated native acceptance run.
 
 ![Control-plane architecture](docs/diagrams/01-control-plane.svg)
 
@@ -18,7 +18,7 @@ Start with the [current executed tests](docs/evidence/dependency-isolation/arriv
 
 **Professional application:** I have designed and delivered shared integration and governance infrastructure for **private equity sponsors and multi-brand operators**. Their acquired businesses retain their own CRMs, operational platforms and financial systems, while the shared control layer enables consistent identities, governed updates, portfolio visibility and recoverable synchronization. This public Python/PostgreSQL system makes the underlying field ownership, No-Regress Logic, independent receipts and crash recovery inspectable.
 
-This Python/PostgreSQL control plane implements stateful middleware: canonical identity, source authority, No-Regress Logic, durable intent, fenced workers and independent receipts. Stable effect IDs and audit trails support idempotent recovery after uncertain writes. Current authorization governs new actions; an existing receipt establishes what already happened. Local tests block recovery when downstream effects outlive control state. Separate AWS evidence records native SQL checks and an available retained-backup restore; the final restored-state comparison remains unverified. These controls apply across enterprise applications and AI-enabled workflows.
+This Python/PostgreSQL control plane implements stateful middleware: canonical identity, source authority, No-Regress Logic, durable intent, fenced workers and independent receipts. Stable effect IDs and audit trails support idempotent recovery after uncertain writes. Current authorization governs new actions; an existing receipt establishes what already happened. A separately executed AWS acceptance completed two retained-backup PITR restores: an early 3-intent/5-receipt state stayed closed, and the later matching state resumed to six intents/effects without duplicates. These controls apply across enterprise applications and AI-enabled workflows.
 
 [Execution and recovery](docs/failures.md) · [Recorded AWS boundary](docs/evidence/aws-readiness/retained-two-instance/native-outcome/README.md)
 
@@ -59,9 +59,13 @@ Delivery is **at least once with idempotent effects under the downstream adapter
 
 ## AWS operating architecture
 
-**Native AWS acceptance:** The [first SQL run](docs/evidence/aws-readiness/native-sql/README.md) verified independent PostgreSQL receipts, duplicate safety and read-only permission denials. A third concurrent RDS instance was denied by the Free-plan quota. A [second run](docs/evidence/aws-readiness/retained-two-instance/native-outcome/README.md) used retained backups to stay within two instances: the disposable source was deleted and its restored replacement was observed `available` alongside the receipt database. The final native post-restore fail-closed comparison **was not recorded**.
+**Native AWS application acceptance:** A [completed, source-bound experiment](docs/evidence/cloud-recovery/native-application-2026-10-28/README.md) executed two sequential retained-backup RDS restores with at most two concurrent instances. A separate read-only task verified the early 3/5 mismatch and closed gate. The matching generation rejected stale approval, enforced current consent, reconciled uncertain work and reached a separately verified **6/6 with zero duplicate effects**. These are synthetic one-off API/worker/receiver tasks, not full production ECS/HTTPS/Multi-AZ acceptance.
 
-RDS service-contract issues found during the run were fixed in the committed controller and covered by regression tests. That revised code has not been run against AWS. [Historical local proof](docs/evidence/aws-readiness/retained-two-instance/README.md) remains tied to its original revision. The [production architecture](docs/cloud-operations.md), including HTTP services and release/failover operations, was not deployed. Active acceptance resources and the cleanup guard were removed; secret/key deletions were pending and final billing had not settled. [Execution and teardown record](docs/evidence/aws-readiness/retained-two-instance/native-outcome/README.md).
+**Preserved earlier evidence:** The [first SQL run](docs/evidence/aws-readiness/native-sql/README.md) verified independent PostgreSQL receipts, duplicate safety and read-only permission denials. A third concurrent RDS instance was denied by the Free-plan quota. A [second run](docs/evidence/aws-readiness/retained-two-instance/native-outcome/README.md) used retained backups to stay within two instances: its restored replacement reached `available`, but that run did not record the final post-restore comparison.
+
+An [earlier October 28 application attempt](docs/evidence/cloud-recovery/native-2026-10-28/README.md) reached an available restore after 773.118 seconds, then failed its post-restore task check. A [separate admission abort](docs/evidence/cloud-recovery/native-admission-2026-10-28/README.md) exposed a missing pre-provisioning time gate, which was corrected before the successful run. Their original bytes and verdicts remain unchanged. Cleanup, pending deletion and delayed billing observations are separate from each application verdict.
+
+The [historical October 19 proof](docs/evidence/aws-readiness/retained-two-instance/README.md) remains tied to its original revision. The [production architecture](docs/cloud-operations.md), including separate ECS services, HTTPS ingress and Multi-AZ recovery, was not deployed by either isolated experiment.
 
 Earlier stages: [Ohio preflight](docs/evidence/aws-readiness/ohio/README.md), [guard and image checks](docs/evidence/aws-readiness/guard-native/README.md), [RDS bootstrap](docs/evidence/aws-readiness/rds-bootstrap/README.md).
 
@@ -82,11 +86,19 @@ A successful database restore alone is insufficient. Downstream effects can be n
 
 [Restore and reconciliation runbook](docs/cloud-operations.md) · [Recovery diagram](docs/diagrams/06-database-restore.svg) · [Executed remote-ahead case](docs/evidence/remote-ahead-restore.json)
 
+## Operational Recovery and Business Integrity
+
+The recovery coordinator closes work admission and dispatch, binds a restore to its exact deployment/database identities, compares independent receipts and requires fresh evidence before controlled resumption. Stored pass reports cannot reopen execution. Current consent/privacy observations must be reapplied through their authoritative source before recovery can authorize new work.
+
+The [executed local recovery harness](docs/cloud-recovery.md) uses actual PostgreSQL database snapshots, separate HTTP processes and a killed worker. It demonstrates blocked remote-ahead recovery, receipt/hash conflicts, missing acknowledgments, stale approval rejection and safe resumption without duplicate synthetic effects. [Structured proof, operator report and source preservation](docs/evidence/cloud-recovery/README.md).
+
+The [separate native acceptance](docs/evidence/cloud-recovery/native-application-2026-10-28/README.md) independently verifies blocked post-restore recovery and controlled resumption on AWS. Local database-copy results and native RDS PITR records remain distinct. Full production deployment is a separate verification boundary.
+
 ## Workload and capacity
 
 | Validation layer | Purpose and observed result |
 |---|---|
-| Exact correctness suite | 323 current tests, preserving the original invariants and adding shared capacity, routed recovery, evidence and permission checks; real PostgreSQL and separate HTTP processes. |
+| Exact correctness suite | Original invariants plus shared capacity, routed recovery, evidence, permission checks and durable recovery approval; real PostgreSQL and separate HTTP processes. Current counts are recorded in [recovery verification](docs/evidence/cloud-recovery/README.md). |
 | Enterprise workload | 1,000 customer accounts, 1,000 intents, four worker processes, 1,200 attempts; 950 unique effects, 50 intended permanent rejections, 50 lost acknowledgements reconciled, zero duplicate effects. |
 | Measured local run | 19.3 seconds admission; 55.5 seconds drain; 18.0 intents/second during drain. HTTP admission p95: 63 ms. |
 | Production capacity model | Explicit connection budgets, admission-lock limits, worker concurrency, retention, failure domains and scaling decision points. |

@@ -12,6 +12,7 @@ COPY docs ./docs
 COPY .github ./.github
 COPY infra ./infra
 COPY compose.yaml Dockerfile ./
-RUN useradd --create-home --uid 10001 control && mkdir -p /app/docs/evidence && chown -R control:control /app
+RUN useradd --create-home --uid 10001 control && mkdir -p /app/docs/evidence /recovery-work && chown -R control:control /app /recovery-work
+VOLUME ["/recovery-work"]
 USER control
 CMD ["python", "-m", "controlplane", "worker"]

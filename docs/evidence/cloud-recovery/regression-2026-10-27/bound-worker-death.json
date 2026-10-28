@@ -1,0 +1,7 @@
+{
+  "process_killed": true,
+  "permit_blocked_after_death": true,
+  "real_expiry_wait_seconds": 30.1,
+  "historical_receipt_after_revision_change": true,
+  "effects": 1
+}

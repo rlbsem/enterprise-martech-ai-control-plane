@@ -63,6 +63,7 @@ def role(c, name, password):
 def grants(control_dsn, remote_dsn):
     """Additional cloud logins; v1 migration and local authorities stay unchanged."""
     with db.connect(control_dsn) as c:
+        c.execute('GRANT EXECUTE ON FUNCTION cp.execution_open() TO control_api,control_worker')
         c.execute('GRANT USAGE ON SCHEMA cp TO control_api,control_worker,control_audit')
         c.execute('GRANT SELECT ON ALL TABLES IN SCHEMA cp TO control_api,control_worker,control_audit')
         c.execute('GRANT INSERT,UPDATE ON cp.customers,cp.identities,cp.proposals,cp.jobs,cp.exceptions TO control_api')
@@ -192,7 +193,7 @@ def main():
                 operations.emit(operations.queue_metrics(), 'observer', os.environ['ENVIRONMENT'])
                 time.sleep(30)
         elif service == 'verifier':
-            result = operations.recovery_snapshot(os.environ['CONTROL_DSN'], os.environ['REMOTE_DSN'])
+            result = operations.runtime_acceptance_snapshot(os.environ['CONTROL_DSN'], os.environ['REMOTE_DSN'])
             # Structured report contains only stable keys/counts/hashes; no customer payload.
             print(json.dumps(result))
             if not result['safe_to_resume']:

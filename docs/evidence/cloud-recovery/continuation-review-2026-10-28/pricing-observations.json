@@ -1,0 +1,61 @@
+{
+  "observed_at": "2026-10-28T17:16:52.336225+00:00",
+  "region": "us-east-2",
+  "scope": "Read-only AWS Pricing API observations; not incurred charges",
+  "prices": [
+    {
+      "service": "AmazonRDS",
+      "sku": "GGD6FE59WWUNDKDC",
+      "unit": "Hrs",
+      "unit_usd": "0.0160000000",
+      "description": "$ 0.016 per RDS db.t4g.micro Single-AZ instance hour (or partial hour) running PostgreSQL",
+      "effective_date": "2026-10-01T00:00:00Z",
+      "request_id": "61c6d53a-8ef0-4e16-9f14-1554d1f3cd3a"
+    },
+    {
+      "service": "AmazonRDS",
+      "sku": "JQQGK6D789TWJF8B",
+      "unit": "GB-Mo",
+      "unit_usd": "0.1150000000",
+      "description": "$0.115 per GB-month of provisioned GP3 storage running PostgreSQL",
+      "effective_date": "2026-10-01T00:00:00Z",
+      "request_id": "f9f08817-984a-4db0-a5f8-79874af940f7"
+    },
+    {
+      "service": "AmazonRDS",
+      "sku": "HQRQUXJ6DAN3XS6X",
+      "unit": "GB-Mo",
+      "unit_usd": "0.0950000000",
+      "description": "$0.095 per additional GB-month of backup storage exceeding free allocation running PostgreSQL",
+      "effective_date": "2026-10-01T00:00:00Z",
+      "request_id": "644f0a76-04f5-40bb-b31b-49a7d6d0fbd4"
+    },
+    {
+      "service": "AmazonECS",
+      "sku": "UGSJ89BUWB7SMJ6A",
+      "unit": "hours",
+      "unit_usd": "0.0404800000",
+      "description": "AWS Fargate - vCPU  - US East 2 (Ohio)",
+      "effective_date": "2026-10-01T00:00:00Z",
+      "request_id": "4203d208-59e7-4ca7-8f38-2bc99c097f6e"
+    },
+    {
+      "service": "AmazonECS",
+      "sku": "HH5EE3ZFWSFKGKWM",
+      "unit": "hours",
+      "unit_usd": "0.0044450000",
+      "description": "AWS Fargate - Memory  - US East 2 (Ohio)",
+      "effective_date": "2026-10-01T00:00:00Z",
+      "request_id": "b337a37b-4721-4ba7-80a1-0606e72fd5e3"
+    },
+    {
+      "service": "AmazonVPC",
+      "sku": "P2Q7Y6KZKKFAHEVG",
+      "unit": "Hrs",
+      "unit_usd": "0.0100000000",
+      "description": "$0.01 per VPC Endpoint Hour",
+      "effective_date": "2026-10-01T00:00:00Z",
+      "request_id": "a64398a9-8c87-42f8-b2b6-ce9d95e3a107"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "observed_at": "2026-10-28T01:26:52.072262+00:00",
+  "scope": "Controlled corruption of private copies only; original records unchanged; no AWS calls",
+  "checker_source_sha256": "6c5e2e8cd2d9d5988bc170985b3a64fb080fba9ed9c3a5d78a0f95ce0aa14ca6",
+  "cases": [
+    {
+      "case": "changed_artifact",
+      "observed_rejection": "recovery_artifact_integrity_failure",
+      "status": "passed"
+    },
+    {
+      "case": "unlisted_artifact",
+      "observed_rejection": "recovery_manifest_file_set_mismatch",
+      "status": "passed"
+    },
+    {
+      "case": "false_source_binding",
+      "observed_rejection": "executed_source_binding_failure",
+      "status": "passed"
+    }
+  ]
+}

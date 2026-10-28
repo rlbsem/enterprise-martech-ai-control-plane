@@ -15,6 +15,14 @@ from .native_retained import RetainedRecovery, STRATEGY
 
 
 def validate_manifest(m):
+    if m.get("acceptance_workflow", "sql-fixture-v1") not in {"sql-fixture-v1", "application-recovery-v1"}:
+        raise ValueError("Unknown versioned acceptance workflow")
+    if m.get("acceptance_workflow") == "application-recovery-v1" and m.get("recovery_strategy") != STRATEGY:
+        raise ValueError("Application recovery requires the retained two-instance strategy")
+    if m.get("acceptance_workflow") == "application-recovery-v1" and not re.fullmatch("[a-f0-9]{40}", m.get("commit", "")):
+        raise ValueError("Application recovery requires an exact source commit")
+    if m.get("acceptance_workflow") == "application-recovery-v1" and m.get("application_protocol") != "source-preflight-v2":
+        raise ValueError("Current source-preflight-v2 application protocol required")
     if m["region"] != "us-east-2" or not re.fullmatch("[a-z0-9]{8,16}", m["run"]):
         raise ValueError("Ohio acceptance run required")
     if not re.fullmatch("[0-9]{12}", m["account"]):
@@ -25,13 +33,19 @@ def validate_manifest(m):
         raise ValueError("Isolated acceptance database name required")
     prefix = "csa-native-" + m["run"]
     if m.get("recovery_strategy") is not None:
-        if (m["recovery_strategy"] != STRATEGY or m.get("maximum_concurrent_instances") != 2
-                or m.get("source_deletion_scope") != "disposable_synthetic_control_only"
-                or m.get("verification_contract") != "receipt-ledger-sha256-v1"
-                or m.get("guard_bucket") != f"{prefix}-guard-{m['account']}"
-                or not re.fullmatch(f"arn:aws:kms:us-east-2:{m['account']}:key/[a-f0-9-]{{36}}",
-                                    m.get("guard_key", ""))):
-            raise ValueError("Explicit retained-backup protocol, private guard and two-instance bound required")
+        if (
+            m["recovery_strategy"] != STRATEGY
+            or m.get("maximum_concurrent_instances") != 2
+            or m.get("source_deletion_scope") != "disposable_synthetic_control_only"
+            or m.get("verification_contract") != "receipt-ledger-sha256-v1"
+            or m.get("guard_bucket") != f"{prefix}-guard-{m['account']}"
+            or not re.fullmatch(
+                f"arn:aws:kms:us-east-2:{m['account']}:key/[a-f0-9-]{{36}}", m.get("guard_key", "")
+            )
+        ):
+            raise ValueError(
+                "Explicit retained-backup protocol, private guard and two-instance bound required"
+            )
     if m["control_db"] != prefix + "-control" or m["downstream_db"] != prefix + "-receipts":
         raise ValueError("Independent exact database identities required")
     if m["cluster"] != f"arn:aws:ecs:us-east-2:{m['account']}:cluster/{prefix}":
@@ -61,10 +75,13 @@ class NativeRun:
         self.allow_source_deletion, self.checkpoint_dir = allow_source_deletion, checkpoint_dir
         self.writes_frozen = False
         if manifest.get("recovery_strategy") == STRATEGY and (
-            not allow_source_deletion or checkpoint_dir is None
+            not allow_source_deletion
+            or checkpoint_dir is None
             or not Path(checkpoint_dir).resolve().is_relative_to(Path.cwd().resolve() / ".local")
         ):
-            raise ValueError("Retained recovery requires separate deletion approval and private .local checkpoints")
+            raise ValueError(
+                "Retained recovery requires separate deletion approval and private .local checkpoints"
+            )
 
     def gate(self):
         return armed_gate(self.m, self.c)
@@ -80,8 +97,69 @@ class NativeRun:
             ):
                 raise RuntimeError("Write-capable tasks are not quiescent")
 
+    def preserve_task_observation(self, name, arn, task, events, log_error=None, *, expected_exit=0,
+                                  request_receipts=None, phase="stopped"):
+        """Persist private diagnostics before accepting or rejecting a stopped task.
+
+        Raw task metadata/logs stay in the private checkpoint and encrypted guard
+        archive. Public result records contain only hashes and finite status data.
+        A failed archive cannot turn a failed task into successful acceptance.
+        """
+        observation = {
+            "task": name,
+            "task_reference": hashlib.sha256(arn.encode()).hexdigest(),
+            "last_status": task.get("lastStatus"),
+            "phase": phase,
+            "stop_code": task.get("stopCode"),
+            "expected_exit": expected_exit,
+            "expected_image_digest": self.m["image"].split("@")[-1],
+            "containers": [
+                {k: container.get(k) for k in ("name", "exitCode", "imageDigest")}
+                for container in task.get("containers", [])
+            ],
+            "log_read_error": log_error,
+            "logs_truncated": len(events) >= 1000,
+        }
+        self.records.append({"task_observation": observation})
+        if self.checkpoint_dir is None:
+            return
+        raw = json.dumps(
+            {"observed_at": datetime.now(UTC).isoformat(), "task": task, "events": events,
+             "expectations": {"task_arn": arn, "task_definition": self.m["tasks"][name],
+                              "expected_exit": expected_exit, "image": self.m["image"]},
+             "execution_binding": {"runtime_manifest": self.m,
+                 "controller_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()},
+             "aws_request_receipts": request_receipts or {}},
+            sort_keys=True,
+            default=str,
+        ).encode()
+        sha = hashlib.sha256(raw).hexdigest()
+        directory = Path(self.checkpoint_dir)
+        directory.mkdir(parents=True, exist_ok=True)
+        target = directory / ("task-observation-" + sha + ".json")
+        with target.open("xb") as stream:
+            stream.write(raw)
+        if target.read_bytes() != raw:
+            raise RuntimeError("Task diagnostic private readback failed")
+        key = "task-observations/" + sha + ".json"
+        self.c["s3"].put_object(
+            Bucket=self.m["guard_bucket"], Key=key, Body=raw, IfNoneMatch="*",
+            ServerSideEncryption="aws:kms", SSEKMSKeyId=self.m["guard_key"],
+        )
+        with self.c["s3"].get_object(Bucket=self.m["guard_bucket"], Key=key)["Body"] as stream:
+            if stream.read(len(raw) + 1) != raw:
+                raise RuntimeError("Task diagnostic cloud readback failed")
+        observation["private_archive_sha256"] = sha
+
     def task(self, name, *, extra=None, expected_exit=0):
-        if self.writes_frozen and name != "verify":
+        application = self.m.get("acceptance_workflow") == "application-recovery-v1"
+        preflight = application and name == "receipt" and extra == {"RECOVERY_PHASE": "source-preflight"}
+        maintenance = (
+            application
+            and name == "receipt"
+            and set(extra or {}) == {"RESTORED_HOST", "SOURCE_DATABASE", "RECOVERY_POINT", "RECOVERY_PHASE"}
+        )
+        if self.writes_frozen and name != "verify" and not maintenance:
             raise RuntimeError("Writers are frozen for retained recovery")
         self.gate()
         self.drained()
@@ -93,10 +171,37 @@ class NativeRun:
             or containers[0]["image"] != self.m["image"]
             or containers[0].get("entryPoint")
             or containers[0]["name"] != name
-            or containers[0]["command"] != ["python", "-m", "controlplane.native_tasks", name]
+            or containers[0]["command"]
+            != [
+                "python",
+                "-m",
+                "controlplane.native_app_tasks" if application else "controlplane.native_tasks",
+                name,
+            ]
         ):
             raise RuntimeError("Task content differs from approved image/command")
         allowed = {"FIXTURE_JSON"} if name == "receipt" else {"RESTORED_HOST"} if name == "verify" else set()
+        if application:
+            allowed = (
+                {"RESTORED_HOST", "SOURCE_DATABASE", "RECOVERY_POINT", "RECOVERY_PHASE"}
+                if name == "receipt"
+                else {"RESTORED_HOST"}
+                if name == "verify"
+                else set()
+            )
+            if name == "receipt" and (
+                not preflight and (not maintenance
+                or extra["RECOVERY_PHASE"] not in {"behind", "matching"}
+                or not re.fullmatch("[a-f0-9]{64}", extra["SOURCE_DATABASE"]))
+            ):
+                raise ValueError("Exact application recovery maintenance binding required")
+            if extra and "RESTORED_HOST" in extra:
+                if self.database(self.prefix + "-restore")["Endpoint"]["Address"] != extra["RESTORED_HOST"]:
+                    raise ValueError("Restored endpoint differs from independently observed RDS target")
+            if name == "receipt" and not preflight:
+                point = datetime.fromisoformat(extra["RECOVERY_POINT"])
+                if point.tzinfo is None or point > datetime.now(UTC):
+                    raise ValueError("Aware historical recovery point required")
         if set(extra or {}) - allowed:
             raise ValueError("Unexpected task override")
         kwargs = dict(
@@ -119,38 +224,87 @@ class NativeRun:
                     {"name": name, "environment": [{"name": k, "value": v} for k, v in extra.items()]}
                 ]
             }
-        launched = ecs.run_task(**kwargs)
+        kwargs["clientToken"] = hashlib.sha256(json.dumps(
+            {"run": self.m["run"], "task": name, "definition": self.m["tasks"][name],
+             "extra": extra, "expected_exit": expected_exit}, sort_keys=True).encode()).hexdigest()
+        kwargs["startedBy"] = self.prefix
+        try:
+            launched = ecs.run_task(**kwargs)
+        except Exception as exc:
+            response = getattr(exc, "response", {})
+            self.preserve_task_observation(name, "unconfirmed-" + kwargs["clientToken"], {}, [],
+                {"error_type": type(exc).__name__, "aws_code": response.get("Error", {}).get("Code")},
+                expected_exit=expected_exit, phase="launch_failed",
+                request_receipts={"RunTask": response.get("ResponseMetadata", {})})
+            raise
         tasks = launched.get("tasks", [])
         if launched.get("failures") or len(tasks) != 1:
+            self.preserve_task_observation(name, "unconfirmed-" + kwargs["clientToken"],
+                {"tasks": tasks, "launch_failures": launched.get("failures", [])}, [],
+                expected_exit=expected_exit, phase="launch_incomplete",
+                request_receipts={"RunTask": launched.get("ResponseMetadata", {})})
             for task in tasks:
                 ecs.stop_task(
                     cluster=self.m["cluster"], task=task["taskArn"], reason="Partial native launch rejected"
                 )
             raise RuntimeError("Native launch incomplete")
         arn = tasks[0]["taskArn"]
+        self.preserve_task_observation(name, arn, tasks[0], [], expected_exit=expected_exit,
+                                      request_receipts={"RunTask": launched.get("ResponseMetadata", {})},
+                                      phase="launched")
         try:
             ecs.get_waiter("tasks_stopped").wait(
                 cluster=self.m["cluster"], tasks=[arn], WaiterConfig={"Delay": 10, "MaxAttempts": 60}
             )
-        except Exception:
-            ecs.stop_task(cluster=self.m["cluster"], task=arn, reason="Bounded native task wait expired")
+        except Exception as exc:
+            try:
+                stopped = ecs.stop_task(cluster=self.m["cluster"], task=arn, reason="Bounded native task wait expired")
+            except Exception as stop_error:
+                response = getattr(stop_error, "response", {})
+                self.preserve_task_observation(name, arn, tasks[0], [],
+                    {"error_type": type(stop_error).__name__, "aws_code": response.get("Error", {}).get("Code")},
+                    expected_exit=expected_exit, phase="wait_failed_stop_failed",
+                    request_receipts={"StopTask": response.get("ResponseMetadata", {})})
+                raise
+            self.preserve_task_observation(name, arn, stopped.get("task", {}), [],
+                {"error_type": type(exc).__name__, "aws_code": getattr(exc, "response", {}).get("Error", {}).get("Code")},
+                expected_exit=expected_exit, phase="wait_failed_stop_requested",
+                request_receipts={"StopTask": stopped.get("ResponseMetadata", {})})
             raise RuntimeError("Task stop requested; independently confirm termination") from None
-        task = ecs.describe_tasks(cluster=self.m["cluster"], tasks=[arn])["tasks"][0]
+        described = ecs.describe_tasks(cluster=self.m["cluster"], tasks=[arn])
+        tasks = described.get("tasks", [])
+        task = tasks[0] if len(tasks) == 1 else {"containers": [], "describe_failures": described.get("failures", [])}
+        events, log_error, log_receipt = [], None, {}
+        try:
+            logged = self.c["logs"].get_log_events(
+                logGroupName=f"/csa-native/{self.m['run']}/{name}",
+                logStreamName=f"task/{name}/" + arn.rsplit("/", 1)[-1],
+                startFromHead=True,
+                limit=1000,
+            )
+            events, log_receipt = logged["events"], logged.get("ResponseMetadata", {})
+        except Exception as exc:
+            log_error = {
+                "error_type": type(exc).__name__,
+                "aws_code": getattr(exc, "response", {}).get("Error", {}).get("Code"),
+                "request_id": getattr(exc, "response", {}).get("ResponseMetadata", {}).get("RequestId"),
+            }
+        self.preserve_task_observation(name, arn, task, events, log_error, expected_exit=expected_exit,
+            request_receipts={"RunTask": launched.get("ResponseMetadata", {}),
+                              "DescribeTasks": described.get("ResponseMetadata", {}),
+                              "GetLogEvents": log_receipt})
+        self.gate()  # A completed task cannot revive an expired execution window.
         if (
-            task["taskArn"] != arn
-            or task["lastStatus"] != "STOPPED"
-            or task["taskDefinitionArn"] != self.m["tasks"][name]
+            task.get("taskArn") != arn
+            or task.get("lastStatus") != "STOPPED"
+            or task.get("taskDefinitionArn") != self.m["tasks"][name]
             or len(task["containers"]) != 1
-            or task["containers"][0]["exitCode"] != expected_exit
-            or task["containers"][0]["imageDigest"] != self.m["image"].split("@")[1]
+            or task["containers"][0].get("exitCode") != expected_exit
+            or task["containers"][0].get("imageDigest") != self.m["image"].split("@")[1]
         ):
             raise RuntimeError("Stopped task identity/image/exit mismatch")
-        events = self.c["logs"].get_log_events(
-            logGroupName=f"/csa-native/{self.m['run']}/{name}",
-            logStreamName=f"task/{name}/" + arn.rsplit("/", 1)[-1],
-            startFromHead=True,
-            limit=1000,
-        )["events"]
+        if log_error:
+            raise RuntimeError("Stopped task logs unavailable; acceptance refused")
         results = []
         for event in events:
             try:
@@ -190,14 +344,15 @@ class NativeRun:
         return db
 
     def restorable_window(self, source):
-        response = self.c["rds"].describe_db_instance_automated_backups(
-            DbiResourceId=source["DbiResourceId"]
-        )
+        response = self.c["rds"].describe_db_instance_automated_backups(DbiResourceId=source["DbiResourceId"])
         rows = response.get("DBInstanceAutomatedBackups", [])
         if not rows:
             return None
-        if (len(rows) != 1 or rows[0]["DbiResourceId"] != source["DbiResourceId"]
-                or rows[0]["DBInstanceIdentifier"] != source["DBInstanceIdentifier"]):
+        if (
+            len(rows) != 1
+            or rows[0]["DbiResourceId"] != source["DbiResourceId"]
+            or rows[0]["DBInstanceIdentifier"] != source["DBInstanceIdentifier"]
+        ):
             raise RuntimeError("Automated backup identity mismatch")
         backup = rows[0]
         if backup["Status"] != "active":
@@ -207,19 +362,23 @@ class NativeRun:
         instance_latest = source.get("LatestRestorableTime")
         if earliest is None or latest is None or instance_latest is None:
             return None
-        if any(not isinstance(t, datetime) or t.tzinfo is None
-               for t in (earliest, latest, instance_latest)):
+        if any(not isinstance(t, datetime) or t.tzinfo is None for t in (earliest, latest, instance_latest)):
             raise RuntimeError("Aware service restore timestamps required")
         latest = min(latest, instance_latest)
         if earliest > latest:
             return None
         return {
-            "earliest": earliest, "latest": latest,
+            "earliest": earliest,
+            "latest": latest,
             "backup_reference": hashlib.sha256(backup["DBInstanceAutomatedBackupsArn"].encode()).hexdigest(),
             "request_id": response["ResponseMetadata"]["RequestId"],
         }
 
     def run(self):
+        if self.m.get("acceptance_workflow") == "application-recovery-v1":
+            from .native_application import ApplicationRecovery
+
+            return ApplicationRecovery(self).execute()
         self.gate()
         original = self.database(self.m["control_db"])
         independent = self.database(self.m["downstream_db"])
@@ -287,13 +446,17 @@ class NativeRun:
             raise RuntimeError("PITR availability deadline exceeded")
         if row.get("BackupRetentionPeriod") != self.m["backup_retention_days"]:
             self.c["rds"].modify_db_instance(
-                DBInstanceIdentifier=target, BackupRetentionPeriod=self.m["backup_retention_days"],
+                DBInstanceIdentifier=target,
+                BackupRetentionPeriod=self.m["backup_retention_days"],
                 ApplyImmediately=True,
             )
         for _ in range(60):
             self.gate()
             observed = self.c["rds"].describe_db_instances(DBInstanceIdentifier=target)["DBInstances"][0]
-            if observed["DBInstanceStatus"] == "available" and observed.get("BackupRetentionPeriod") == self.m["backup_retention_days"]:
+            if (
+                observed["DBInstanceStatus"] == "available"
+                and observed.get("BackupRetentionPeriod") == self.m["backup_retention_days"]
+            ):
                 break
             time.sleep(15)
         else:
@@ -349,17 +512,23 @@ def main():
         name: s.client(name, region_name="us-east-1" if name == "freetier" else "us-east-2")
         for name in ("sts", "freetier", "ecs", "rds", "logs", "scheduler", "lambda", "s3", "kms")
     }
-    runner = NativeRun(m, c, allow_source_deletion=a.approve_retained_source_deletion,
-                       checkpoint_dir=a.private_checkpoints)
+    runner = NativeRun(
+        m, c, allow_source_deletion=a.approve_retained_source_deletion, checkpoint_dir=a.private_checkpoints
+    )
     if a.private_checkpoints:
         if not a.private_checkpoints.resolve().is_relative_to(Path.cwd().resolve() / ".local"):
             p.error("Request receipt logs require a private .local directory")
         a.private_checkpoints.mkdir(parents=True, exist_ok=True)
 
         def receipt(http_response, parsed, model, **kwargs):
-            row = {"at": datetime.now(UTC).isoformat(), "service": model.service_model.service_name,
-                   "operation": model.name, "request_id": parsed.get("ResponseMetadata", {}).get("RequestId"),
-                   "http_status": http_response.status_code, "error_code": parsed.get("Error", {}).get("Code")}
+            row = {
+                "at": datetime.now(UTC).isoformat(),
+                "service": model.service_model.service_name,
+                "operation": model.name,
+                "request_id": parsed.get("ResponseMetadata", {}).get("RequestId"),
+                "http_status": http_response.status_code,
+                "error_code": parsed.get("Error", {}).get("Code"),
+            }
             with (a.private_checkpoints / "aws-request-receipts.jsonl").open("a") as stream:
                 stream.write(json.dumps(row) + "\n")
 
@@ -379,8 +548,16 @@ def main():
     a.output.parent.mkdir(parents=True, exist_ok=True)
     a.output.write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps({"status": result["status"]}))
-    return 0 if result["status"] in {"NATIVE_SQL_PITR_ACCEPTANCE_PASSED",
-                                    "NATIVE_RETAINED_SQL_PITR_ACCEPTANCE_PASSED"} else 1
+    return (
+        0
+        if result["status"]
+        in {
+            "NATIVE_SQL_PITR_ACCEPTANCE_PASSED",
+            "NATIVE_RETAINED_SQL_PITR_ACCEPTANCE_PASSED",
+            "NATIVE_APPLICATION_RECOVERY_ACCEPTANCE_PASSED",
+        }
+        else 1
+    )
 
 
 if __name__ == "__main__":

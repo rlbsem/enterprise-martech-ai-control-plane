@@ -1,0 +1,6 @@
+{
+  "source_commit": "8579b7c88165f5d88c233c4bbdb8da4b472e2a40",
+  "verification_sha256": "4317b7429e93c4bbf4cfb27fc169ff55dd7ebb26fe18caa873009e83537c2723",
+  "source_files_verified": 21,
+  "scope": "Exact executed local/static source; not native AWS acceptance of subsequent code"
+}

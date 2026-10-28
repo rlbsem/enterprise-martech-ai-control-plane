@@ -11,13 +11,16 @@ def account_gate(manifest, clients):
     if clients["sts"].get_caller_identity()["Account"] != manifest["account"]:
         raise RuntimeError("Wrong account")
     state = clients["freetier"].get_account_plan_state()
+    required = 20 if manifest.get("acceptance_workflow") == "application-recovery-v1" else 5
+    if required == 20 and state["accountPlanRemainingCredits"].get("unit") != "USD":
+        raise RuntimeError("USD credit headroom required for application recovery")
     if (
         state["accountPlanType"] != "FREE"
         or state["accountPlanStatus"] != "ACTIVE"
         or not math.isfinite(float(state["accountPlanRemainingCredits"]["amount"]))
-        or float(state["accountPlanRemainingCredits"]["amount"]) < 5
+        or float(state["accountPlanRemainingCredits"]["amount"]) < required
     ):
-        raise RuntimeError("Active Free plan with five-credit headroom required")
+        raise RuntimeError(f"Active Free plan with {required}-credit headroom required")
 
 
 def armed_gate(manifest, clients):

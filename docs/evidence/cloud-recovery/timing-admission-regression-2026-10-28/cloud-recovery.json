@@ -1,0 +1,398 @@
+{
+  "schema": "cloud-recovery-local.v1",
+  "synthetic": true,
+  "aws_execution": false,
+  "snapshot_mechanism": "PostgreSQL CREATE DATABASE TEMPLATE; not WAL or native RDS PITR",
+  "deployment_revision": "94af18cec52ab70fafee1462fd515832657b9c0f1941a798cacfb51f4071bb39",
+  "scenarios": {
+    "A_remote_ahead": {
+      "status": "passed",
+      "verification": {
+        "proof_id": "a1bfb08c-db49-478c-9bfe-79577ddba32a",
+        "safe_to_resume": false,
+        "local_intents": 3,
+        "remote_effects": 5,
+        "findings": [
+          {
+            "key": "2b13fd3a-a6f4-479f-a478-33b1c1edfb64",
+            "reason": "remote_ahead_missing_intent"
+          },
+          {
+            "key": "675938d8-e821-48a6-b664-03b518de0159",
+            "reason": "remote_ahead_missing_intent"
+          }
+        ],
+        "snapshot_hash": "8f0db2b09f7e470479f92be891253bd99a328b69f5dcfc87932062d18c4db4e0",
+        "observed_at": "2026-10-28T18:26:01.348278+00:00",
+        "scope": "quiesced databases; no changes or replay performed",
+        "control_fingerprint": "d7df156c44dee244eea08442bc786564e29477786098b3186104e1787855f44d",
+        "binding_hash": "49dec84afa12e6dc9fb182b42126024d91857f8e54d86404ba29d7cb95018b3b",
+        "quiescence": {
+          "quiescent": true,
+          "observed_at": "2026-10-28T18:26:01.304260+00:00",
+          "registered_runtime": [
+            {
+              "service": "api",
+              "pid": 49528,
+              "exited": true
+            }
+          ]
+        },
+        "policy_hash": "f6360ddf381e1f14bd52be2d5cf3163fe39bc8034a7371f3321568a8d8646c39"
+      },
+      "resume_refused": "fresh_safe_proof_required",
+      "worker_claimed": false,
+      "missing_restored_intents": 2
+    },
+    "D_mutation_conflict": {
+      "status": "passed",
+      "verification": {
+        "proof_id": "17ef8302-1d7c-4148-9964-156e73114d0c",
+        "safe_to_resume": false,
+        "local_intents": 5,
+        "remote_effects": 5,
+        "findings": [
+          {
+            "key": "06ff3fce-e6b8-41f7-bb8f-bca822a97b6b",
+            "reason": "remote_identity_conflict"
+          }
+        ],
+        "snapshot_hash": "dea5ac28e4e6064388c23bdf9aa17a7b1efe3b1bd3db652b557c30fcdc8f8658",
+        "observed_at": "2026-10-28T18:26:03.142206+00:00",
+        "scope": "quiesced databases; no changes or replay performed",
+        "control_fingerprint": "72b88c61076a6a64efc8f8964dd3c1c88db28d9927d3eab8cf008492517463b7",
+        "binding_hash": "352ee514b28a48a2c20b3ac73f60d740628777832bfa408edf277f3908a06d3c",
+        "quiescence": {
+          "quiescent": true,
+          "observed_at": "2026-10-28T18:26:03.077671+00:00",
+          "registered_runtime": [
+            {
+              "service": "api",
+              "pid": 29236,
+              "exited": true
+            }
+          ]
+        },
+        "policy_hash": "f6360ddf381e1f14bd52be2d5cf3163fe39bc8034a7371f3321568a8d8646c39"
+      },
+      "independent_original_preserved": true
+    },
+    "E_missing_acknowledged_receipt": {
+      "status": "passed",
+      "verification": {
+        "proof_id": "bf57cd5d-7b7a-484e-b4fb-27c23bb7a8a4",
+        "safe_to_resume": false,
+        "local_intents": 5,
+        "remote_effects": 4,
+        "findings": [
+          {
+            "key": "06ff3fce-e6b8-41f7-bb8f-bca822a97b6b",
+            "reason": "acknowledged_receipt_missing"
+          }
+        ],
+        "snapshot_hash": "f7115340061f264f9d72b6a901c8874ea82901ea93e265e227e4b665b7410526",
+        "observed_at": "2026-10-28T18:26:04.902310+00:00",
+        "scope": "quiesced databases; no changes or replay performed",
+        "control_fingerprint": "e50a159ee8e10ec37d054c13ab56173579a44c2ed01a9f074842f1ceea327d39",
+        "binding_hash": "93bf409e8e8712b75897454e4129303962b72779b726d64b2c62f80334a9e594",
+        "quiescence": {
+          "quiescent": true,
+          "observed_at": "2026-10-28T18:26:04.846583+00:00",
+          "registered_runtime": [
+            {
+              "service": "api",
+              "pid": 53560,
+              "exited": true
+            }
+          ]
+        },
+        "policy_hash": "f6360ddf381e1f14bd52be2d5cf3163fe39bc8034a7371f3321568a8d8646c39"
+      },
+      "fault_scope": "Deleted one receipt only from a separate negative-test copy; original receiver unchanged"
+    },
+    "H_stale_approval": {
+      "status": "passed",
+      "prior_proof": "5c2ae9c9-17ac-4f1d-bda3-8106c6663a1c",
+      "refusal": "recovery_evidence_changed",
+      "gate_remained_closed": true
+    },
+    "B_lost_acknowledgment": {
+      "status": "passed",
+      "key": "189c287e-787c-4897-90bb-1e5346d0c9e3",
+      "sender": {
+        "reason": "reconciled_committed_effect",
+        "uncertain": false,
+        "status": "succeeded"
+      },
+      "original_effect_count": 1,
+      "independent_receipt_recovered": true
+    },
+    "C_killed_worker": {
+      "status": "passed",
+      "key": "f1cd8671-2c37-4b1f-b327-4a3fbb14455f",
+      "terminated_pid": 21828,
+      "old_completion_accepted": false,
+      "replacement": {
+        "reason": "reconciled_committed_effect",
+        "status": "succeeded"
+      },
+      "original_effect_count": 1,
+      "lease_boundary": "Original process was terminated; its real one-second lease expired without rewriting the deadline"
+    },
+    "F_current_authority": {
+      "status": "passed",
+      "restored_permission_refresh_required": {
+        "proof_id": "23b8b9a3-5a37-4651-885e-649d215810c7",
+        "safe_to_resume": false,
+        "local_intents": 5,
+        "remote_effects": 5,
+        "findings": [
+          {
+            "key": "4974a8e2-6685-409c-8a83-7b0cd67da960",
+            "reason": "current_authority_refresh_missing",
+            "field": "consent"
+          },
+          {
+            "key": "4974a8e2-6685-409c-8a83-7b0cd67da960",
+            "reason": "current_authority_refresh_missing",
+            "field": "suppressed"
+          },
+          {
+            "key": "8e394a23-5e7e-4e13-911c-a7383ac000dd",
+            "reason": "current_authority_refresh_missing",
+            "field": "consent"
+          },
+          {
+            "key": "8e394a23-5e7e-4e13-911c-a7383ac000dd",
+            "reason": "current_authority_refresh_missing",
+            "field": "suppressed"
+          },
+          {
+            "key": "d3b66395-4f4b-4535-8d8d-401f15143a83",
+            "reason": "current_authority_refresh_missing",
+            "field": "consent"
+          },
+          {
+            "key": "d3b66395-4f4b-4535-8d8d-401f15143a83",
+            "reason": "current_authority_refresh_missing",
+            "field": "suppressed"
+          }
+        ],
+        "snapshot_hash": "a8cba948b14080fc920ef1606e116d39ed36c0f3a92f8939084a99ad27fa9869",
+        "observed_at": "2026-10-28T18:26:05.495258+00:00",
+        "scope": "quiesced databases; no changes or replay performed",
+        "control_fingerprint": "fd8f48f87cce354900d0f316d028bce64fc0664e1c45116745121517faba5a36",
+        "binding_hash": "4f25f93fd70dd0d7822e503cb207046477b86d71f01e206ee33f426bc851a0d8",
+        "quiescence": {
+          "quiescent": true,
+          "observed_at": "2026-10-28T18:26:05.431257+00:00",
+          "registered_runtime": []
+        },
+        "policy_hash": "f6360ddf381e1f14bd52be2d5cf3163fe39bc8034a7371f3321568a8d8646c39"
+      },
+      "new_dispatch": {
+        "id": "45aecc0e-6bc8-486b-bc3c-5c06e111ff17",
+        "decision": "deny",
+        "reason": "consent_missing_or_revoked"
+      },
+      "historical_committed_effect_still_recognized": true
+    },
+    "G_safe_resumption": {
+      "status": "passed",
+      "approval_proof": {
+        "proof_id": "9df606d1-02d2-4a2a-9702-253713e82f21",
+        "safe_to_resume": true,
+        "local_intents": 5,
+        "remote_effects": 5,
+        "findings": [],
+        "snapshot_hash": "a8cba948b14080fc920ef1606e116d39ed36c0f3a92f8939084a99ad27fa9869",
+        "observed_at": "2026-10-28T18:26:08.050373+00:00",
+        "scope": "quiesced databases; no changes or replay performed",
+        "control_fingerprint": "d3f7d21ca7d48549cd436d3ffdc438807cf06376723ae9d480ffd2279d448e3a",
+        "binding_hash": "4f25f93fd70dd0d7822e503cb207046477b86d71f01e206ee33f426bc851a0d8",
+        "quiescence": {
+          "quiescent": true,
+          "observed_at": "2026-10-28T18:26:07.985335+00:00",
+          "registered_runtime": [
+            {
+              "service": "api",
+              "pid": 16740,
+              "exited": true
+            },
+            {
+              "service": "api",
+              "pid": 52900,
+              "exited": true
+            },
+            {
+              "service": "worker",
+              "pid": 40632,
+              "exited": true
+            }
+          ]
+        },
+        "policy_hash": "f6360ddf381e1f14bd52be2d5cf3163fe39bc8034a7371f3321568a8d8646c39"
+      },
+      "resume": {
+        "resumed": true,
+        "fresh_comparison": {
+          "safe_to_resume": true,
+          "local_intents": 5,
+          "remote_effects": 5,
+          "findings": [],
+          "snapshot_hash": "a8cba948b14080fc920ef1606e116d39ed36c0f3a92f8939084a99ad27fa9869",
+          "observed_at": "2026-10-28T18:26:08.369145+00:00",
+          "scope": "quiesced databases; no changes or replay performed",
+          "control_fingerprint": "d3f7d21ca7d48549cd436d3ffdc438807cf06376723ae9d480ffd2279d448e3a",
+          "binding_hash": "4f25f93fd70dd0d7822e503cb207046477b86d71f01e206ee33f426bc851a0d8",
+          "quiescence": {
+            "quiescent": true,
+            "observed_at": "2026-10-28T18:26:08.303450+00:00",
+            "registered_runtime": [
+              {
+                "service": "api",
+                "pid": 16740,
+                "exited": true
+              },
+              {
+                "service": "api",
+                "pid": 52900,
+                "exited": true
+              },
+              {
+                "service": "worker",
+                "pid": 40632,
+                "exited": true
+              }
+            ]
+          },
+          "policy_hash": "f6360ddf381e1f14bd52be2d5cf3163fe39bc8034a7371f3321568a8d8646c39"
+        },
+        "deployment_revision": "94af18cec52ab70fafee1462fd515832657b9c0f1941a798cacfb51f4071bb39"
+      },
+      "post_resume": {
+        "safe_to_resume": true,
+        "local_intents": 6,
+        "remote_effects": 6,
+        "findings": [],
+        "snapshot_hash": "363ddbab59dde922021a911aa60da8f0fe62f253efbd87bbb6624b8579794752",
+        "observed_at": "2026-10-28T18:26:12.403285+00:00",
+        "scope": "quiesced databases; no changes or replay performed"
+      },
+      "independent_effects_before": 5,
+      "independent_effects_after": 6,
+      "duplicate_business_effects": 0,
+      "independent_database_identity_unchanged": true,
+      "resumption_to_verified_seconds": 4.258154499999364
+    }
+  },
+  "status": "passed",
+  "original_intents": 5,
+  "original_independent_effects": 5,
+  "independent_final_effects": 6,
+  "elapsed_seconds": 20.068339500008733,
+  "checkpoints": [
+    {
+      "at": "2026-10-28T18:25:57.683090+00:00",
+      "local_intents": 3
+    },
+    {
+      "at": "2026-10-28T18:25:59.736106+00:00",
+      "local_intents": 5
+    }
+  ],
+  "independent_receipts": [
+    {
+      "key": "06ff3fce-e6b8-41f7-bb8f-bca822a97b6b",
+      "hash": "7616900c80a2b87cef93edc8c0797147d8ece2279dd5461c5916e97e889f7449",
+      "body": {
+        "action": "sync_profile",
+        "payload": {
+          "email": "synthetic0@example.test",
+          "lifecycle": "Opportunity"
+        },
+        "revision": 3,
+        "customer_id": "4974a8e2-6685-409c-8a83-7b0cd67da960"
+      },
+      "receipt": "09508397-8c74-4490-8878-37f346e9fa11"
+    },
+    {
+      "key": "189c287e-787c-4897-90bb-1e5346d0c9e3",
+      "hash": "14fe5772d02edf83fd86c866a8fa0fdd8b6df7119e2c83daacfbceb0a3d1f98b",
+      "body": {
+        "action": "send_marketing",
+        "payload": {
+          "email": "synthetic1@example.test",
+          "template": "welcome"
+        },
+        "revision": 3,
+        "customer_id": "8e394a23-5e7e-4e13-911c-a7383ac000dd"
+      },
+      "receipt": "0f831427-8532-4a6d-908e-39367622f49e"
+    },
+    {
+      "key": "2b13fd3a-a6f4-479f-a478-33b1c1edfb64",
+      "hash": "7616900c80a2b87cef93edc8c0797147d8ece2279dd5461c5916e97e889f7449",
+      "body": {
+        "action": "sync_profile",
+        "payload": {
+          "email": "synthetic0@example.test",
+          "lifecycle": "Opportunity"
+        },
+        "revision": 3,
+        "customer_id": "4974a8e2-6685-409c-8a83-7b0cd67da960"
+      },
+      "receipt": "56d4b11a-0a31-464f-bf61-4c4572897135"
+    },
+    {
+      "key": "675938d8-e821-48a6-b664-03b518de0159",
+      "hash": "7616900c80a2b87cef93edc8c0797147d8ece2279dd5461c5916e97e889f7449",
+      "body": {
+        "action": "sync_profile",
+        "payload": {
+          "email": "synthetic0@example.test",
+          "lifecycle": "Opportunity"
+        },
+        "revision": 3,
+        "customer_id": "4974a8e2-6685-409c-8a83-7b0cd67da960"
+      },
+      "receipt": "80d53bcb-5ec9-416e-af69-4a6e97f3bec9"
+    },
+    {
+      "key": "902419b9-057b-455e-b404-f44308914550",
+      "hash": "e44a55ebc35942ce103971e73396cfaae581903fbcb7c3d820c92403d4166867",
+      "body": {
+        "action": "sync_profile",
+        "payload": {
+          "email": "synthetic0@example.test",
+          "owner": "changed_owner",
+          "lifecycle": "Opportunity"
+        },
+        "revision": 6,
+        "customer_id": "4974a8e2-6685-409c-8a83-7b0cd67da960"
+      },
+      "receipt": "cc640776-ed5a-4c5a-8b32-b5354d631ca5"
+    },
+    {
+      "key": "f1cd8671-2c37-4b1f-b327-4a3fbb14455f",
+      "hash": "76f59ad5a53d2a207be35747780c9b72adbf51b0212803d800c04c24a7829fc4",
+      "body": {
+        "action": "sync_profile",
+        "payload": {
+          "email": "synthetic2@example.test",
+          "lifecycle": "Opportunity"
+        },
+        "revision": 3,
+        "customer_id": "d3b66395-4f4b-4535-8d8d-401f15143a83"
+      },
+      "receipt": "cef4352d-53e7-4faf-b15b-07df3a3f1116"
+    }
+  ],
+  "boundary": "Isolated PostgreSQL snapshots and HTTP processes; no native AWS or production RPO/RTO claim",
+  "cleanup": {
+    "created_databases": 9,
+    "remaining_generated_databases": 0,
+    "created_roles": 6,
+    "remaining_generated_roles": 0
+  }
+}

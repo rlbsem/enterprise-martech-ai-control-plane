@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 from scripts.check_isolation import check
+from history import historical_source
 
 
 def test_recorded_runs_and_recovered_alerts():
@@ -27,7 +28,7 @@ def test_recorded_runs_and_recovered_alerts():
         protocol = record["protocol"]
         assert protocol["duration_seconds"] == 300 and protocol["proposals"] == 5000
         for name, expected in protocol["source_sha256"].items():
-            assert hashlib.sha256((root / source_map.get(name, name)).read_bytes()).hexdigest() == expected, (
+            assert hashlib.sha256(historical_source(root, source_map.get(name, name))).hexdigest() == expected, (
                 name
             )
         if protocol["fault"] == "healthy":
@@ -46,7 +47,7 @@ def test_recorded_runs_and_recovered_alerts():
         )
 
 
-def test_corrected_recorded_runs_match_current_runtime():
+def test_corrected_recorded_runs_match_recorded_runtime():
     root = Path(__file__).resolve().parents[1]
     evidence = root / "docs/evidence/dependency-isolation/portability-fix"
     for name in ("runs/artifact-manifest.json", "timeline-manifest.json"):
@@ -68,7 +69,7 @@ def test_corrected_recorded_runs_match_current_runtime():
         assert protocol["duration_seconds"] == 300 and protocol["proposals"] == 5000
         assert protocol["fault"] == ("healthy" if index == 0 else "mixed")
         for source, expected in protocol["source_sha256"].items():
-            assert hashlib.sha256((root / source_map.get(source, source)).read_bytes()).hexdigest() == expected, source
+            assert hashlib.sha256(historical_source(root, source_map.get(source, source))).hexdigest() == expected, source
         cleanup = json.loads((path.parent / "cleanup.json").read_text(encoding="utf-8"))
         assert cleanup["created_databases"] == 3 and cleanup["remaining_generated_databases"] == 0
         if index:
@@ -129,4 +130,4 @@ def test_arrival_review_preserves_all_recorded_bytes_and_runtime():
     assert record["source_commit"] == "b176cf3be3d8f606f0c6729bfc7e37878318a9a3"
     assert record["files"]
     for name, expected in record["files"].items():
-        assert hashlib.sha256((root / name).read_bytes()).hexdigest() == expected, name
+        assert hashlib.sha256(historical_source(root, name)).hexdigest() == expected, name

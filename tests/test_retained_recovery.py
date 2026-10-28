@@ -136,7 +136,7 @@ def fixture(tmp_path, monkeypatch):
     objects = {"inventory/registry.json": b"[]"}
 
     def put(**kwargs):
-        if kwargs["Key"].startswith("recovery/"):
+        if kwargs["Key"].startswith(("recovery/", "execution/")):
             assert kwargs["IfNoneMatch"] == "*" and kwargs["Key"] not in objects
         else:
             assert kwargs["IfMatch"] == "offline-etag"

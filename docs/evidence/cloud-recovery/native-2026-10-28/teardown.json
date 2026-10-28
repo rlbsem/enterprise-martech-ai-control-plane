@@ -1,0 +1,403 @@
+{
+  "schema": "cloud-recovery-teardown.v1",
+  "observed_at": "2026-10-28T15:13:32.408211+00:00",
+  "execution": "Actual AWS Core API calls after local CLI expiry; no renewed CLI session or new provisioning",
+  "runtime_active_resources_absent": true,
+  "guard_active_resources_absent": true,
+  "absence_checks": {
+    "rds.DescribeDBInstances": true,
+    "rds.DescribeDBInstanceAutomatedBackups": true,
+    "rds.DescribeDBSnapshots": true,
+    "rds.DescribeDBSubnetGroups": true,
+    "ecs.ListClusters": true,
+    "ecr.DescribeRepositories": true,
+    "ec2.DescribeVpcEndpoints": true,
+    "ec2.DescribeNetworkInterfaces": true,
+    "logs.DescribeLogGroups": true,
+    "run_parameter_group": true,
+    "lambda.ListFunctions": true,
+    "scheduler.ListSchedules": true,
+    "sqs.ListQueues": true,
+    "cloudwatch.DescribeAlarms": true,
+    "s3.ListBuckets": true,
+    "runtime_and_guard_roles": true,
+    "run_DescribeRouteTables": true,
+    "run_DescribeSecurityGroups": true,
+    "run_DescribeSubnets": true,
+    "run_DescribeVpcs": true
+  },
+  "pending": [
+    {
+      "kind": "key",
+      "reference": "454d6ba9cab70745736417a8b6bcbde7afcf19d16a6c36ad03378b8e716a6f28",
+      "state": "PendingDeletion",
+      "scheduled_deletion_at": "2026-11-04T15:11:45.265000+00:00"
+    },
+    {
+      "kind": "key",
+      "reference": "24e01d6352131ea7eaed003a5a57c76141a62f64cbe6300ed58a9f6f2ce6b9b7",
+      "state": "PendingDeletion",
+      "scheduled_deletion_at": "2026-11-04T04:46:26.618000+00:00"
+    },
+    {
+      "kind": "secret",
+      "reference": "49b8d9d04f46732aa8b9f59c59e72c47b6406b4c5ea5bd40c551bac0b78da255",
+      "state": "pending_deletion",
+      "service_deleted_date_observation": "2026-10-28T04:43:29.583000+00:00",
+      "recovery_window_requested_days": 7,
+      "permanent_deletion_verified": false
+    },
+    {
+      "kind": "secret",
+      "reference": "2b5ad00ed5876130a39ddbf392d71c559d01c2e9de9917bc8f550127f571db75",
+      "state": "pending_deletion",
+      "service_deleted_date_observation": "2026-10-28T04:43:29.644000+00:00",
+      "recovery_window_requested_days": 7,
+      "permanent_deletion_verified": false
+    },
+    {
+      "kind": "secret",
+      "reference": "401c5530f06e0e3ebcb5af8dbbd218cd1044e6967e3a24ebf5658ef1e1187268",
+      "state": "pending_deletion",
+      "service_deleted_date_observation": "2026-10-28T04:43:29.718000+00:00",
+      "recovery_window_requested_days": 7,
+      "permanent_deletion_verified": false
+    },
+    {
+      "kind": "secret",
+      "reference": "72b32a03a65a292b23060d8d71b5ced677e73f5a776c1978448e592544bec40e",
+      "state": "pending_deletion",
+      "service_deleted_date_observation": "2026-10-28T04:43:29.786000+00:00",
+      "recovery_window_requested_days": 7,
+      "permanent_deletion_verified": false
+    },
+    {
+      "kind": "secret",
+      "reference": "cad3dc17bfe27c7df3199bf64e8cdf086d5f388227381360ddf84903db0659ba",
+      "state": "pending_deletion",
+      "service_deleted_date_observation": "2026-10-28T04:43:29.856000+00:00",
+      "recovery_window_requested_days": 7,
+      "permanent_deletion_verified": false
+    },
+    {
+      "kind": "secret",
+      "reference": "686d04d17a9d85f29e1d82ab3834b89f3c7d8e7f649d48ab1d717ec4538c4e43",
+      "state": "pending_deletion",
+      "service_deleted_date_observation": "2026-10-28T04:43:29.907000+00:00",
+      "recovery_window_requested_days": 7,
+      "permanent_deletion_verified": false
+    },
+    {
+      "kind": "task_definition",
+      "reference": "18a542e1e29b2d4890c7c604a3cf7ef2923f9130cf5520583b7213883dfd3320",
+      "state": "DELETE_IN_PROGRESS"
+    },
+    {
+      "kind": "task_definition",
+      "reference": "61458b3b322f20afd007945b62a0d62d04a46bcc7e27ebb1440a8819f9132f8d",
+      "state": "DELETE_IN_PROGRESS"
+    },
+    {
+      "kind": "task_definition",
+      "reference": "1c4717d5cece9f7416a5568eb90b3a4420948081f32d9dc191b3587259b5204f",
+      "state": "DELETE_IN_PROGRESS"
+    },
+    {
+      "kind": "task_definition",
+      "reference": "3dd35041c4eef498b9cb8ae171e68eb4d9771640efffcb3a7be6833efd9dcd32",
+      "state": "DELETE_IN_PROGRESS"
+    },
+    {
+      "kind": "task_definition",
+      "reference": "3ec18d063266dca775e6146426b7583fdd9ec4c32eb5e94c77349b71c037c5e4",
+      "state": "DELETE_IN_PROGRESS"
+    }
+  ],
+  "account_plan": "FREE",
+  "account_state": "ACTIVE",
+  "earlier_observed_credits_usd": "139.74",
+  "remaining_credits_usd": "139.52",
+  "observed_account_credit_decrease_usd": "0.22",
+  "credit_delta_is_final_experiment_bill": false,
+  "free_tier_usage_records": 0,
+  "usage_reporting_limitation": "Account-level and delayed; no final resource-level bill or experiment attribution established",
+  "billing_clearance": false,
+  "archive": {
+    "versions": 739,
+    "delete_markers": 2,
+    "bytes": 3576467,
+    "failure_queue_messages": 60,
+    "every_version_reopened_and_hashed": true,
+    "version_set_sha256": "e805ae6208ab42971109a3aca1f5c1273ad8bd3e00c3f080f65e1b67b9121633"
+  },
+  "observed_api_calls": [
+    {
+      "service": "sts",
+      "operation": "GetCallerIdentity",
+      "status": "success"
+    },
+    {
+      "service": "rds",
+      "operation": "DescribeDBInstances",
+      "status": "success",
+      "n_items": {
+        "DBInstances": 0
+      }
+    },
+    {
+      "service": "rds",
+      "operation": "DescribeDBInstanceAutomatedBackups",
+      "status": "success",
+      "n_items": {
+        "DBInstanceAutomatedBackups": 0
+      }
+    },
+    {
+      "service": "rds",
+      "operation": "DescribeDBSnapshots",
+      "status": "success",
+      "n_items": {
+        "DBSnapshots": 0
+      }
+    },
+    {
+      "service": "rds",
+      "operation": "DescribeDBSubnetGroups",
+      "status": "success",
+      "n_items": {
+        "DBSubnetGroups": 0
+      }
+    },
+    {
+      "service": "rds",
+      "operation": "DescribeDBParameterGroups",
+      "status": "success",
+      "n_items": {
+        "DBParameterGroups": 1
+      }
+    },
+    {
+      "service": "ecs",
+      "operation": "ListClusters",
+      "status": "success",
+      "n_items": {
+        "clusterArns": 0
+      }
+    },
+    {
+      "service": "ecr",
+      "operation": "DescribeRepositories",
+      "status": "success",
+      "n_items": {
+        "repositories": 0
+      }
+    },
+    {
+      "service": "secretsmanager",
+      "operation": "ListSecrets",
+      "status": "success",
+      "n_items": {
+        "SecretList": 6
+      }
+    },
+    {
+      "service": "kms",
+      "operation": "ListKeys",
+      "status": "success",
+      "n_items": {
+        "Keys": 4
+      }
+    },
+    {
+      "service": "ec2",
+      "operation": "DescribeVpcEndpoints",
+      "status": "success",
+      "n_items": {
+        "VpcEndpoints": 0
+      }
+    },
+    {
+      "service": "ec2",
+      "operation": "DescribeNetworkInterfaces",
+      "status": "success",
+      "n_items": {
+        "NetworkInterfaces": 0
+      }
+    },
+    {
+      "service": "ec2",
+      "operation": "DescribeRouteTables",
+      "status": "success",
+      "n_items": {
+        "RouteTables": 1
+      }
+    },
+    {
+      "service": "ec2",
+      "operation": "DescribeSecurityGroups",
+      "status": "success",
+      "n_items": {
+        "SecurityGroups": 1
+      }
+    },
+    {
+      "service": "ec2",
+      "operation": "DescribeSubnets",
+      "status": "success",
+      "n_items": {
+        "Subnets": 3
+      }
+    },
+    {
+      "service": "ec2",
+      "operation": "DescribeVpcs",
+      "status": "success",
+      "n_items": {
+        "Vpcs": 1
+      }
+    },
+    {
+      "service": "logs",
+      "operation": "DescribeLogGroups",
+      "status": "success",
+      "n_items": {
+        "logGroups": 0
+      }
+    },
+    {
+      "service": "ecs",
+      "operation": "ListTaskDefinitions",
+      "status": "success",
+      "n_items": {
+        "taskDefinitionArns": 0
+      }
+    },
+    {
+      "service": "ecs",
+      "operation": "ListTaskDefinitions",
+      "status": "success",
+      "n_items": {
+        "taskDefinitionArns": 0
+      }
+    },
+    {
+      "service": "ecs",
+      "operation": "ListTaskDefinitions",
+      "status": "success",
+      "n_items": {
+        "taskDefinitionArns": 5
+      }
+    },
+    {
+      "service": "kms",
+      "operation": "DescribeKey",
+      "status": "success"
+    },
+    {
+      "service": "kms",
+      "operation": "DescribeKey",
+      "status": "success"
+    },
+    {
+      "service": "kms",
+      "operation": "ListResourceTags",
+      "status": "success",
+      "n_items": {
+        "Tags": 3
+      }
+    },
+    {
+      "service": "kms",
+      "operation": "DescribeKey",
+      "status": "success"
+    },
+    {
+      "service": "kms",
+      "operation": "DescribeKey",
+      "status": "success"
+    },
+    {
+      "service": "kms",
+      "operation": "ListResourceTags",
+      "status": "success",
+      "n_items": {
+        "Tags": 2
+      }
+    },
+    {
+      "service": "lambda",
+      "operation": "ListFunctions",
+      "status": "success",
+      "n_items": {
+        "Functions": 0
+      }
+    },
+    {
+      "service": "scheduler",
+      "operation": "ListSchedules",
+      "status": "success",
+      "n_items": {
+        "Schedules": 0
+      }
+    },
+    {
+      "service": "sqs",
+      "operation": "ListQueues",
+      "status": "success"
+    },
+    {
+      "service": "cloudwatch",
+      "operation": "DescribeAlarms",
+      "status": "success",
+      "n_items": {
+        "MetricAlarms": 0,
+        "CompositeAlarms": 0,
+        "LogAlarms": 0
+      }
+    },
+    {
+      "service": "s3",
+      "operation": "ListBuckets",
+      "status": "success",
+      "n_items": {
+        "Buckets": 0
+      }
+    },
+    {
+      "service": "iam",
+      "operation": "ListRoles",
+      "status": "success",
+      "n_items": {
+        "Roles": 0
+      }
+    },
+    {
+      "service": "iam",
+      "operation": "ListRoles",
+      "status": "success",
+      "n_items": {
+        "Roles": 0
+      }
+    },
+    {
+      "service": "freetier",
+      "operation": "GetAccountPlanState",
+      "status": "success"
+    },
+    {
+      "service": "freetier",
+      "operation": "GetFreeTierUsage",
+      "status": "success",
+      "n_items": {
+        "freeTierUsages": 0
+      }
+    }
+  ],
+  "private_originals_sha256": {
+    "core-runtime-post-teardown.json": "5ca486048821710f03dd51a0a26bbe0dd43265e610c88b095a17b754e7d80d27",
+    "core-guard-post-teardown.json": "1feefe3e7f4736e3ac567c15fd1c377b9f4f076d1537b54f0f59a75d4bde17ad",
+    "core-guard-retirement-final.json": "a5bd749ccf9abb9a0d3c8e169e02be7f6932db31f77e94abdb3dde704c6add5d",
+    "core-task-definition-cleanup.json": "834d9ba85e5acdd08586f2c6443cf80d6c3993d35dd805b9099a1d784fd31eb0",
+    "core-checker-active-absence.json": "565ffca8dd5095890f7516ade8a428ba6723e91e089f7956ba16881da0bc9373"
+  }
+}

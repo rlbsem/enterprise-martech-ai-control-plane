@@ -1,0 +1,124 @@
+{
+  "schema": "recovery-cost-plan.v1",
+  "currency": "USD",
+  "region": "us-east-2",
+  "maximum_concurrent_rds_instances": 2,
+  "runtime_hours_including_cleanup_allowance": 4,
+  "planned_usd": "11.2868",
+  "authorized_planned_ceiling_usd": "20.00",
+  "lines": [
+    {
+      "resource": "RDS PostgreSQL t4g.micro",
+      "quantity": "8",
+      "unit_usd": "0.016",
+      "unit": "instance-hours",
+      "pricing_sku": "GGD6FE59WWUNDKDC",
+      "planned_usd": "0.1280"
+    },
+    {
+      "resource": "RDS gp3 storage",
+      "quantity": "0.2191780821917808219178082192",
+      "unit_usd": "0.115",
+      "unit": "GB-month",
+      "pricing_sku": "JQQGK6D789TWJF8B",
+      "planned_usd": "0.0253"
+    },
+    {
+      "resource": "Retained/automated backups",
+      "quantity": "6.575342465753424657534246575",
+      "unit_usd": "0.095",
+      "unit": "GB-month",
+      "pricing_sku": "HQRQUXJ6DAN3XS6X",
+      "planned_usd": "0.6247"
+    },
+    {
+      "resource": "Four private endpoints",
+      "quantity": "16",
+      "unit_usd": "0.010",
+      "unit": "endpoint-hours",
+      "pricing_sku": "P2Q7Y6KZKKFAHEVG",
+      "planned_usd": "0.1600"
+    },
+    {
+      "resource": "Fargate CPU",
+      "quantity": "2.0",
+      "unit_usd": "0.04048",
+      "unit": "vCPU-hours",
+      "pricing_sku": "UGSJ89BUWB7SMJ6A",
+      "planned_usd": "0.0810"
+    },
+    {
+      "resource": "Fargate memory",
+      "quantity": "4",
+      "unit_usd": "0.004445",
+      "unit": "GB-hours",
+      "pricing_sku": "HH5EE3ZFWSFKGKWM",
+      "planned_usd": "0.0178"
+    },
+    {
+      "resource": "Two customer keys",
+      "quantity": "2",
+      "unit_usd": "1",
+      "unit": "whole-month allowance",
+      "pricing_sku": null,
+      "planned_usd": "2.0000"
+    },
+    {
+      "resource": "Up to ten runtime/owner secrets",
+      "quantity": "10",
+      "unit_usd": "0.40",
+      "unit": "whole-month allowance",
+      "pricing_sku": null,
+      "planned_usd": "4.0000"
+    },
+    {
+      "resource": "Logs, alarms and bounded API traffic",
+      "quantity": "1",
+      "unit_usd": "1",
+      "unit": "allowance",
+      "pricing_sku": null,
+      "planned_usd": "1.0000"
+    },
+    {
+      "resource": "Private image/evidence storage and requests",
+      "quantity": "1",
+      "unit_usd": "0.50",
+      "unit": "allowance",
+      "pricing_sku": null,
+      "planned_usd": "0.5000"
+    },
+    {
+      "resource": "Data transfer/endpoint processing",
+      "quantity": "1",
+      "unit_usd": "0.25",
+      "unit": "allowance",
+      "pricing_sku": null,
+      "planned_usd": "0.2500"
+    },
+    {
+      "resource": "Scheduled cleanup/checker and failure queue",
+      "quantity": "1",
+      "unit_usd": "0.50",
+      "unit": "allowance",
+      "pricing_sku": null,
+      "planned_usd": "0.5000"
+    },
+    {
+      "resource": "Contingency",
+      "quantity": "1",
+      "unit_usd": "2",
+      "unit": "allowance",
+      "pricing_sku": null,
+      "planned_usd": "2.0000"
+    }
+  ],
+  "conditions": [
+    "FREE/ACTIVE and sufficient credits rechecked before apply",
+    "No Paid upgrade, billing changes or out-of-pocket authorization",
+    "Three-hour work deadline; one-hour cleanup allowance, never extended",
+    "100 GB backup allowance assumes removal within 48 hours",
+    "No NAT gateway, public IPv4, load balancer, CodeBuild or paid inference",
+    "Alerts and this estimate are not a hard billing cap",
+    "Delayed credit/usage reporting cannot establish billing clearance"
+  ]
+}

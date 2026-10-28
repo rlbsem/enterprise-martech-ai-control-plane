@@ -1,0 +1,6 @@
+{
+  "source_commit": "58fc9837e3fd05e0d0fab2a1029b31d56c842e4d",
+  "verification_sha256": "e6051d1518efe93f4e6950154851bc4891bbc9d694e12fc69b29fd901be1c9fc",
+  "source_files_verified": 98,
+  "scope": "Executed local PostgreSQL/HTTP regression; AWS service-contract tests use mocks, not native acceptance"
+}

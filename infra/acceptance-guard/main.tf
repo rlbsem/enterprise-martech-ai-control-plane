@@ -44,7 +44,7 @@ locals {
   deadline_policy       = var.cleanup_at == null ? "three_hours_from_guard_apply_start" : "fixed_deadline"
   functions             = toset(["watchdog", "checker"])
   runtime_tag           = { StringEquals = { "aws:ResourceTag/AcceptanceRun" = var.run_id } }
-  read_actions          = ["sts:GetCallerIdentity", "rds:DescribeDBInstances", "rds:DescribeDBSnapshots", "rds:DescribeDBInstanceAutomatedBackups", "rds:ListTagsForResource", "rds:DescribeDBSubnetGroups", "rds:DescribeDBParameterGroups", "ecs:DescribeClusters", "ecs:ListTasks", "ecs:ListTaskDefinitions", "ecr:DescribeRepositories", "ecr:DescribeImages", "secretsmanager:ListSecrets", "logs:DescribeLogGroups", "kms:ListKeys", "kms:DescribeKey", "kms:ListResourceTags", "ec2:DescribeVpcs", "ec2:DescribeVpcEndpoints", "ec2:DescribeNetworkInterfaces", "ec2:DescribeRouteTables", "ec2:DescribeSecurityGroups", "ec2:DescribeSubnets", "iam:ListRoles"]
+  read_actions          = ["sts:GetCallerIdentity", "rds:DescribeDBInstances", "rds:DescribeDBSnapshots", "rds:DescribeDBInstanceAutomatedBackups", "rds:ListTagsForResource", "rds:DescribeDBSubnetGroups", "rds:DescribeDBParameterGroups", "ecs:DescribeClusters", "ecs:ListTasks", "ecs:ListTaskDefinitions", "ecr:DescribeRepositories", "ecr:DescribeImages", "secretsmanager:ListSecrets", "secretsmanager:DescribeSecret", "logs:DescribeLogGroups", "kms:ListKeys", "kms:DescribeKey", "kms:ListResourceTags", "ec2:DescribeVpcs", "ec2:DescribeVpcEndpoints", "ec2:DescribeNetworkInterfaces", "ec2:DescribeRouteTables", "ec2:DescribeSecurityGroups", "ec2:DescribeSubnets", "iam:ListRoles"]
   trust                 = jsonencode({ Version = "2012-10-17", Statement = [{ Effect = "Allow", Principal = { Service = "lambda.amazonaws.com" }, Action = "sts:AssumeRole" }] })
 }
 resource "aws_kms_key" "guard" {
@@ -133,8 +133,8 @@ resource "aws_iam_role_policy" "function" {
   policy = jsonencode({ Version = "2012-10-17", Statement = [
     { Effect = "Allow", Action = local.read_actions, Resource = "*" },
     { Effect = "Allow", Action = ["logs:CreateLogStream", "logs:PutLogEvents"], Resource = "${aws_cloudwatch_log_group.function[each.key].arn}:*" },
-    { Effect = "Allow", Action = "s3:GetObject", Resource = "${aws_s3_bucket.guard.arn}/inventory/registry.json" },
-    { Effect = "Allow", Action = "s3:PutObject", Resource = each.key == "checker" ? ["${aws_s3_bucket.guard.arn}/checks/*"] : ["${aws_s3_bucket.guard.arn}/inventory/*", "${aws_s3_bucket.guard.arn}/cleanup/*"] },
+    { Effect = "Allow", Action = "s3:GetObject", Resource = each.key == "checker" ? ["${aws_s3_bucket.guard.arn}/inventory/registry.json"] : ["${aws_s3_bucket.guard.arn}/inventory/registry.json", "${aws_s3_bucket.guard.arn}/task-logs/*"] },
+    { Effect = "Allow", Action = "s3:PutObject", Resource = each.key == "checker" ? ["${aws_s3_bucket.guard.arn}/checks/*"] : ["${aws_s3_bucket.guard.arn}/inventory/*", "${aws_s3_bucket.guard.arn}/cleanup/*", "${aws_s3_bucket.guard.arn}/task-logs/*"] },
     { Effect = "Allow", Action = ["kms:Decrypt", "kms:GenerateDataKey"], Resource = aws_kms_key.guard.arn, Condition = { StringEquals = { "kms:ViaService" = "s3.us-east-2.amazonaws.com" } } },
     { Effect = "Allow", Action = "sqs:SendMessage", Resource = aws_sqs_queue.failures.arn }
   ] })
@@ -142,9 +142,13 @@ resource "aws_iam_role_policy" "function" {
 resource "aws_iam_role_policy" "cleanup" {
   role = aws_iam_role.function["watchdog"].id
   policy = jsonencode({ Version = "2012-10-17", Statement = [
+    { Effect = "Allow", Action = ["logs:DescribeLogStreams", "logs:GetLogEvents"], Resource = ["arn:aws:logs:us-east-2:${var.account_id}:log-group:/csa-native/${var.run_id}/*:*", "arn:aws:logs:us-east-2:${var.account_id}:log-group:/aws/rds/instance/${local.name}-*:*"] },
     { Effect = "Allow", Action = ["rds:ModifyDBInstance", "rds:DeleteDBInstance", "rds:DeleteDBSnapshot", "rds:DeleteDBSubnetGroup", "rds:DeleteDBParameterGroup"], Resource = [for type in ["db", "snapshot", "subgrp", "pg"] : "arn:aws:rds:us-east-2:${var.account_id}:${type}:${local.name}*"] },
     { Effect = "Allow", Action = "rds:DeleteDBInstanceAutomatedBackup", Resource = "arn:aws:rds:us-east-2:${var.account_id}:auto-backup:*", Condition = { StringEquals = { "aws:ResourceTag/AcceptanceRun" = var.run_id } } },
-    { Effect = "Allow", Action = ["ecs:StopTask", "ecs:DeleteCluster", "ecs:DeregisterTaskDefinition", "ecs:DeleteTaskDefinitions"], Resource = ["arn:aws:ecs:us-east-2:${var.account_id}:cluster/${local.name}", "arn:aws:ecs:us-east-2:${var.account_id}:task/${local.name}/*", "arn:aws:ecs:us-east-2:${var.account_id}:task-definition/${local.name}-*:*"] },
+    # DeregisterTaskDefinition does not support task-definition ARN authorization.
+    # Keep this unavoidable regional permission separate; code accepts only exact run families.
+    { Effect = "Allow", Action = "ecs:DeregisterTaskDefinition", Resource = "*", Condition = { StringEquals = { "aws:RequestedRegion" = "us-east-2" } } },
+    { Effect = "Allow", Action = ["ecs:StopTask", "ecs:DeleteCluster", "ecs:DeleteTaskDefinitions"], Resource = ["arn:aws:ecs:us-east-2:${var.account_id}:cluster/${local.name}", "arn:aws:ecs:us-east-2:${var.account_id}:task/${local.name}/*", "arn:aws:ecs:us-east-2:${var.account_id}:task-definition/${local.name}-*:*"] },
     { Effect = "Allow", Action = "ecr:DeleteRepository", Resource = "arn:aws:ecr:us-east-2:${var.account_id}:repository/${local.name}" },
     { Effect = "Allow", Action = "secretsmanager:DeleteSecret", Resource = "arn:aws:secretsmanager:us-east-2:${var.account_id}:secret:${local.name}/*" },
     { Effect = "Allow", Action = "logs:DeleteLogGroup", Resource = ["arn:aws:logs:us-east-2:${var.account_id}:log-group:/csa-native/${var.run_id}/*:*", "arn:aws:logs:us-east-2:${var.account_id}:log-group:/aws/rds/instance/${local.name}-*/postgresql:*"] },

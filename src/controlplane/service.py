@@ -13,6 +13,7 @@ def ingest(source, event):
     body = event.model_dump(mode="json", exclude_none=True)
     payload_hash = digest(body)
     with db.connect() as c:
+        db.execution_open(c)  # Source truth can refresh while work admission remains closed.
         # Bounded demo: serialize identity discovery as well as event deduplication.
         # A row lock cannot protect an identity that does not exist yet.
         c.execute("SELECT pg_advisory_xact_lock(83191)")
@@ -98,6 +99,8 @@ def link(actor, command):
 def propose(actor, command):
     body = command.model_dump(mode="json")
     with db.connect() as c:
+        if not db.execution_open(c):
+            return {"decision": "deny", "reason": "recovery_closed"}
         row = db.customer(c, command.customer_id)
         # Request IDs are global; prevent two customers from racing on a reused ID.
         c.execute("SELECT pg_advisory_xact_lock(hashtextextended(%s,0))", (str(command.request_id),))
@@ -144,6 +147,8 @@ def valid_proposal(proposal, row, now=None, require_approval=True):
 
 def approve(actor, proposal_id, command):
     with db.connect() as c:
+        if not db.execution_open(c):
+            return {"approved": False, "reason": "recovery_closed"}
         # Lock order is customer -> proposal. Workers also start with the customer.
         p = c.execute("SELECT * FROM cp.proposals WHERE id=%s", (proposal_id,)).fetchone()
         if not p:

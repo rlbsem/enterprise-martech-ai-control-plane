@@ -1,0 +1,71 @@
+{
+  "scope": "Hashed AWS DbiResourceId identities; three sequential control generations and one unchanged independent receipt instance, never four concurrent instances",
+  "references": {
+    "original_control": "a559e9a59fd5458a8ede10fa8ead87dcb873889d30d98a7035c0e227e543ae8f",
+    "independent_receipts": "bd38d5ae9497f024ab31cb196874087bfcddcd3d4e37d2654e51e20a8f33280f",
+    "behind_control": "6d56402cf6a11fc384af5df8a3be86dc559d26199de3024e4ca3518f8e4ece47",
+    "matching_control": "1e4218e4af57c53ceda6125573bdb0e1b4a8322685037125c91251f4a55a2fc8"
+  },
+  "observations": [
+    {
+      "at": "2026-10-28T20:38:37.250169+00:00",
+      "region": "us-east-2",
+      "concurrent_instances": 2,
+      "instances": [
+        {
+          "role": "independent_receipts",
+          "physical_reference_sha256": "bd38d5ae9497f024ab31cb196874087bfcddcd3d4e37d2654e51e20a8f33280f",
+          "state": "available",
+          "class": "db.t4g.micro",
+          "storage_gb": 20,
+          "encrypted": true,
+          "multi_az": false
+        },
+        {
+          "role": "restored_control",
+          "physical_reference_sha256": "6d56402cf6a11fc384af5df8a3be86dc559d26199de3024e4ca3518f8e4ece47",
+          "state": "creating",
+          "class": "db.t4g.micro",
+          "storage_gb": 20,
+          "encrypted": true,
+          "multi_az": false
+        }
+      ],
+      "request_id": "e0043ab6-9a9d-4091-8825-7f50e57327bf",
+      "plan": "FREE",
+      "plan_status": "ACTIVE",
+      "billing_clearance": false,
+      "credit_headroom_above_20_verified": true
+    },
+    {
+      "at": "2026-10-28T20:55:32.541677+00:00",
+      "phase": "second_restore_pending",
+      "concurrent_instances": 2,
+      "instances": [
+        {
+          "role": "independent_receipts",
+          "physical_reference_sha256": "bd38d5ae9497f024ab31cb196874087bfcddcd3d4e37d2654e51e20a8f33280f",
+          "state": "available",
+          "encrypted": true,
+          "storage_gb": 20,
+          "multi_az": false
+        },
+        {
+          "role": "restored_control",
+          "physical_reference_sha256": "1e4218e4af57c53ceda6125573bdb0e1b4a8322685037125c91251f4a55a2fc8",
+          "state": "creating",
+          "encrypted": true,
+          "storage_gb": 20,
+          "multi_az": false
+        }
+      ],
+      "request_id": "ac171701-c22a-49e1-a8e9-548bc85f4862",
+      "distinct_restored_generation": true,
+      "independent_receipt_generation_unchanged": true,
+      "plan": "FREE",
+      "plan_status": "ACTIVE",
+      "billing_clearance": false,
+      "credit_headroom_above_20_verified": true
+    }
+  ]
+}

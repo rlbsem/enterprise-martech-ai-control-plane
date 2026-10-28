@@ -36,6 +36,14 @@ variable "source_commit" {
     error_message = "Pin the complete source commit."
   }
 }
+variable "acceptance_workflow" {
+  type    = string
+  default = "sql-fixture-v1"
+  validation {
+    condition     = contains(["sql-fixture-v1", "application-recovery-v1"], var.acceptance_workflow)
+    error_message = "Use an explicit versioned SQL or application acceptance contract."
+  }
+}
 variable "cleanup_at" { type = string }
 variable "guard_code_sha256" { type = string }
 variable "watchdog_name" { type = string }
@@ -45,10 +53,13 @@ variable "operator_armed_schedule_verified" {
   default = false
 }
 locals {
-  name       = "csa-native-${var.run_id}"
-  tasks      = toset(["bootstrap", "baseline", "control", "receipt", "verify"])
-  secret_for = { baseline = "api", control = "api", receipt = "remote", verify = "verifier" }
-  db_users   = toset(["control", "receipts"])
+  name                    = "csa-native-${var.run_id}"
+  tasks                   = toset(["bootstrap", "baseline", "control", "receipt", "verify"])
+  secret_for              = { baseline = "api", control = "api", receipt = "remote", verify = "verifier" }
+  db_users                = toset(["control", "receipts"])
+  application             = var.acceptance_workflow == "application-recovery-v1"
+  runtime_secret_keys     = toset(concat(["api", "worker", "remote", "observer", "verifier"], local.application ? ["recovery"] : []))
+  application_secret_keys = toset(["api", "worker", "remote", "verifier", "recovery"])
 }
 data "aws_lambda_function" "watchdog" { function_name = var.watchdog_name }
 resource "aws_vpc" "runtime" {
@@ -93,9 +104,10 @@ resource "aws_security_group" "endpoint" {
   vpc_id      = aws_vpc.runtime.id
 }
 locals {
-  connections = { bootstrap_control = ["bootstrap", "control"], bootstrap_receipts = ["bootstrap", "receipts"],
+  connections = merge({ bootstrap_control = ["bootstrap", "control"], bootstrap_receipts = ["bootstrap", "receipts"],
     baseline_control = ["baseline", "control"], control_control = ["control", "control"],
-  receipt_receipts = ["receipt", "receipts"], verify_control = ["verify", "control"], verify_receipts = ["verify", "receipts"] }
+    receipt_receipts = ["receipt", "receipts"], verify_control = ["verify", "control"], verify_receipts = ["verify", "receipts"] },
+  local.application ? { baseline_receipts = ["baseline", "receipts"], control_receipts = ["control", "receipts"], receipt_control = ["receipt", "control"] } : {})
 }
 resource "aws_vpc_security_group_ingress_rule" "db" {
   for_each                     = local.connections
@@ -213,7 +225,7 @@ resource "aws_db_instance" "store" {
   lifecycle { prevent_destroy = true }
 }
 resource "aws_secretsmanager_secret" "runtime" {
-  for_each                = toset(["api", "worker", "remote", "observer", "verifier"])
+  for_each                = local.runtime_secret_keys
   name                    = "${local.name}/${each.key}"
   kms_key_id              = aws_kms_key.runtime.arn
   recovery_window_in_days = 7
@@ -267,7 +279,7 @@ resource "aws_iam_role_policy" "task" {
   for_each = local.tasks
   role     = aws_iam_role.task[each.key].id
   policy = jsonencode({ Version = "2012-10-17", Statement = concat([
-    { Effect = "Allow", Action = "secretsmanager:GetSecretValue", Resource = each.key == "bootstrap" ? concat([for s in aws_secretsmanager_secret.runtime : s.arn], [for d in aws_db_instance.store : d.master_user_secret[0].secret_arn]) : [aws_secretsmanager_secret.runtime[local.secret_for[each.key]].arn] },
+    { Effect = "Allow", Action = "secretsmanager:GetSecretValue", Resource = each.key == "bootstrap" ? concat([for s in aws_secretsmanager_secret.runtime : s.arn], [for d in aws_db_instance.store : d.master_user_secret[0].secret_arn]) : (local.application && each.key != "verify" ? [for k in local.application_secret_keys : aws_secretsmanager_secret.runtime[k].arn] : [aws_secretsmanager_secret.runtime[local.secret_for[each.key]].arn]) },
     { Effect = "Allow", Action = each.key == "bootstrap" ? ["kms:Decrypt", "kms:GenerateDataKey"] : ["kms:Decrypt"], Resource = aws_kms_key.runtime.arn, Condition = { StringEquals = { "kms:ViaService" = "secretsmanager.us-east-2.amazonaws.com" } } }
   ], each.key == "bootstrap" ? [{ Effect = "Allow", Action = "secretsmanager:PutSecretValue", Resource = [for s in aws_secretsmanager_secret.runtime : s.arn] }] : []) })
 }
@@ -276,14 +288,15 @@ resource "aws_ecs_task_definition" "native" {
   family                   = "${local.name}-${each.key}"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  cpu                      = "256"
-  memory                   = "512"
+  cpu                      = local.application ? "512" : "256"
+  memory                   = local.application ? "1024" : "512"
   execution_role_arn       = aws_iam_role.execution.arn
   task_role_arn            = aws_iam_role.task[each.key].arn
   container_definitions = jsonencode([{
     name            = each.key, image = "${aws_ecr_repository.image.repository_url}@${var.image_digest}", essential = true,
     user            = "10001", readonlyRootFilesystem = true, stopTimeout = 60,
-    command         = ["python", "-m", "controlplane.native_tasks", each.key],
+    command         = ["python", "-m", local.application ? "controlplane.native_app_tasks" : "controlplane.native_tasks", each.key],
+    mountPoints     = local.application ? [{ sourceVolume = "recovery-work", containerPath = "/recovery-work", readOnly = false }] : [],
     linuxParameters = { initProcessEnabled = true, capabilities = { drop = ["ALL"] } },
     environment = concat([{ name = "ACCEPTANCE_RUN", value = var.run_id }, { name = "SOURCE_COMMIT", value = var.source_commit },
       { name = "AWS_DEFAULT_REGION", value = "us-east-2" }, { name = "PYTHONDONTWRITEBYTECODE", value = "1" }],
@@ -291,12 +304,18 @@ resource "aws_ecs_task_definition" "native" {
         { name = "DB_HOSTS", value = jsonencode({ control = aws_db_instance.store["control"].address, downstream = aws_db_instance.store["receipts"].address }) },
         { name = "DB_MASTER_SECRET_ARNS", value = jsonencode({ control = aws_db_instance.store["control"].master_user_secret[0].secret_arn, downstream = aws_db_instance.store["receipts"].master_user_secret[0].secret_arn }) },
         { name = "RUNTIME_SECRET_ARNS", value = jsonencode({ for k, s in aws_secretsmanager_secret.runtime : k => s.arn }) }
-    ] : [{ name = "RUNTIME_SECRET_ARN", value = aws_secretsmanager_secret.runtime[local.secret_for[each.key]].arn }]),
+    ] : (local.application ? [{ name = "APP_RUNTIME_SECRET_ARNS", value = jsonencode({ for k in(each.key == "verify" ? toset(["verifier"]) : local.application_secret_keys) : k => aws_secretsmanager_secret.runtime[k].arn }) }] : [{ name = "RUNTIME_SECRET_ARN", value = aws_secretsmanager_secret.runtime[local.secret_for[each.key]].arn }])),
     logConfiguration = { logDriver = "awslogs", options = { awslogs-group = aws_cloudwatch_log_group.task[each.key].name, awslogs-region = "us-east-2", awslogs-stream-prefix = "task", mode = "blocking" } }
   }])
+  dynamic "volume" {
+    for_each = local.application ? [1] : []
+    content { name = "recovery-work" }
+  }
 }
 output "manifest" {
   value = { account = var.account_id, region = "us-east-2", run = var.run_id, cleanup_at = var.cleanup_at, backup_retention_days = 1, database_name = "csaacceptance",
+    acceptance_workflow   = var.acceptance_workflow,
+    application_protocol  = local.application ? "source-preflight-v2" : null,
     image                 = "${aws_ecr_repository.image.repository_url}@${var.image_digest}", commit = var.source_commit,
     tasks                 = { for k, t in aws_ecs_task_definition.native : k => t.arn }, cluster = aws_ecs_cluster.runtime.arn,
     control_db            = aws_db_instance.store["control"].identifier, downstream_db = aws_db_instance.store["receipts"].identifier,

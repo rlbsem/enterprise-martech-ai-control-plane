@@ -1,0 +1,14 @@
+{
+  "proposal": {
+    "id": "1954dfff-55f4-407f-bd8d-df0aef5a08d7",
+    "decision": "approval",
+    "reason": "policy_allowed"
+  },
+  "approval": {
+    "approved": true
+  },
+  "consent_before_execution": false,
+  "execution": "blocked",
+  "reason": "consent_missing_or_revoked",
+  "messages_sent": 0
+}
