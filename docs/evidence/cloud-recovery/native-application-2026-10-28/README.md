@@ -13,13 +13,13 @@ flowchart TD
   Ledger["Independent receipt database<br/>Same physical generation throughout"]:::independent
   Freeze --> Earlier["RDS PITR #1<br/>20:18:23 UTC<br/>3 restored control intents"]
   Earlier --> CompareEarly["Independent read-only comparison"]
-  Ledger -. "5 unchanged receipts" .-> CompareEarly
+  Ledger -.->|5 unchanged receipts| CompareEarly
   CompareEarly --> Mismatch{"Do restored intents match<br/>committed downstream effects?"}
-  Mismatch -->|"No: 3 vs 5"| Block["EXPECTED SAFETY BLOCK<br/>Gate closed; no replay or worker claims"]
+  Mismatch -->|No, 3 vs 5| Block["EXPECTED SAFETY BLOCK<br/>Gate closed; no replay or worker claims"]
   Block --> Retire["Delete first restored control generation<br/>Keep independent receipts unchanged"]
   Retire --> Later["RDS PITR #2<br/>20:23:32 UTC<br/>5 restored control intents"]
   Later --> CompareLater["Independent read-only comparison"]
-  Ledger -. "Same 5 receipts" .-> CompareLater
+  Ledger -.->|Same 5 receipts| CompareLater
   CompareLater --> Match{"Are all 5 intents and<br/>5 receipts reconciled?"}
   Match -->|Yes| Proof["Fresh proof and exact approval<br/>Reject stale approval after source change"]
   Proof --> Resume["Controlled resumption<br/>Reject stale worker completion<br/>Deny action with revoked consent"]
