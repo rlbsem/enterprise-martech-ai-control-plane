@@ -4,38 +4,33 @@
 
 ## Executed recovery sequence
 
-The diagram uses the same dark Mermaid architecture style as the other engineering repositories. The red safety block is **the expected, successful result** of the first recovery test: the control plane refused to replay work when independently recorded effects disagreed with restored state.
+Two point-in-time restores, two deliberate decisions. The first **correctly blocked unsafe execution**; the second resumed only after fresh verification.
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#10101D","primaryColor":"#2A2A3D","primaryTextColor":"#F0F0FF","primaryBorderColor":"#7C7CAF","lineColor":"#B8B8FF","textColor":"#F0F0FF","secondaryColor":"#181825","tertiaryColor":"#2E2E45","fontFamily":"IBM Plex Sans, Arial, sans-serif","fontSize":"15px","edgeLabelBackground":"#10101D"}}}%%
-flowchart TD
-  Source["Source checkpoint<br/>5 control intents, 5 downstream receipts"] --> Freeze["Quiesce API and workers<br/>Verify backup windows and ownership"]
-  Ledger["Independent receipt database<br/>Same physical generation throughout"]:::independent
-  Freeze --> Earlier["RDS PITR #1<br/>20:18:23 UTC<br/>3 restored control intents"]
-  Earlier --> CompareEarly["Independent read-only comparison"]
-  Ledger -.->|5 unchanged receipts| CompareEarly
-  CompareEarly --> Mismatch{"Do restored intents match<br/>committed downstream effects?"}
-  Mismatch -->|No, 3 vs 5| Block["EXPECTED SAFETY BLOCK<br/>Gate closed; no replay or worker claims"]
-  Block --> Retire["Delete first restored control generation<br/>Keep independent receipts unchanged"]
-  Retire --> Later["RDS PITR #2<br/>20:23:32 UTC<br/>5 restored control intents"]
-  Later --> CompareLater["Independent read-only comparison"]
-  Ledger -.->|Same 5 receipts| CompareLater
-  CompareLater --> Match{"Are all 5 intents and<br/>5 receipts reconciled?"}
-  Match -->|Yes| Proof["Fresh proof and exact approval<br/>Reject stale approval after source change"]
-  Proof --> Resume["Controlled resumption<br/>Reject stale worker completion<br/>Deny action with revoked consent"]
-  Resume --> Final["INDEPENDENT FINAL ACCEPTANCE<br/>6 intents = 6 effects<br/>Zero duplicates, zero unresolved findings"]
+flowchart TB
+  subgraph First["RESTORE 01  |  SAFETY CHECK"]
+    direction LR
+    Early["AWS RDS PITR #1<br/>3 restored intents"] --> CompareEarly{"5 independent receipts<br/>Do they match?"}
+    CompareEarly -->|No| Block["EXPECTED BLOCK<br/>No unsafe replay"]
+  end
+  subgraph Second["RESTORE 02  |  VERIFIED RESUMPTION"]
+    direction LR
+    Later["AWS RDS PITR #2<br/>5 intents / 5 receipts"] --> Proof["Fresh proof + approval<br/>Consent and worker checks"]
+    Proof --> Final["SAFE RESUMPTION<br/>6 intents / 6 effects<br/>Zero duplicates"]
+  end
+  First --> Second
   classDef stage fill:#2A2A3D,stroke:#B8B8FF,color:#F0F0FF,stroke-width:1.6px
-  classDef independent fill:#181825,stroke:#7C7CAF,color:#F0F0FF,stroke-width:1.6px
   classDef decision fill:#2E2E45,stroke:#E3BC7F,color:#F0F0FF,stroke-width:2px
   classDef hold fill:#30252E,stroke:#D98EA3,color:#F0F0FF,stroke-width:2.5px
   classDef release fill:#20352E,stroke:#81C5B0,color:#F0F0FF,stroke-width:2.5px
-  class Source,Freeze,Earlier,CompareEarly,Retire,Later,CompareLater,Proof,Resume stage
-  class Mismatch,Match decision
+  class Early,Later,Proof stage
+  class CompareEarly decision
   class Block hold
   class Final release
 ```
 
-*Observed AWS acceptance with synthetic one-off Fargate application tasks. Both restores used distinct control database generations and the same independent receipt database, with no more than two RDS instances concurrently. This is not full production ECS/HTTPS/Multi-AZ acceptance. Exact results, restore requests and limitations follow.*
+*Both restores used distinct control generations and the same independent receipt database, with no more than two RDS instances concurrently. Native AWS RDS recovery used synthetic one-off Fargate application tasks; this does not establish full production ECS/HTTPS/Multi-AZ acceptance. Detailed evidence follows.*
 
 | Executed stage | Observed result |
 |---|---|
