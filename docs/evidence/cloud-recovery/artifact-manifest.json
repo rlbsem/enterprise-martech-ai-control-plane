@@ -2,10 +2,12 @@
   "schema": "cloud-recovery-artifacts.v1",
   "hash_format": "SHA-256 of exact bytes; manifest itself excluded",
   "files": {
+    "continuation-infrastructure-2026-10-28/execution-binding.json": "a839d6d9c08c2fa76dd85b3a89512d845827b5d956322da17ce6d2b841543c5c",
     "continuation-infrastructure-2026-10-28/secrets.json": "109189a7e29cdc678b86b5f1e03967d1eec6d79bf89d35af71dce7aaf5cbb844",
     "continuation-infrastructure-2026-10-28/security.json": "3f00405ec71bd23457000bc02472afdaa2637688c554842efa8a3f6ca0546f5e",
     "continuation-infrastructure-2026-10-28/verification.json": "cd988ec340c5a69c7e9115364c31f1712b8f45ff10262ffc792ed2a7ef4d4234",
     "continuation-regression-2026-10-28/cloud-recovery.json": "54f53b082872218ea9e811ab34e01103dd8fad262d0841b56a1f15ef9f16a714",
+    "continuation-regression-2026-10-28/execution-binding.json": "f3a6ff31df44d8e60cd2a142f03f642a79628c8fe4f36bc1b2c56c91a1236af6",
     "continuation-regression-2026-10-28/report.md": "cfdb089bcc3ca20540153a8f097d38a01d70bdf85b3c19114628ee1340c018fb",
     "continuation-regression-2026-10-28/tests.xml": "9539e169291aaaa4d948b0f4fbd886429aa1c7920edc10ea72f9e2fe50554c97",
     "continuation-regression-2026-10-28/verification.json": "251a19d3d4d2086b3ca08a471ebbffa38e2b9eac554f4190899d0e691564509e",

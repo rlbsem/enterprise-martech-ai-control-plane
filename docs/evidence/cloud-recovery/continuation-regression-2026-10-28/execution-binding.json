@@ -1,0 +1,6 @@
+{
+  "source_commit": "1aa8c710d06d9ed1ce58f96556c04586a72ca644",
+  "verification_sha256": "251a19d3d4d2086b3ca08a471ebbffa38e2b9eac554f4190899d0e691564509e",
+  "source_files_verified": 101,
+  "scope": "Exact executed local/static source; no native acceptance of these corrections implied"
+}
