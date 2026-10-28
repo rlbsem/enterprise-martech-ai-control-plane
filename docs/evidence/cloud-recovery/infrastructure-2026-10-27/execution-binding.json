@@ -1,0 +1,6 @@
+{
+  "source_commit": "bfa3e00ea17871b163f90d8874ddf42bceb348b7",
+  "verification_sha256": "33f33abb7f1f4246159678438c29ac989736b1990200193ec8713ba567e5addc",
+  "source_files_verified": 21,
+  "scope": "Exact Git source verified against recorded LF-normalized SHA-256; no native AWS execution implied"
+}

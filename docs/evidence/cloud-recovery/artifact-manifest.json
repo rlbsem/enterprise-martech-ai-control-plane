@@ -2,6 +2,11 @@
   "schema": "cloud-recovery-artifacts.v1",
   "hash_format": "SHA-256 of exact bytes; manifest itself excluded",
   "files": {
+    "infrastructure-2026-10-27/execution-binding.json": "a7bdcc8fd932dc7ee78f9a18b5ebef2927ad8be0e536f73c8cdf5c7144348b82",
+    "infrastructure-2026-10-27/secrets.json": "8cd61492558e9859358dd4e709d80ed7179b3e3daa4bfe3ad7641afe4db7d59c",
+    "infrastructure-2026-10-27/security.json": "6476034a3d209d005dffec60fdcf53b4090c399aabfb39514414111d97a23d2d",
+    "infrastructure-2026-10-27/verification.json": "33f33abb7f1f4246159678438c29ac989736b1990200193ec8713ba567e5addc",
+    "integrity-negatives-2026-10-27.json": "fc80839ce6c2a7cc9d757313322b8325d83c82f6ec35ed76d9d47ee282736d75",
     "local-2026-10-27/acceptance.json": "2ad4af8fc49bc65ed240bce7ee0bfac6e2a76a23015b9489783b384dc2076823",
     "local-2026-10-27/browser-02/desktop.png": "edf76116c483bdbc64cd07537748f0d752e49b7af1bbadfce080fdb3dd6ca8c2",
     "local-2026-10-27/browser-02/mobile.png": "5f2b46a14050e7aacf12c33d51d8d99a720a131e43901bb74e2346b5ff683b4a",
@@ -25,6 +30,19 @@
     "prior-runtime/README.md": "6a676dcb9f1a1bd2d41e57c6b12b6b98d9f69da32b29757fb9d7456e26d11a6c",
     "prior-runtime/service.py": "cd9efa1dcd2f1d4c816c49f89a4fbc7cbe7b839f6675faf93b3d81f153151eed",
     "prior-runtime/worker.py": "bf9d75172b80f56dc0dd409c359e1124453581fa2e2d7ec1263b4bd55584a56c",
-    "README.md": "2c31ea2c06ac7da0b7803069c12b94a01798500cd8d041617967b896378ae490"
+    "README.md": "f8b30a5687c10dbf5512af851dc020a1f491bad9173aff55cd1042fe37f005fc",
+    "regression-2026-10-27/bound-worker-death.json": "329532f69a6442a7cd94dcb086754d673e7c9a8a5fe6abd4378d0c962d251821",
+    "regression-2026-10-27/cloud-recovery.json": "fef52bc6a69c523b968bedc47a0e6b84b76bf6fae2187dac7bb67e1614949060",
+    "regression-2026-10-27/competing-workers.json": "a34b3af0d09c699a2c7a2c14a87b228fced2d8e1f3230d572683d42f1b228274",
+    "regression-2026-10-27/consent-race.json": "78d701d50696e95b00928ea1e33288a0d9cfc6208cc320d7a0ad7283b94cbdad",
+    "regression-2026-10-27/execution-binding.json": "98fe1654a1fcc467344f03c67e22d95c444cf7e13b4d08f08c8bff42ebdcc78e",
+    "regression-2026-10-27/no-regress.json": "ed9c9241cbf1aad66c3502d51a8c30ceffa589e13d7234f530ef1ffe947b3faa",
+    "regression-2026-10-27/preserved-pacing-counterexample.json": "45c7358ce611551718e48f157ec7f97a33b1c0b11508d6110f8edfe30f81d013",
+    "regression-2026-10-27/process-death.json": "97035fe1e0aec00744e7c9aba855d7f6788b46d5566a25c574e5aa4c256a99ab",
+    "regression-2026-10-27/remote-ahead-restore.json": "296599eb06fcbb8fd095235a0cb0496f869e847ecbf04848ed11924cd91c5161",
+    "regression-2026-10-27/report.md": "9118748ab044fefd33f914b9e582504b8dd94769dfafde80fd18b54a35814b1d",
+    "regression-2026-10-27/tests.xml": "6d3f19ae789536e40048e2667695fbe24ce0be5f39c93fe56f549581d14e9e92",
+    "regression-2026-10-27/unknown-result.json": "2ae2317ca5929e1941b994a7246e7a47245dcc336b88ca0132366a4599f66f45",
+    "regression-2026-10-27/verification.json": "7c9202b3bcb1ee3a58eb7f534b0b7a6b52e6e08442a95d714f282adcba903572"
   }
 }
