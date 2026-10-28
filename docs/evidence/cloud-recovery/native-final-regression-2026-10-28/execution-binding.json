@@ -1,0 +1,6 @@
+{
+  "source_commit": "af1383069660ef3a6ceb57cf85dd336385064c21",
+  "verification_sha256": "7904a49b976618aa79a34f0215cadeb7eb09e4afa662b89e7986265a5c168260",
+  "source_files_verified": 102,
+  "scope": "407 executed local software tests including validation of the separately executed native record; native application source remains pinned to3d62df2"
+}

@@ -67,6 +67,7 @@
     "native-controller-source-archive/manifest.json": "3489d3945a96c72aff176a7ff1491fbc344adade2a3058766095e33fc6be57d7",
     "native-controller-source-archive/native_application.py": "fa6dff1613242b8f778296e9e75b218ac6f8b9aae3a6702f2a267df5ec0eaff3",
     "native-final-regression-2026-10-28/cloud-recovery.json": "60ebcb5065cd06f0d90b81af9d9bb79da6f0e924ad1e95184d0588e89bf8a63b",
+    "native-final-regression-2026-10-28/execution-binding.json": "02624f8ea2dada19add2584a1eeceb9ffbee119f9883b4a1c8397c09237adcc4",
     "native-final-regression-2026-10-28/report.md": "ab8e82f0d5a86529f3e8ba37f4ac7c6c0b8d1b67ac48cad8d7f29feed226b36c",
     "native-final-regression-2026-10-28/tests.xml": "6ad04ca890c0accfd0287bcd13764a1ef4cfb7882a3e2b979845e61ef5f1739c",
     "native-final-regression-2026-10-28/verification.json": "7904a49b976618aa79a34f0215cadeb7eb09e4afa662b89e7986265a5c168260",
