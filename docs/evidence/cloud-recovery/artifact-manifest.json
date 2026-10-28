@@ -1,0 +1,30 @@
+{
+  "schema": "cloud-recovery-artifacts.v1",
+  "hash_format": "SHA-256 of exact bytes; manifest itself excluded",
+  "files": {
+    "local-2026-10-27/acceptance.json": "2ad4af8fc49bc65ed240bce7ee0bfac6e2a76a23015b9489783b384dc2076823",
+    "local-2026-10-27/browser-02/desktop.png": "edf76116c483bdbc64cd07537748f0d752e49b7af1bbadfce080fdb3dd6ca8c2",
+    "local-2026-10-27/browser-02/mobile.png": "5f2b46a14050e7aacf12c33d51d8d99a720a131e43901bb74e2346b5ff683b4a",
+    "local-2026-10-27/browser-02/provenance.json": "c4d6b993f2586d68606fc9475a33489465ff60ee378426b059a3e64e7e1aee0f",
+    "local-2026-10-27/browser-03/desktop.png": "97ebdc8df825f10a2186204c9f4dba6540eb1b837e693ba42961ce267ebdc523",
+    "local-2026-10-27/browser-03/mobile.png": "008d02e3d6aa946139aff7f0e3a2fcd152816e8edb050cef21ce347332aecac7",
+    "local-2026-10-27/browser-03/provenance.json": "947ce9096d0c4b342b8cd5aa5d14385745e53c34fb1fbc1b4c16c7ee93c27b89",
+    "local-2026-10-27/operator-report-v2.html": "33c62a1882a37cac3be82018cb2aa1b77ea962ce9b286381b810f636ba8aa8f2",
+    "local-2026-10-27/operator-report.html": "5bd7bb09b111b868b29890259122256091f79b04b7a8da4ec16ba9fa47cb6bcf",
+    "native-plan-2026-10-27/cost-plan.json": "995de187b03dc0ec1bdfb180c3f34d4cb630e6889f7d2fcd188bae81279391e3",
+    "native-plan-2026-10-27/read-only-observations.json": "52634c21b9bf8e66d893e63c84ecb7d9ccf3523ce30e081f3ba5fb56f9ec9ab2",
+    "native-plan-2026-10-27/README.md": "b7291591878f5c6cd3f55acec85feb0a1ca0811c5ef243d581a7177aaeb8f7e8",
+    "prior-runtime/additional/scripts/native_deploy.py": "1e4209bba32db05f63369ddc1bc3207c19a9df8fa4279c2df5b865c31a036659",
+    "prior-runtime/additional/src/controlplane/native_arming.py": "cc4d746a5c9238f01f8a1afee13c172d67943c5c494430d0f4a56e6c35cb1ed3",
+    "prior-runtime/additional/src/controlplane/native_inventory.py": "7b3131b3096e2ee85df2300e9f6c34543bc78f09d448935130fab37e5ed322eb",
+    "prior-runtime/additional/src/controlplane/native_run.py": "e353818622db2724fb03370ed33cd6f4ef4aac5e87148bdba644010673ea5784",
+    "prior-runtime/cloud.py": "08fc438fdd9e4c9b97fabdde8a0eba112a08031620d9492f3429188f7a210f41",
+    "prior-runtime/db.py": "2d409dcff0cc15e7a1c6461a0ae0da9da9c4528fd4f227e2e3483e6a8fb0c800",
+    "prior-runtime/manifest.json": "f89cf52491495ef9e6adaff9ba1102f84e21db7e3388ea7b296145706e8d81fa",
+    "prior-runtime/operations.py": "aca62af2f9a4cc4fe4d58be09108719db6fa7cbc2dcf6f0c43b031a5d098b629",
+    "prior-runtime/README.md": "6a676dcb9f1a1bd2d41e57c6b12b6b98d9f69da32b29757fb9d7456e26d11a6c",
+    "prior-runtime/service.py": "cd9efa1dcd2f1d4c816c49f89a4fbc7cbe7b839f6675faf93b3d81f153151eed",
+    "prior-runtime/worker.py": "bf9d75172b80f56dc0dd409c359e1124453581fa2e2d7ec1263b4bd55584a56c",
+    "README.md": "2c31ea2c06ac7da0b7803069c12b94a01798500cd8d041617967b896378ae490"
+  }
+}

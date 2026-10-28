@@ -10,7 +10,7 @@ Field ownership blocks unauthorized overwrites. Permission and approval are chec
 
 **Failure case:** A downstream system commits an action but loses its acknowledgment. The control plane looks up the stable effect ID and finds the existing receipt rather than issuing a second effect. After a database restore, independent receipts must reconcile before services can resume.
 
-Start with the [current executed tests](docs/evidence/dependency-isolation/arrival-review/README.md#verification), [workload results](docs/evidence/enterprise-workload.json) and [recovery design](docs/cloud-operations.md). AWS infrastructure, service identities and release controls are defined separately from the isolated native acceptance run.
+Start with [executed recovery acceptance](docs/evidence/cloud-recovery/README.md), [preserved capacity tests](docs/evidence/dependency-isolation/arrival-review/README.md#verification), [workload results](docs/evidence/enterprise-workload.json) and [recovery design](docs/cloud-operations.md). AWS infrastructure, service identities and release controls are defined separately from the isolated native acceptance run.
 
 ![Control-plane architecture](docs/diagrams/01-control-plane.svg)
 
@@ -86,7 +86,7 @@ A successful database restore alone is insufficient. Downstream effects can be n
 
 The recovery coordinator closes work admission and dispatch, binds a restore to its exact deployment/database identities, compares independent receipts and requires fresh evidence before controlled resumption. Stored pass reports cannot reopen execution. Current consent/privacy observations must be reapplied through their authoritative source before recovery can authorize new work.
 
-The [executed local recovery harness](docs/cloud-recovery.md) uses actual PostgreSQL database snapshots, separate HTTP processes and a killed worker. It demonstrates blocked remote-ahead recovery, receipt/hash conflicts, missing acknowledgments, stale approval rejection and safe resumption without duplicate synthetic effects. The complete regression suite passes 356 tests. [Evidence and source preservation](docs/evidence/cloud-recovery/README.md).
+The [executed local recovery harness](docs/cloud-recovery.md) uses actual PostgreSQL database snapshots, separate HTTP processes and a killed worker. It demonstrates blocked remote-ahead recovery, receipt/hash conflicts, missing acknowledgments, stale approval rejection and safe resumption without duplicate synthetic effects. [Structured proof, operator report and source preservation](docs/evidence/cloud-recovery/README.md).
 
 These local results do not close the [previous native post-restore verification gap](docs/evidence/aws-readiness/retained-two-instance/native-outcome/README.md). Native AWS acceptance and full production deployment remain separate, explicitly scoped verification boundaries.
 
@@ -94,7 +94,7 @@ These local results do not close the [previous native post-restore verification 
 
 | Validation layer | Purpose and observed result |
 |---|---|
-| Exact correctness suite | 323 current tests, preserving the original invariants and adding shared capacity, routed recovery, evidence and permission checks; real PostgreSQL and separate HTTP processes. |
+| Exact correctness suite | Original invariants plus shared capacity, routed recovery, evidence, permission checks and durable recovery approval; real PostgreSQL and separate HTTP processes. Current counts are recorded in [recovery verification](docs/evidence/cloud-recovery/README.md). |
 | Enterprise workload | 1,000 customer accounts, 1,000 intents, four worker processes, 1,200 attempts; 950 unique effects, 50 intended permanent rejections, 50 lost acknowledgements reconciled, zero duplicate effects. |
 | Measured local run | 19.3 seconds admission; 55.5 seconds drain; 18.0 intents/second during drain. HTTP admission p95: 63 ms. |
 | Production capacity model | Explicit connection budgets, admission-lock limits, worker concurrency, retention, failure domains and scaling decision points. |

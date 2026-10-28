@@ -1,0 +1,295 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Control Plane | Recovery acceptance</title><style>
+:root{color-scheme:dark;font-family:system-ui,sans-serif;color:#e8eef7;background:#0b1220;line-height:1.55}
+*{box-sizing:border-box}body{margin:0}main{max-width:1200px;margin:auto;padding:38px 24px 64px}
+.eyebrow{color:#9bbacb;text-transform:uppercase;letter-spacing:.12em;font-size:.76rem;margin:0 0 8px}
+h1{font-size:clamp(2rem,5vw,3.4rem);line-height:1.12;max-width:850px;margin:12px 0 20px}h2{font-size:1.15rem;margin:6px 0}
+.intro{color:#c1ccda;max-width:850px;font-size:1.1rem}.boundary{border-left:3px solid #60c5bd;background:#142331;padding:16px 20px;margin:28px 0}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:28px 0}.metrics div,article{border:1px solid #33445b;border-radius:12px;background:#142033;padding:20px}
+.metrics strong{display:block;font-size:2rem;color:#8ee0d7}.metrics span{display:block;color:#c1ccda;font-size:.88rem}
+.cases{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.status{display:inline-block;background:#183a3c;color:#a4ece1;border-radius:4px;padding:3px 9px;font-size:.75rem;font-weight:700}
+summary{cursor:pointer;color:#c1d9ed;padding:8px 0}summary:focus-visible{outline:2px solid #8ee0d7;outline-offset:4px}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#0b1220;padding:14px;font-size:.78rem;max-height:480px;overflow:auto}
+footer{color:#a9b9ca;font-size:.85rem;margin-top:30px;overflow-wrap:anywhere}@media(max-width:720px){.metrics,.cases{grid-template-columns:1fr 1fr}.cases{grid-template-columns:1fr}main{padding:24px 16px}}
+</style><main><p class="eyebrow">Enterprise control plane · executed operator proof</p>
+<h1>A restored database is not permission to resume.</h1>
+<p class="intro">An early control snapshot misses independently committed effects and stays closed. A later matching snapshot requires fresh authority, an exact approval and another live comparison before work can resume.</p>
+<div class="boundary"><strong>Recorded local PostgreSQL / HTTP execution. Synthetic records only.</strong><br>
+Actual database copies, separate receiver storage and terminated worker processes. This report is read-only. It does not claim native RDS PITR, a production deployment, or guaranteed RPO/RTO.</div>
+<section class="metrics" aria-label="Observed counts"><div><strong>5</strong><span>Original control intents</span></div><div><strong>5</strong><span>Independent effects before recovery</span></div><div><strong>2</strong><span>Missing intents after early restore</span></div><div><strong>6</strong><span>Effects after one authorized new action</span></div></section>
+<section class="cases" aria-label="Executed recovery scenarios"><article><p class="eyebrow">Executed scenario A</p><h2>Historical restore stays closed</h2><p class="status">PASSED</p><details><summary>Inspect persisted evidence</summary><pre>{
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;verification&quot;: {
+    &quot;proof_id&quot;: &quot;28763775-607b-4dff-a9f6-05877432d341&quot;,
+    &quot;safe_to_resume&quot;: false,
+    &quot;local_intents&quot;: 3,
+    &quot;remote_effects&quot;: 5,
+    &quot;findings&quot;: [
+      {
+        &quot;key&quot;: &quot;a1307487-6ee9-48da-b247-fde730f309a1&quot;,
+        &quot;reason&quot;: &quot;remote_ahead_missing_intent&quot;
+      },
+      {
+        &quot;key&quot;: &quot;b61abbbe-e5e6-4c54-be6b-47c43aede2f2&quot;,
+        &quot;reason&quot;: &quot;remote_ahead_missing_intent&quot;
+      }
+    ],
+    &quot;snapshot_hash&quot;: &quot;7dc235a1fd30cc203d96a8de3433301d520ada42a11d13615657c12a467b618e&quot;,
+    &quot;observed_at&quot;: &quot;2026-10-28T00:56:30.921177+00:00&quot;,
+    &quot;scope&quot;: &quot;quiesced databases; no changes or replay performed&quot;,
+    &quot;control_fingerprint&quot;: &quot;fc29ec22e5b3bd912bdca114a48720b6b67dc180203c7b5b9438b3b488c423bb&quot;,
+    &quot;binding_hash&quot;: &quot;a98e1993aa9a5ae0e7f19e082a1f8111dcb3696906c91e354db0fdc7cbf19c99&quot;,
+    &quot;quiescence&quot;: {
+      &quot;quiescent&quot;: true,
+      &quot;observed_at&quot;: &quot;2026-10-28T00:56:30.763178+00:00&quot;,
+      &quot;registered_runtime&quot;: [
+        {
+          &quot;service&quot;: &quot;api&quot;,
+          &quot;pid&quot;: 63396,
+          &quot;exited&quot;: true
+        }
+      ]
+    },
+    &quot;policy_hash&quot;: &quot;f6360ddf381e1f14bd52be2d5cf3163fe39bc8034a7371f3321568a8d8646c39&quot;
+  },
+  &quot;resume_refused&quot;: &quot;fresh_safe_proof_required&quot;,
+  &quot;worker_claimed&quot;: false,
+  &quot;missing_restored_intents&quot;: 2
+}</pre></details></article><article><p class="eyebrow">Executed scenario B</p><h2>Lost acknowledgment reconciled</h2><p class="status">PASSED</p><details><summary>Inspect persisted evidence</summary><pre>{
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;key&quot;: &quot;4b2a0fbe-61ac-4e27-85a2-d4cc3d8d0360&quot;,
+  &quot;sender&quot;: {
+    &quot;reason&quot;: &quot;reconciled_committed_effect&quot;,
+    &quot;uncertain&quot;: false,
+    &quot;status&quot;: &quot;succeeded&quot;
+  },
+  &quot;original_effect_count&quot;: 1,
+  &quot;independent_receipt_recovered&quot;: true
+}</pre></details></article><article><p class="eyebrow">Executed scenario C</p><h2>Terminated worker safely replaced</h2><p class="status">PASSED</p><details><summary>Inspect persisted evidence</summary><pre>{
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;key&quot;: &quot;20b5dc07-194f-4a5e-beb7-1b5f836b86c7&quot;,
+  &quot;terminated_pid&quot;: 9896,
+  &quot;old_completion_accepted&quot;: false,
+  &quot;replacement&quot;: {
+    &quot;reason&quot;: &quot;reconciled_committed_effect&quot;,
+    &quot;status&quot;: &quot;succeeded&quot;
+  },
+  &quot;original_effect_count&quot;: 1,
+  &quot;lease_boundary&quot;: &quot;Original process was terminated; its real one-second lease expired without rewriting the deadline&quot;
+}</pre></details></article><article><p class="eyebrow">Executed scenario D</p><h2>Conflicting content rejected</h2><p class="status">PASSED</p><details><summary>Inspect persisted evidence</summary><pre>{
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;verification&quot;: {
+    &quot;proof_id&quot;: &quot;c8331daf-c89a-4ea2-bab4-32577adafecc&quot;,
+    &quot;safe_to_resume&quot;: false,
+    &quot;local_intents&quot;: 5,
+    &quot;remote_effects&quot;: 5,
+    &quot;findings&quot;: [
+      {
+        &quot;key&quot;: &quot;764a50d3-b555-40fa-8a65-26e20b850f9f&quot;,
+        &quot;reason&quot;: &quot;remote_identity_conflict&quot;
+      }
+    ],
+    &quot;snapshot_hash&quot;: &quot;6065bcdc8e9582c26ce11ad22948052e76334b4ed7a3631e8352cf578568b786&quot;,
+    &quot;observed_at&quot;: &quot;2026-10-28T00:56:32.854560+00:00&quot;,
+    &quot;scope&quot;: &quot;quiesced databases; no changes or replay performed&quot;,
+    &quot;control_fingerprint&quot;: &quot;2c0f08ca9d44b8d9d642608e65e5def243c54050762935bd51fdc6562fb6577e&quot;,
+    &quot;binding_hash&quot;: &quot;2d7b4421e8f2a85b498613e004c1511ccc29ba819ade024a5dd8a82e0dcdaee5&quot;,
+    &quot;quiescence&quot;: {
+      &quot;quiescent&quot;: true,
+      &quot;observed_at&quot;: &quot;2026-10-28T00:56:32.787559+00:00&quot;,
+      &quot;registered_runtime&quot;: [
+        {
+          &quot;service&quot;: &quot;api&quot;,
+          &quot;pid&quot;: 23188,
+          &quot;exited&quot;: true
+        }
+      ]
+    },
+    &quot;policy_hash&quot;: &quot;f6360ddf381e1f14bd52be2d5cf3163fe39bc8034a7371f3321568a8d8646c39&quot;
+  },
+  &quot;independent_original_preserved&quot;: true
+}</pre></details></article><article><p class="eyebrow">Executed scenario E</p><h2>Missing receipt blocks resumption</h2><p class="status">PASSED</p><details><summary>Inspect persisted evidence</summary><pre>{
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;verification&quot;: {
+    &quot;proof_id&quot;: &quot;6a8c0332-d31f-4e26-a5e0-ca56b1863d2e&quot;,
+    &quot;safe_to_resume&quot;: false,
+    &quot;local_intents&quot;: 5,
+    &quot;remote_effects&quot;: 4,
+    &quot;findings&quot;: [
+      {
+        &quot;key&quot;: &quot;764a50d3-b555-40fa-8a65-26e20b850f9f&quot;,
+        &quot;reason&quot;: &quot;acknowledged_receipt_missing&quot;
+      }
+    ],
+    &quot;snapshot_hash&quot;: &quot;d737e57f9db7b5f6d0bb6c4bd0788cba922661a3a1b401166f90586b481c080f&quot;,
+    &quot;observed_at&quot;: &quot;2026-10-28T00:56:34.927312+00:00&quot;,
+    &quot;scope&quot;: &quot;quiesced databases; no changes or replay performed&quot;,
+    &quot;control_fingerprint&quot;: &quot;9ca4e92c0db56642e8175e3cc8fa4c76452b6513d3c69cfc549fcf839e9e6716&quot;,
+    &quot;binding_hash&quot;: &quot;9f688846dd8708de1427f0b8ef2de4e3ef2f7611cef545aade459532212d613f&quot;,
+    &quot;quiescence&quot;: {
+      &quot;quiescent&quot;: true,
+      &quot;observed_at&quot;: &quot;2026-10-28T00:56:34.822472+00:00&quot;,
+      &quot;registered_runtime&quot;: [
+        {
+          &quot;service&quot;: &quot;api&quot;,
+          &quot;pid&quot;: 65608,
+          &quot;exited&quot;: true
+        }
+      ]
+    },
+    &quot;policy_hash&quot;: &quot;f6360ddf381e1f14bd52be2d5cf3163fe39bc8034a7371f3321568a8d8646c39&quot;
+  },
+  &quot;fault_scope&quot;: &quot;Deleted one receipt only from a separate negative-test copy; original receiver unchanged&quot;
+}</pre></details></article><article><p class="eyebrow">Executed scenario F</p><h2>Current permission required</h2><p class="status">PASSED</p><details><summary>Inspect persisted evidence</summary><pre>{
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;restored_permission_refresh_required&quot;: {
+    &quot;proof_id&quot;: &quot;67a0bdae-163c-47fe-b30b-57f7fcd51fc9&quot;,
+    &quot;safe_to_resume&quot;: false,
+    &quot;local_intents&quot;: 5,
+    &quot;remote_effects&quot;: 5,
+    &quot;findings&quot;: [
+      {
+        &quot;key&quot;: &quot;2d2d1cca-3ee1-4ad7-ad5a-f928bfc399b4&quot;,
+        &quot;reason&quot;: &quot;current_authority_refresh_missing&quot;,
+        &quot;field&quot;: &quot;consent&quot;
+      },
+      {
+        &quot;key&quot;: &quot;2d2d1cca-3ee1-4ad7-ad5a-f928bfc399b4&quot;,
+        &quot;reason&quot;: &quot;current_authority_refresh_missing&quot;,
+        &quot;field&quot;: &quot;suppressed&quot;
+      },
+      {
+        &quot;key&quot;: &quot;cdd49aed-1df5-439e-818a-7b035099b68e&quot;,
+        &quot;reason&quot;: &quot;current_authority_refresh_missing&quot;,
+        &quot;field&quot;: &quot;consent&quot;
+      },
+      {
+        &quot;key&quot;: &quot;cdd49aed-1df5-439e-818a-7b035099b68e&quot;,
+        &quot;reason&quot;: &quot;current_authority_refresh_missing&quot;,
+        &quot;field&quot;: &quot;suppressed&quot;
+      },
+      {
+        &quot;key&quot;: &quot;d021866a-26d1-41ac-919e-d9e51d641ea9&quot;,
+        &quot;reason&quot;: &quot;current_authority_refresh_missing&quot;,
+        &quot;field&quot;: &quot;consent&quot;
+      },
+      {
+        &quot;key&quot;: &quot;d021866a-26d1-41ac-919e-d9e51d641ea9&quot;,
+        &quot;reason&quot;: &quot;current_authority_refresh_missing&quot;,
+        &quot;field&quot;: &quot;suppressed&quot;
+      }
+    ],
+    &quot;snapshot_hash&quot;: &quot;b44d77b995329736ef74b4a316fa84879baa8e44c600428e50de515c10638b31&quot;,
+    &quot;observed_at&quot;: &quot;2026-10-28T00:56:35.679582+00:00&quot;,
+    &quot;scope&quot;: &quot;quiesced databases; no changes or replay performed&quot;,
+    &quot;control_fingerprint&quot;: &quot;6dcc00a0fb90dbec3de73f1b7647b49e72f0bd293e1fc9752b7210737b44b896&quot;,
+    &quot;binding_hash&quot;: &quot;9e3f56423cce563dfc063124db1d24abdc96b98b0d6b7a31d68ace2d7a39c033&quot;,
+    &quot;quiescence&quot;: {
+      &quot;quiescent&quot;: true,
+      &quot;observed_at&quot;: &quot;2026-10-28T00:56:35.617174+00:00&quot;,
+      &quot;registered_runtime&quot;: []
+    },
+    &quot;policy_hash&quot;: &quot;f6360ddf381e1f14bd52be2d5cf3163fe39bc8034a7371f3321568a8d8646c39&quot;
+  },
+  &quot;new_dispatch&quot;: {
+    &quot;id&quot;: &quot;bbb9b524-d640-4c26-b0cd-056da778110f&quot;,
+    &quot;decision&quot;: &quot;deny&quot;,
+    &quot;reason&quot;: &quot;consent_missing_or_revoked&quot;
+  },
+  &quot;historical_committed_effect_still_recognized&quot;: true
+}</pre></details></article><article><p class="eyebrow">Executed scenario G</p><h2>Matching state resumes safely</h2><p class="status">PASSED</p><details><summary>Inspect persisted evidence</summary><pre>{
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;approval_proof&quot;: {
+    &quot;proof_id&quot;: &quot;c49d077a-9f3c-4400-acac-ace558e67afe&quot;,
+    &quot;safe_to_resume&quot;: true,
+    &quot;local_intents&quot;: 5,
+    &quot;remote_effects&quot;: 5,
+    &quot;findings&quot;: [],
+    &quot;snapshot_hash&quot;: &quot;b44d77b995329736ef74b4a316fa84879baa8e44c600428e50de515c10638b31&quot;,
+    &quot;observed_at&quot;: &quot;2026-10-28T00:56:38.318265+00:00&quot;,
+    &quot;scope&quot;: &quot;quiesced databases; no changes or replay performed&quot;,
+    &quot;control_fingerprint&quot;: &quot;8c8370482c10d499f1d9edc90eba1c8512bf9d62078197c6af6fa03d8290fc6f&quot;,
+    &quot;binding_hash&quot;: &quot;9e3f56423cce563dfc063124db1d24abdc96b98b0d6b7a31d68ace2d7a39c033&quot;,
+    &quot;quiescence&quot;: {
+      &quot;quiescent&quot;: true,
+      &quot;observed_at&quot;: &quot;2026-10-28T00:56:38.253424+00:00&quot;,
+      &quot;registered_runtime&quot;: [
+        {
+          &quot;service&quot;: &quot;api&quot;,
+          &quot;pid&quot;: 15540,
+          &quot;exited&quot;: true
+        },
+        {
+          &quot;service&quot;: &quot;api&quot;,
+          &quot;pid&quot;: 56776,
+          &quot;exited&quot;: true
+        },
+        {
+          &quot;service&quot;: &quot;worker&quot;,
+          &quot;pid&quot;: 54652,
+          &quot;exited&quot;: true
+        }
+      ]
+    },
+    &quot;policy_hash&quot;: &quot;f6360ddf381e1f14bd52be2d5cf3163fe39bc8034a7371f3321568a8d8646c39&quot;
+  },
+  &quot;resume&quot;: {
+    &quot;resumed&quot;: true,
+    &quot;fresh_comparison&quot;: {
+      &quot;safe_to_resume&quot;: true,
+      &quot;local_intents&quot;: 5,
+      &quot;remote_effects&quot;: 5,
+      &quot;findings&quot;: [],
+      &quot;snapshot_hash&quot;: &quot;b44d77b995329736ef74b4a316fa84879baa8e44c600428e50de515c10638b31&quot;,
+      &quot;observed_at&quot;: &quot;2026-10-28T00:56:38.944956+00:00&quot;,
+      &quot;scope&quot;: &quot;quiesced databases; no changes or replay performed&quot;,
+      &quot;control_fingerprint&quot;: &quot;8c8370482c10d499f1d9edc90eba1c8512bf9d62078197c6af6fa03d8290fc6f&quot;,
+      &quot;binding_hash&quot;: &quot;9e3f56423cce563dfc063124db1d24abdc96b98b0d6b7a31d68ace2d7a39c033&quot;,
+      &quot;quiescence&quot;: {
+        &quot;quiescent&quot;: true,
+        &quot;observed_at&quot;: &quot;2026-10-28T00:56:38.787115+00:00&quot;,
+        &quot;registered_runtime&quot;: [
+          {
+            &quot;service&quot;: &quot;api&quot;,
+            &quot;pid&quot;: 15540,
+            &quot;exited&quot;: true
+          },
+          {
+            &quot;service&quot;: &quot;api&quot;,
+            &quot;pid&quot;: 56776,
+            &quot;exited&quot;: true
+          },
+          {
+            &quot;service&quot;: &quot;worker&quot;,
+            &quot;pid&quot;: 54652,
+            &quot;exited&quot;: true
+          }
+        ]
+      },
+      &quot;policy_hash&quot;: &quot;f6360ddf381e1f14bd52be2d5cf3163fe39bc8034a7371f3321568a8d8646c39&quot;
+    },
+    &quot;deployment_revision&quot;: &quot;1cf99bbc09d70e068f0a167f11c611b2b15fc8dfb2a0f27fcbc374d561ab7bb1&quot;
+  },
+  &quot;post_resume&quot;: {
+    &quot;safe_to_resume&quot;: true,
+    &quot;local_intents&quot;: 6,
+    &quot;remote_effects&quot;: 6,
+    &quot;findings&quot;: [],
+    &quot;snapshot_hash&quot;: &quot;0103172e4a97d0ac773a2bf86f3b3c54c88ddfccfa5c6c91aeb23bbbdd50e399&quot;,
+    &quot;observed_at&quot;: &quot;2026-10-28T00:56:42.861582+00:00&quot;,
+    &quot;scope&quot;: &quot;quiesced databases; no changes or replay performed&quot;
+  },
+  &quot;independent_effects_before&quot;: 5,
+  &quot;independent_effects_after&quot;: 6,
+  &quot;duplicate_business_effects&quot;: 0,
+  &quot;independent_database_identity_unchanged&quot;: true,
+  &quot;resumption_to_verified_seconds&quot;: 4.4529984000000695
+}</pre></details></article><article><p class="eyebrow">Executed scenario H</p><h2>Stale approval rejected</h2><p class="status">PASSED</p><details><summary>Inspect persisted evidence</summary><pre>{
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;prior_proof&quot;: &quot;ffcc4eee-4c26-4662-aa84-c5b860323167&quot;,
+  &quot;refusal&quot;: &quot;recovery_evidence_changed&quot;,
+  &quot;gate_remained_closed&quot;: true
+}</pre></details></article></section><footer>
+Evidence SHA-256: 2ad4af8fc49bc65ed240bce7ee0bfac6e2a76a23015b9489783b384dc2076823<br>Source commit: 5720f56276b208c823e1e7383b1a74c468c6c8e8<br>
+Measured harness duration: 21.041 seconds. This includes isolated fixture preparation and negative scenarios; it is not a production recovery objective.<br>
+Cleanup: {&quot;created_databases&quot;: 9, &quot;remaining_generated_databases&quot;: 0, &quot;created_roles&quot;: 6, &quot;remaining_generated_roles&quot;: 0}</footer></main></html>

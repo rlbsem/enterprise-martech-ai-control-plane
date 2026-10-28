@@ -20,7 +20,7 @@ def render(raw):
         "B_lost_acknowledgment": "Lost acknowledgment reconciled",
         "C_killed_worker": "Terminated worker safely replaced",
         "D_mutation_conflict": "Conflicting content rejected",
-        "E_missing_receipt": "Missing receipt blocks resumption",
+        "E_missing_acknowledged_receipt": "Missing receipt blocks resumption",
         "F_current_authority": "Current permission required",
         "G_safe_resumption": "Matching state resumes safely",
         "H_stale_approval": "Stale approval rejected",

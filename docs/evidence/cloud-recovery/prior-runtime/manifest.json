@@ -21,6 +21,22 @@
     "src/controlplane/cloud.py": {
       "path": "docs/evidence/cloud-recovery/prior-runtime/cloud.py",
       "sha256": "08fc438fdd9e4c9b97fabdde8a0eba112a08031620d9492f3429188f7a210f41"
+    },
+    "src/controlplane/native_arming.py": {
+      "path": "docs/evidence/cloud-recovery/prior-runtime/additional/src/controlplane/native_arming.py",
+      "sha256": "cc4d746a5c9238f01f8a1afee13c172d67943c5c494430d0f4a56e6c35cb1ed3"
+    },
+    "src/controlplane/native_inventory.py": {
+      "path": "docs/evidence/cloud-recovery/prior-runtime/additional/src/controlplane/native_inventory.py",
+      "sha256": "7b3131b3096e2ee85df2300e9f6c34543bc78f09d448935130fab37e5ed322eb"
+    },
+    "src/controlplane/native_run.py": {
+      "path": "docs/evidence/cloud-recovery/prior-runtime/additional/src/controlplane/native_run.py",
+      "sha256": "e353818622db2724fb03370ed33cd6f4ef4aac5e87148bdba644010673ea5784"
+    },
+    "scripts/native_deploy.py": {
+      "path": "docs/evidence/cloud-recovery/prior-runtime/additional/scripts/native_deploy.py",
+      "sha256": "1e4209bba32db05f63369ddc1bc3207c19a9df8fa4279c2df5b865c31a036659"
     }
   }
 }

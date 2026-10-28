@@ -226,8 +226,18 @@ def test_previous_workload_runtime_is_preserved_at_exact_revision():
     root = Path(__file__).resolve().parents[1]
     record = json.loads((root / "docs/evidence/cloud-recovery/prior-runtime/manifest.json").read_bytes())
     assert record["source_revision"] == "0f934d6b14f2cb23fc88f4c33a65ba3034133847"
-    assert set(record["files"]) == {
-        "src/controlplane/" + n + ".py" for n in ["db", "worker", "operations", "service", "cloud"]
+    assert set(record["files"]) == {"scripts/native_deploy.py"} | {
+        "src/controlplane/" + n + ".py"
+        for n in [
+            "db",
+            "worker",
+            "operations",
+            "service",
+            "cloud",
+            "native_arming",
+            "native_inventory",
+            "native_run",
+        ]
     }
     for row in record["files"].values():
         assert hashlib.sha256((root / row["path"]).read_bytes()).hexdigest() == row["sha256"]

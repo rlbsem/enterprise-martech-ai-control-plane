@@ -88,7 +88,12 @@ def main():
         if document["variables"][key]["value"] != expected:
             p.error("Plan/manifest identity mismatch")
     if a.phase == "runtime":
-        armed_gate(manifest, clients)
+        workflow = document["variables"].get("acceptance_workflow", {}).get("value", "sql-fixture-v1")
+        if workflow not in {"sql-fixture-v1", "application-recovery-v1"}:
+            p.error("Unknown saved-plan acceptance workflow")
+        # The guard manifest predates the runtime topology. Derive the stronger
+        # credit gate from the approved plan itself, not an editable side report.
+        armed_gate({**manifest, "acceptance_workflow": workflow}, clients)
         if document["variables"]["guard_code_sha256"]["value"] != manifest["guard_code_sha256"]:
             p.error("Approved guard code mismatch")
     else:
