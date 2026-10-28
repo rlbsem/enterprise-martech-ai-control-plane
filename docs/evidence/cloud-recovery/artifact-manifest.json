@@ -62,7 +62,7 @@
     "native-application-2026-10-28/image-upload.json": "4c3edaaf743b04ac940dd0039073aac013fd6f23ebd4d7aaeb26160c487284b8",
     "native-application-2026-10-28/image-verification.json": "4c637340dc38c359f6f6d38aacf38cde9d2ccd037f6ecbe0cf87b28921c2bc1b",
     "native-application-2026-10-28/preservation.json": "234e9c9073064f1639fd626137575edb70994a92a8976ddffa176f4e6341a026",
-    "native-application-2026-10-28/README.md": "76fdb6239deccb9c9413a42a631f96f6ccb5be863c3a7e2424cb755dda5c9e7c",
+    "native-application-2026-10-28/README.md": "702aa0046fcbf8e90db8320ff7cf9819eff77e1f7204565a570f6c2cec47de2a",
     "native-application-2026-10-28/teardown.json": "db7488a6063c0a40c12c3472ba4eecacc6c6ca7d7570f56de05aa2174a6e5c07",
     "native-controller-source-archive/manifest.json": "3489d3945a96c72aff176a7ff1491fbc344adade2a3058766095e33fc6be57d7",
     "native-controller-source-archive/native_application.py": "fa6dff1613242b8f778296e9e75b218ac6f8b9aae3a6702f2a267df5ec0eaff3",
@@ -109,6 +109,7 @@
     "timing-admission-regression-2026-10-28/execution-binding.json": "c1da6fbd46d718aab9b3e771d7698e9681953e30cff0319f9c8deb275bf4032f",
     "timing-admission-regression-2026-10-28/report.md": "85d8b5e0736a5b3dfdad067302e506f15327455bf59c9ea9f8f043d2d940939e",
     "timing-admission-regression-2026-10-28/tests.xml": "50841eff00bf796976e0cff135e7bdf4c2817b3beacfca19918934abbc345d19",
-    "timing-admission-regression-2026-10-28/verification.json": "d2ff21339d6d1903c273e5c01ee3b904e76810dcf9bc71efb8391d1ef7d7f51a"
+    "timing-admission-regression-2026-10-28/verification.json": "d2ff21339d6d1903c273e5c01ee3b904e76810dcf9bc71efb8391d1ef7d7f51a",
+    "native-application-2026-10-28/recovery-overview.svg": "a2698c70a8c7fcab8f9a1dcba8f1c453be33b6268aa012c662c38953d30c0f3f"
   }
 }
