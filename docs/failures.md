@@ -17,7 +17,7 @@ The idempotency row **is the synthetic business effect**. In a real adapter, ded
 | Wrong source / old sequence / lifecycle regression | Per-field refusal with provenance and exception | Examine producer authority and ordering |
 | Stale/expired/denied proposal | No new dispatch | Submit fresh context; new approval if required |
 | Consent/suppression changed after approval | New marketing dispatch blocked | Approval is not a privacy override |
-| HTTP 429 | Durable retry; integer Retry-After bounded to 1–300 seconds | Rate-limited, not a governance exception |
+| HTTP 429 | Durable retry; integer Retry-After bounded to 1 to 300 seconds | Rate-limited, not a governance exception |
 | HTTP 5xx | Retry with uncertainty; reconcile before another mutation | A server error is not proof of no commit |
 | Timeout before mutation | Unknown state; lookup finds no effect; current policy gates resend | May recover if still authorized |
 | Timeout after mutation | Lookup finds original effect and verifies hash | Report success without duplicate mutation |
