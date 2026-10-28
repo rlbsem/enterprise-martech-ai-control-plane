@@ -1,0 +1,910 @@
+{
+  "schema": "cloud-recovery-native-application.v1",
+  "run": "a26102819521179",
+  "scope": "Actual isolated AWS RDS retained-backup PITR, synthetic API/worker/receiver tasks and separate read-only comparisons; not full production ECS/HTTPS acceptance",
+  "private_original_sha256": "0aa7c33aa8c7327c3f5312c65f60f2423872a138368721556b2d38ee7bc7e370",
+  "redactions": "Private account/ARN/endpoint/resource references replaced by hashes; executed counts, findings, request IDs, times and source bindings preserved",
+  "result": {
+    "status": "NATIVE_APPLICATION_RECOVERY_ACCEPTANCE_PASSED",
+    "workflow": "application-recovery-v1",
+    "synthetic": true,
+    "full_production_application_acceptance": false,
+    "maximum_concurrent_instances": 2,
+    "first_recovery_point": "2026-10-28T20:18:23+00:00",
+    "matching_recovery_point": "2026-10-28T20:23:32+00:00",
+    "blocked": {
+      "workflow": "application-recovery-v1",
+      "stage": "behind_blocked",
+      "verification": {
+        "proof_id": "166d17c1-5638-45fe-98cb-de6890ea91f0",
+        "safe_to_resume": false,
+        "local_intents": 3,
+        "remote_effects": 5,
+        "findings": [
+          {
+            "key": "86b6e827-de0f-4c02-9788-7466f291866b",
+            "reason": "remote_ahead_missing_intent"
+          },
+          {
+            "key": "91c09287-0cff-4f53-9196-9383b7190caa",
+            "reason": "remote_ahead_missing_intent"
+          }
+        ],
+        "snapshot_hash": "d91968d5345cb6fe33b551d6cd665ef1272107e278cf1165a8ae285def2152ce",
+        "observed_at": "2026-10-28T20:44:30.985125+00:00",
+        "scope": "quiesced databases; no changes or replay performed",
+        "control_fingerprint": "a192a347f2a39435b4210cf88c76a124f87fd78b4204bacd339de74c2fcb2b22",
+        "binding_hash": "0d6e00e6cbf0eb023a41428ed66166bbac39933e14475851792214eff3ad9f2a",
+        "quiescence": {
+          "quiescent": true,
+          "observed_at": "2026-10-28T20:44:30.858382+00:00",
+          "registered_runtime": [
+            {
+              "service": "api",
+              "pid": 7,
+              "exited": true
+            }
+          ]
+        },
+        "policy_hash": "f6360ddf381e1f14bd52be2d5cf3163fe39bc8034a7371f3321568a8d8646c39"
+      },
+      "resume_refused": "fresh_safe_proof_required",
+      "worker_claimed": false,
+      "remote_ledger_sha256": "3dd187801800c3576fbd16c53b8dd45db6fb2abe2d6ad8df9646778df74f9fd5"
+    },
+    "resumed": {
+      "workflow": "application-recovery-v1",
+      "stage": "matching_resumed",
+      "resume": {
+        "resumed": true,
+        "fresh_comparison": {
+          "safe_to_resume": true,
+          "local_intents": 5,
+          "remote_effects": 5,
+          "findings": [],
+          "snapshot_hash": "8b6f6b2b0d46ae0b1cd43af7a08d3eef9ec8cbb8ab98e0d993505559d8ca84d8",
+          "observed_at": "2026-10-28T21:02:12.840980+00:00",
+          "scope": "quiesced databases; no changes or replay performed",
+          "control_fingerprint": "223e765399e07c811f3ace46fcd13f724069879ff2d6f704ab8803a9fc3d0024",
+          "binding_hash": "66c9578e1a95f647a9536e129940bd6c697238798a0bb89f1aadec5a39677d34",
+          "quiescence": {
+            "quiescent": true,
+            "observed_at": "2026-10-28T21:02:12.722674+00:00",
+            "registered_runtime": [
+              {
+                "service": "api",
+                "pid": 8,
+                "exited": true
+              },
+              {
+                "service": "api",
+                "pid": 10,
+                "exited": true
+              },
+              {
+                "service": "worker",
+                "pid": 12,
+                "exited": true
+              }
+            ]
+          },
+          "policy_hash": "f6360ddf381e1f14bd52be2d5cf3163fe39bc8034a7371f3321568a8d8646c39"
+        },
+        "deployment_revision": "ecc7c94e3c930d1e3927a4dd4d78afcec3f9ac26a4947c5f49c96c07a2d7c6e7"
+      },
+      "stale_approval_refusal": "recovery_evidence_changed",
+      "revoked_action": {
+        "id": "018da178-43f8-44dc-b72a-82e7e7da4d41",
+        "decision": "deny",
+        "reason": "consent_missing_or_revoked"
+      },
+      "old_completion_accepted": false,
+      "recovered_jobs": [
+        {
+          "reason": "reconciled_committed_effect",
+          "uncertain": false,
+          "status": "succeeded"
+        },
+        {
+          "reason": "remote_committed",
+          "uncertain": false,
+          "status": "succeeded"
+        },
+        {
+          "reason": "remote_committed",
+          "uncertain": false,
+          "status": "succeeded"
+        },
+        {
+          "reason": "reconciled_committed_effect",
+          "uncertain": false,
+          "status": "succeeded"
+        },
+        {
+          "reason": "remote_committed",
+          "uncertain": false,
+          "status": "succeeded"
+        }
+      ],
+      "post_resume": {
+        "safe_to_resume": true,
+        "local_intents": 6,
+        "remote_effects": 6,
+        "findings": [],
+        "snapshot_hash": "01ed3e2fb6d6e062af52702bd39c711acd5383c60729ffb8a98e096083e2613d",
+        "observed_at": "2026-10-28T21:02:34.730430+00:00",
+        "scope": "quiesced databases; no changes or replay performed",
+        "execution_gate": {
+          "mode": "open",
+          "epoch": 1,
+          "session_id": "0f443189-053b-4a88-9df4-181564ed054b"
+        }
+      },
+      "duplicate_business_effects": 0,
+      "independent_database_identity_unchanged": true,
+      "remote_ledger_sha256": "bb15d85bd0cfd5a96e5b8d74b6a118cf964d0bef0eef60a306b4d42e48de8054"
+    },
+    "independent_final": {
+      "safe_to_resume": true,
+      "local_intents": 6,
+      "remote_effects": 6,
+      "findings": [],
+      "snapshot_hash": "01ed3e2fb6d6e062af52702bd39c711acd5383c60729ffb8a98e096083e2613d",
+      "observed_at": "2026-10-28T21:03:41.939328+00:00",
+      "scope": "quiesced databases; no changes or replay performed",
+      "execution_gate": {
+        "mode": "open",
+        "epoch": 1,
+        "session_id": "0f443189-053b-4a88-9df4-181564ed054b"
+      },
+      "write_denials": 2,
+      "remote_ledger_sha256": "bb15d85bd0cfd5a96e5b8d74b6a118cf964d0bef0eef60a306b4d42e48de8054"
+    },
+    "records": [
+      {
+        "task_observation": {
+          "task": "bootstrap",
+          "task_reference": "6b710d1131f09ac2bcb5cb3e67f9e0efa25227faf894eb7fa7805b1219922134",
+          "last_status": "PROVISIONING",
+          "phase": "launched",
+          "stop_code": null,
+          "expected_exit": 0,
+          "expected_image_digest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852",
+          "containers": [
+            {
+              "name": "bootstrap",
+              "exitCode": null,
+              "imageDigest": null
+            }
+          ],
+          "log_read_error": null,
+          "logs_truncated": false,
+          "private_archive_sha256": "d7b8b37509843cd512a1e4350404cdec1c1b31a0704c01b9a7ae1434b6410609"
+        }
+      },
+      {
+        "task_observation": {
+          "task": "bootstrap",
+          "task_reference": "6b710d1131f09ac2bcb5cb3e67f9e0efa25227faf894eb7fa7805b1219922134",
+          "last_status": "STOPPED",
+          "phase": "stopped",
+          "stop_code": "EssentialContainerExited",
+          "expected_exit": 0,
+          "expected_image_digest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852",
+          "containers": [
+            {
+              "name": "bootstrap",
+              "exitCode": 0,
+              "imageDigest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852"
+            }
+          ],
+          "log_read_error": null,
+          "logs_truncated": false,
+          "private_archive_sha256": "86a28044e78a8d3cd31e5d741e6f718d7182623609c2f92692aa110f5ae2edb3"
+        }
+      },
+      {
+        "task": "bootstrap",
+        "task_reference": "6b710d1131f09ac2bcb5cb3e67f9e0efa25227faf894eb7fa7805b1219922134",
+        "exit_code": 0,
+        "result": {
+          "bootstrap": "complete",
+          "workflow": "application-recovery-v1",
+          "owner_credentials_in_runtime_children": false
+        }
+      },
+      {
+        "task_observation": {
+          "task": "receipt",
+          "task_reference": "ad420af275d504c4bec8c43f82d206804f6095f58b7d9c13211c77075ad88adb",
+          "last_status": "PROVISIONING",
+          "phase": "launched",
+          "stop_code": null,
+          "expected_exit": 0,
+          "expected_image_digest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852",
+          "containers": [
+            {
+              "name": "receipt",
+              "exitCode": null,
+              "imageDigest": null
+            }
+          ],
+          "log_read_error": null,
+          "logs_truncated": false,
+          "private_archive_sha256": "74cd356d62931648a4251e81dea6576eb7d22e0279494a787c87c720a1d18b0d"
+        }
+      },
+      {
+        "task_observation": {
+          "task": "receipt",
+          "task_reference": "ad420af275d504c4bec8c43f82d206804f6095f58b7d9c13211c77075ad88adb",
+          "last_status": "STOPPED",
+          "phase": "stopped",
+          "stop_code": "EssentialContainerExited",
+          "expected_exit": 0,
+          "expected_image_digest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852",
+          "containers": [
+            {
+              "name": "receipt",
+              "exitCode": 0,
+              "imageDigest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852"
+            }
+          ],
+          "log_read_error": null,
+          "logs_truncated": false,
+          "private_archive_sha256": "50c911e9f135d248151fb250ef4e7ab54926e1bdcc55bdb5521d70782c28b15f"
+        }
+      },
+      {
+        "task": "receipt",
+        "task_reference": "ad420af275d504c4bec8c43f82d206804f6095f58b7d9c13211c77075ad88adb",
+        "exit_code": 0,
+        "result": {
+          "workflow": "application-recovery-v1",
+          "stage": "source_preflight_passed",
+          "comparison": {
+            "safe_to_resume": true,
+            "local_intents": 0,
+            "remote_effects": 0,
+            "findings": [],
+            "snapshot_hash": "3e77a5ff9346807a034b8f0439fed66d742c25c68e2d7e62152bda4c6207e6d2",
+            "observed_at": "2026-10-28T20:17:07.557428+00:00",
+            "scope": "quiesced databases; no changes or replay performed"
+          },
+          "recovery_operations_rolled_back": true,
+          "api_receiver_health_passed": true,
+          "empty_worker_claimed": false,
+          "write_denials": 2
+        }
+      },
+      {
+        "task_observation": {
+          "task": "baseline",
+          "task_reference": "035871c9a395ce26cd663ee4e7c37e35140f619fc2c7976c18a6f89716dbcd31",
+          "last_status": "PROVISIONING",
+          "phase": "launched",
+          "stop_code": null,
+          "expected_exit": 0,
+          "expected_image_digest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852",
+          "containers": [
+            {
+              "name": "baseline",
+              "exitCode": null,
+              "imageDigest": null
+            }
+          ],
+          "log_read_error": null,
+          "logs_truncated": false,
+          "private_archive_sha256": "6d6e69090aea0bf5ef5b1df3ed45ce9b7a6a4b1b652d957d291031831d5e57ab"
+        }
+      },
+      {
+        "task_observation": {
+          "task": "baseline",
+          "task_reference": "035871c9a395ce26cd663ee4e7c37e35140f619fc2c7976c18a6f89716dbcd31",
+          "last_status": "STOPPED",
+          "phase": "stopped",
+          "stop_code": "EssentialContainerExited",
+          "expected_exit": 0,
+          "expected_image_digest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852",
+          "containers": [
+            {
+              "name": "baseline",
+              "exitCode": 0,
+              "imageDigest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852"
+            }
+          ],
+          "log_read_error": null,
+          "logs_truncated": false,
+          "private_archive_sha256": "cbc0f9db626bf09bbd170ca5a7fc655d1307ff770c888613177ff884ed848a48"
+        }
+      },
+      {
+        "task": "baseline",
+        "task_reference": "035871c9a395ce26cd663ee4e7c37e35140f619fc2c7976c18a6f89716dbcd31",
+        "exit_code": 0,
+        "result": {
+          "workflow": "application-recovery-v1",
+          "stage": "three_effects",
+          "comparison": {
+            "safe_to_resume": true,
+            "local_intents": 3,
+            "remote_effects": 3,
+            "findings": [],
+            "snapshot_hash": "ae16f3500c82f67806ed6ed87b8774167bdf0d6dff3f091091ee6e8d9603f90f",
+            "observed_at": "2026-10-28T20:18:21.831397+00:00",
+            "scope": "quiesced databases; no changes or replay performed"
+          },
+          "recovery_point": "2026-10-28T20:18:21.890576+00:00",
+          "source_database": "09a37ff159d3d42d01c056be5c1698d5a7a225ace9ce602498596ce801b6b866",
+          "terminated_worker": true,
+          "normal_key": "cd590179-16c0-4726-bd37-6104acaa32e5",
+          "lost_ack_key": "3cdce12a-41d4-4f49-8936-1f58ecaa3152",
+          "killed_key": "c580583b-e238-4f4d-84bc-c0cfd1ab9d6a",
+          "remote_ledger_sha256": "fdc84570fbe2ba3b04ee784c184c7d8bbccb33db29a114a1ce5e6c22800ab1e3"
+        }
+      },
+      {
+        "task_observation": {
+          "task": "control",
+          "task_reference": "beff9a78df0003fd70c8ed8e5035f67cffc2dc302b45dca1d42c752d1e2b58ef",
+          "last_status": "PROVISIONING",
+          "phase": "launched",
+          "stop_code": null,
+          "expected_exit": 0,
+          "expected_image_digest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852",
+          "containers": [
+            {
+              "name": "control",
+              "exitCode": null,
+              "imageDigest": null
+            }
+          ],
+          "log_read_error": null,
+          "logs_truncated": false,
+          "private_archive_sha256": "a3eaddf554da29f96ce9e589c9763e6db89f92a0b056c10df05edfc8f3d789dd"
+        }
+      },
+      {
+        "task_observation": {
+          "task": "control",
+          "task_reference": "beff9a78df0003fd70c8ed8e5035f67cffc2dc302b45dca1d42c752d1e2b58ef",
+          "last_status": "STOPPED",
+          "phase": "stopped",
+          "stop_code": "EssentialContainerExited",
+          "expected_exit": 0,
+          "expected_image_digest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852",
+          "containers": [
+            {
+              "name": "control",
+              "exitCode": 0,
+              "imageDigest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852"
+            }
+          ],
+          "log_read_error": null,
+          "logs_truncated": false,
+          "private_archive_sha256": "758e75746c6e5b52789e212f3e1dda7ae3f0097d288adda2415638e04b4684f4"
+        }
+      },
+      {
+        "task": "control",
+        "task_reference": "beff9a78df0003fd70c8ed8e5035f67cffc2dc302b45dca1d42c752d1e2b58ef",
+        "exit_code": 0,
+        "result": {
+          "workflow": "application-recovery-v1",
+          "stage": "five_effects",
+          "comparison": {
+            "safe_to_resume": true,
+            "local_intents": 5,
+            "remote_effects": 5,
+            "findings": [],
+            "snapshot_hash": "8b6f6b2b0d46ae0b1cd43af7a08d3eef9ec8cbb8ab98e0d993505559d8ca84d8",
+            "observed_at": "2026-10-28T20:23:30.862000+00:00",
+            "scope": "quiesced databases; no changes or replay performed"
+          },
+          "new_keys": [
+            "86b6e827-de0f-4c02-9788-7466f291866b",
+            "91c09287-0cff-4f53-9196-9383b7190caa"
+          ],
+          "recovery_point": "2026-10-28T20:23:30.919198+00:00",
+          "remote_ledger_sha256": "3dd187801800c3576fbd16c53b8dd45db6fb2abe2d6ad8df9646778df74f9fd5"
+        }
+      },
+      {
+        "task_observation": {
+          "task": "verify",
+          "task_reference": "982f4b4c3d479941d5186d0351b6d1e7f25f77c6ad6b64c16e97476a10cd3928",
+          "last_status": "PROVISIONING",
+          "phase": "launched",
+          "stop_code": null,
+          "expected_exit": 0,
+          "expected_image_digest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852",
+          "containers": [
+            {
+              "name": "verify",
+              "exitCode": null,
+              "imageDigest": null
+            }
+          ],
+          "log_read_error": null,
+          "logs_truncated": false,
+          "private_archive_sha256": "b453403b9c3f94f68b175585d2323dde435bb1d65231c5f297b489495751bb4a"
+        }
+      },
+      {
+        "task_observation": {
+          "task": "verify",
+          "task_reference": "982f4b4c3d479941d5186d0351b6d1e7f25f77c6ad6b64c16e97476a10cd3928",
+          "last_status": "STOPPED",
+          "phase": "stopped",
+          "stop_code": "EssentialContainerExited",
+          "expected_exit": 0,
+          "expected_image_digest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852",
+          "containers": [
+            {
+              "name": "verify",
+              "exitCode": 0,
+              "imageDigest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852"
+            }
+          ],
+          "log_read_error": null,
+          "logs_truncated": false,
+          "private_archive_sha256": "ab41c884efa5c72173916d7a956499b1fbd8c126c2470fded883c67072fa5ef3"
+        }
+      },
+      {
+        "task": "verify",
+        "task_reference": "982f4b4c3d479941d5186d0351b6d1e7f25f77c6ad6b64c16e97476a10cd3928",
+        "exit_code": 0,
+        "result": {
+          "safe_to_resume": true,
+          "local_intents": 5,
+          "remote_effects": 5,
+          "findings": [],
+          "snapshot_hash": "8b6f6b2b0d46ae0b1cd43af7a08d3eef9ec8cbb8ab98e0d993505559d8ca84d8",
+          "observed_at": "2026-10-28T20:27:14.110290+00:00",
+          "scope": "quiesced databases; no changes or replay performed",
+          "execution_gate": {
+            "mode": "open",
+            "epoch": 0,
+            "session_id": null
+          },
+          "write_denials": 2,
+          "remote_ledger_sha256": "3dd187801800c3576fbd16c53b8dd45db6fb2abe2d6ad8df9646778df74f9fd5"
+        }
+      },
+      {
+        "task_observation": {
+          "task": "receipt",
+          "task_reference": "462ac0a62bb18b5a4f0c2eb790f9427eb1213181b2a7a15766f5129996f2543b",
+          "last_status": "PROVISIONING",
+          "phase": "launched",
+          "stop_code": null,
+          "expected_exit": 0,
+          "expected_image_digest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852",
+          "containers": [
+            {
+              "name": "receipt",
+              "exitCode": null,
+              "imageDigest": null
+            }
+          ],
+          "log_read_error": null,
+          "logs_truncated": false,
+          "private_archive_sha256": "f00794f1a447a0b140c0dfd416a305c4ea77531bc5acb533839417e407937698"
+        }
+      },
+      {
+        "task_observation": {
+          "task": "receipt",
+          "task_reference": "462ac0a62bb18b5a4f0c2eb790f9427eb1213181b2a7a15766f5129996f2543b",
+          "last_status": "STOPPED",
+          "phase": "stopped",
+          "stop_code": "EssentialContainerExited",
+          "expected_exit": 0,
+          "expected_image_digest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852",
+          "containers": [
+            {
+              "name": "receipt",
+              "exitCode": 0,
+              "imageDigest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852"
+            }
+          ],
+          "log_read_error": null,
+          "logs_truncated": false,
+          "private_archive_sha256": "d6be21d8f1baf47cc96ddda6a8a645a8980107faa46d23094d1f8cf085abe9aa"
+        }
+      },
+      {
+        "task": "receipt",
+        "task_reference": "462ac0a62bb18b5a4f0c2eb790f9427eb1213181b2a7a15766f5129996f2543b",
+        "exit_code": 0,
+        "result": {
+          "workflow": "application-recovery-v1",
+          "stage": "behind_blocked",
+          "verification": {
+            "proof_id": "166d17c1-5638-45fe-98cb-de6890ea91f0",
+            "safe_to_resume": false,
+            "local_intents": 3,
+            "remote_effects": 5,
+            "findings": [
+              {
+                "key": "86b6e827-de0f-4c02-9788-7466f291866b",
+                "reason": "remote_ahead_missing_intent"
+              },
+              {
+                "key": "91c09287-0cff-4f53-9196-9383b7190caa",
+                "reason": "remote_ahead_missing_intent"
+              }
+            ],
+            "snapshot_hash": "d91968d5345cb6fe33b551d6cd665ef1272107e278cf1165a8ae285def2152ce",
+            "observed_at": "2026-10-28T20:44:30.985125+00:00",
+            "scope": "quiesced databases; no changes or replay performed",
+            "control_fingerprint": "a192a347f2a39435b4210cf88c76a124f87fd78b4204bacd339de74c2fcb2b22",
+            "binding_hash": "0d6e00e6cbf0eb023a41428ed66166bbac39933e14475851792214eff3ad9f2a",
+            "quiescence": {
+              "quiescent": true,
+              "observed_at": "2026-10-28T20:44:30.858382+00:00",
+              "registered_runtime": [
+                {
+                  "service": "api",
+                  "pid": 7,
+                  "exited": true
+                }
+              ]
+            },
+            "policy_hash": "f6360ddf381e1f14bd52be2d5cf3163fe39bc8034a7371f3321568a8d8646c39"
+          },
+          "resume_refused": "fresh_safe_proof_required",
+          "worker_claimed": false,
+          "remote_ledger_sha256": "3dd187801800c3576fbd16c53b8dd45db6fb2abe2d6ad8df9646778df74f9fd5"
+        }
+      },
+      {
+        "task_observation": {
+          "task": "verify",
+          "task_reference": "5edb42901ad18d48ebf4c1309afafb643990b4657b590fa111baaa16fd02a53f",
+          "last_status": "PROVISIONING",
+          "phase": "launched",
+          "stop_code": null,
+          "expected_exit": 2,
+          "expected_image_digest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852",
+          "containers": [
+            {
+              "name": "verify",
+              "exitCode": null,
+              "imageDigest": null
+            }
+          ],
+          "log_read_error": null,
+          "logs_truncated": false,
+          "private_archive_sha256": "98b47791796169363076bacba84d1f624fe6a309a6e3e5dbd9f559acb759f3a5"
+        }
+      },
+      {
+        "task_observation": {
+          "task": "verify",
+          "task_reference": "5edb42901ad18d48ebf4c1309afafb643990b4657b590fa111baaa16fd02a53f",
+          "last_status": "STOPPED",
+          "phase": "stopped",
+          "stop_code": "EssentialContainerExited",
+          "expected_exit": 2,
+          "expected_image_digest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852",
+          "containers": [
+            {
+              "name": "verify",
+              "exitCode": 2,
+              "imageDigest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852"
+            }
+          ],
+          "log_read_error": null,
+          "logs_truncated": false,
+          "private_archive_sha256": "e11c8a59863a2acccf09879d247277c5a1cfcedd8f9b2b4150b314c8034b6e15"
+        }
+      },
+      {
+        "task": "verify",
+        "task_reference": "5edb42901ad18d48ebf4c1309afafb643990b4657b590fa111baaa16fd02a53f",
+        "exit_code": 2,
+        "result": {
+          "safe_to_resume": false,
+          "local_intents": 3,
+          "remote_effects": 5,
+          "findings": [
+            {
+              "key": "86b6e827-de0f-4c02-9788-7466f291866b",
+              "reason": "remote_ahead_missing_intent"
+            },
+            {
+              "key": "91c09287-0cff-4f53-9196-9383b7190caa",
+              "reason": "remote_ahead_missing_intent"
+            },
+            {
+              "reason": "execution_gate_closed"
+            }
+          ],
+          "snapshot_hash": "d91968d5345cb6fe33b551d6cd665ef1272107e278cf1165a8ae285def2152ce",
+          "observed_at": "2026-10-28T20:45:37.911824+00:00",
+          "scope": "quiesced databases; no changes or replay performed",
+          "execution_gate": {
+            "mode": "closed",
+            "epoch": 1,
+            "session_id": "4e3fc0b8-d255-4b81-adf9-5b57da29f8b5"
+          },
+          "write_denials": 2,
+          "remote_ledger_sha256": "3dd187801800c3576fbd16c53b8dd45db6fb2abe2d6ad8df9646778df74f9fd5"
+        }
+      },
+      {
+        "task_observation": {
+          "task": "receipt",
+          "task_reference": "cce10649485ef325a5b938c868e781e1e15c099305c3f2de472876321bbc98d7",
+          "last_status": "PROVISIONING",
+          "phase": "launched",
+          "stop_code": null,
+          "expected_exit": 0,
+          "expected_image_digest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852",
+          "containers": [
+            {
+              "name": "receipt",
+              "exitCode": null,
+              "imageDigest": null
+            }
+          ],
+          "log_read_error": null,
+          "logs_truncated": false,
+          "private_archive_sha256": "01d54d03209fb77a315d20efed2429e8dfe08efce06a92fa795993753dec6f24"
+        }
+      },
+      {
+        "task_observation": {
+          "task": "receipt",
+          "task_reference": "cce10649485ef325a5b938c868e781e1e15c099305c3f2de472876321bbc98d7",
+          "last_status": "STOPPED",
+          "phase": "stopped",
+          "stop_code": "EssentialContainerExited",
+          "expected_exit": 0,
+          "expected_image_digest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852",
+          "containers": [
+            {
+              "name": "receipt",
+              "exitCode": 0,
+              "imageDigest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852"
+            }
+          ],
+          "log_read_error": null,
+          "logs_truncated": false,
+          "private_archive_sha256": "96daedc7bb4d8306f0bf5cc713e31a549a4da9b6efe8994804c9434864f24ae1"
+        }
+      },
+      {
+        "task": "receipt",
+        "task_reference": "cce10649485ef325a5b938c868e781e1e15c099305c3f2de472876321bbc98d7",
+        "exit_code": 0,
+        "result": {
+          "workflow": "application-recovery-v1",
+          "stage": "matching_resumed",
+          "resume": {
+            "resumed": true,
+            "fresh_comparison": {
+              "safe_to_resume": true,
+              "local_intents": 5,
+              "remote_effects": 5,
+              "findings": [],
+              "snapshot_hash": "8b6f6b2b0d46ae0b1cd43af7a08d3eef9ec8cbb8ab98e0d993505559d8ca84d8",
+              "observed_at": "2026-10-28T21:02:12.840980+00:00",
+              "scope": "quiesced databases; no changes or replay performed",
+              "control_fingerprint": "223e765399e07c811f3ace46fcd13f724069879ff2d6f704ab8803a9fc3d0024",
+              "binding_hash": "66c9578e1a95f647a9536e129940bd6c697238798a0bb89f1aadec5a39677d34",
+              "quiescence": {
+                "quiescent": true,
+                "observed_at": "2026-10-28T21:02:12.722674+00:00",
+                "registered_runtime": [
+                  {
+                    "service": "api",
+                    "pid": 8,
+                    "exited": true
+                  },
+                  {
+                    "service": "api",
+                    "pid": 10,
+                    "exited": true
+                  },
+                  {
+                    "service": "worker",
+                    "pid": 12,
+                    "exited": true
+                  }
+                ]
+              },
+              "policy_hash": "f6360ddf381e1f14bd52be2d5cf3163fe39bc8034a7371f3321568a8d8646c39"
+            },
+            "deployment_revision": "ecc7c94e3c930d1e3927a4dd4d78afcec3f9ac26a4947c5f49c96c07a2d7c6e7"
+          },
+          "stale_approval_refusal": "recovery_evidence_changed",
+          "revoked_action": {
+            "id": "018da178-43f8-44dc-b72a-82e7e7da4d41",
+            "decision": "deny",
+            "reason": "consent_missing_or_revoked"
+          },
+          "old_completion_accepted": false,
+          "recovered_jobs": [
+            {
+              "reason": "reconciled_committed_effect",
+              "uncertain": false,
+              "status": "succeeded"
+            },
+            {
+              "reason": "remote_committed",
+              "uncertain": false,
+              "status": "succeeded"
+            },
+            {
+              "reason": "remote_committed",
+              "uncertain": false,
+              "status": "succeeded"
+            },
+            {
+              "reason": "reconciled_committed_effect",
+              "uncertain": false,
+              "status": "succeeded"
+            },
+            {
+              "reason": "remote_committed",
+              "uncertain": false,
+              "status": "succeeded"
+            }
+          ],
+          "post_resume": {
+            "safe_to_resume": true,
+            "local_intents": 6,
+            "remote_effects": 6,
+            "findings": [],
+            "snapshot_hash": "01ed3e2fb6d6e062af52702bd39c711acd5383c60729ffb8a98e096083e2613d",
+            "observed_at": "2026-10-28T21:02:34.730430+00:00",
+            "scope": "quiesced databases; no changes or replay performed",
+            "execution_gate": {
+              "mode": "open",
+              "epoch": 1,
+              "session_id": "0f443189-053b-4a88-9df4-181564ed054b"
+            }
+          },
+          "duplicate_business_effects": 0,
+          "independent_database_identity_unchanged": true,
+          "remote_ledger_sha256": "bb15d85bd0cfd5a96e5b8d74b6a118cf964d0bef0eef60a306b4d42e48de8054"
+        }
+      },
+      {
+        "task_observation": {
+          "task": "verify",
+          "task_reference": "5f753cb63979af014bfc19f6431a6789156d62441eab9b4aca9a881e1c2ab26d",
+          "last_status": "PROVISIONING",
+          "phase": "launched",
+          "stop_code": null,
+          "expected_exit": 0,
+          "expected_image_digest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852",
+          "containers": [
+            {
+              "name": "verify",
+              "exitCode": null,
+              "imageDigest": null
+            }
+          ],
+          "log_read_error": null,
+          "logs_truncated": false,
+          "private_archive_sha256": "91de605496e7addcfe00cc99182b61872a2b3e38b81f7f69682b4277a6d8fc9a"
+        }
+      },
+      {
+        "task_observation": {
+          "task": "verify",
+          "task_reference": "5f753cb63979af014bfc19f6431a6789156d62441eab9b4aca9a881e1c2ab26d",
+          "last_status": "STOPPED",
+          "phase": "stopped",
+          "stop_code": "EssentialContainerExited",
+          "expected_exit": 0,
+          "expected_image_digest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852",
+          "containers": [
+            {
+              "name": "verify",
+              "exitCode": 0,
+              "imageDigest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852"
+            }
+          ],
+          "log_read_error": null,
+          "logs_truncated": false,
+          "private_archive_sha256": "46d61b0df5d1d71c4ac6fdd721c5aac992d0ea37f5378e4214060317b099b295"
+        }
+      },
+      {
+        "task": "verify",
+        "task_reference": "5f753cb63979af014bfc19f6431a6789156d62441eab9b4aca9a881e1c2ab26d",
+        "exit_code": 0,
+        "result": {
+          "safe_to_resume": true,
+          "local_intents": 6,
+          "remote_effects": 6,
+          "findings": [],
+          "snapshot_hash": "01ed3e2fb6d6e062af52702bd39c711acd5383c60729ffb8a98e096083e2613d",
+          "observed_at": "2026-10-28T21:03:41.939328+00:00",
+          "scope": "quiesced databases; no changes or replay performed",
+          "execution_gate": {
+            "mode": "open",
+            "epoch": 1,
+            "session_id": "0f443189-053b-4a88-9df4-181564ed054b"
+          },
+          "write_denials": 2,
+          "remote_ledger_sha256": "bb15d85bd0cfd5a96e5b8d74b6a118cf964d0bef0eef60a306b4d42e48de8054"
+        }
+      }
+    ],
+    "phases": [
+      {
+        "phase": "application-execution-claimed",
+        "checkpoint_sha256": "f16db86ae4b062b42bb1b9d7c3c188c6e76faa5fc788df214e41c7ce95eec2ad",
+        "readback_request_id": "1TY3QMH4PZ5F7JAA"
+      },
+      {
+        "phase": "source-recovery-permissions-verified",
+        "checkpoint_sha256": "be8fdfe58b4f9dbe6f9a1c95c6bcbffa6ff023173237060dff02db3d347536bf",
+        "readback_request_id": "18GX11825CGMTDEQ"
+      },
+      {
+        "phase": "behind-quiescent-point-selected",
+        "checkpoint_sha256": "567f38b752be5bb9ad6fe3274df9770e18132f716875d7dd1a83a8572e174a79",
+        "readback_request_id": "HFBEKYD2P8VWJ75F"
+      },
+      {
+        "phase": "matching-quiescent-point-selected",
+        "checkpoint_sha256": "35afec61626a2707c8d1338cd0e577c02532bb252dbd00a4b46fd16967ffa1a4",
+        "readback_request_id": "ZBSDZ1Z9CDPZTAEQ"
+      },
+      {
+        "phase": "application-before-source-deletion",
+        "checkpoint_sha256": "5fcff43a9e6d64ec7e0ac23ae9eba6da44244a2d5c6254ae5029193b1c5671f6",
+        "readback_request_id": "XVA5T34K2CPHSXAM"
+      },
+      {
+        "phase": "delete-intent-[private-reference-sha256:a559e9a59fd5458a8ede10fa8ead87dcb873889d30d98a7035c0e227e543ae8f]",
+        "checkpoint_sha256": "57e286f077a3d958327a337536617ea1ae76d7b9bbd5e58446971ba2d2ca9bd2",
+        "readback_request_id": "XWA9QD27GPZ8JS0G"
+      },
+      {
+        "phase": "behind-rds-available",
+        "checkpoint_sha256": "e9147d1df59db9c71e8fe7cab1d43e9d6f2a6f1f08ff67d69d506a98007be596",
+        "readback_request_id": "03JNA7EQDRV2GPD3"
+      },
+      {
+        "phase": "application-behind-independently-blocked",
+        "checkpoint_sha256": "d4a19e6279733fb34db35709442f926766a26ae1778d6a7850cd2344b0800dbe",
+        "readback_request_id": "SZ505XDHBV2C7BDM"
+      },
+      {
+        "phase": "delete-intent-[private-reference-sha256:6d56402cf6a11fc384af5df8a3be86dc559d26199de3024e4ca3518f8e4ece47]",
+        "checkpoint_sha256": "1d447e4877d0f229ed22e72a610069b3c26fb37ca8f477ff49ecc77b0b235d45",
+        "readback_request_id": "B559NQDSNWQTZ0VY"
+      },
+      {
+        "phase": "matching-rds-available",
+        "checkpoint_sha256": "c09060b3713f3e09c034d63a0c5ea421cd55806e0a51387ec9ad6043404f6f55",
+        "readback_request_id": "5T612X9MA4X2GHD6"
+      },
+      {
+        "phase": "application-recovery-independently-accepted",
+        "checkpoint_sha256": "4e072b1dcb7e1c510f7eb07a102c04edfd95f31a53ef57b7caedd855c20365ea",
+        "readback_request_id": "XHD0CVQMKRFKNPEM"
+      }
+    ],
+    "execution_binding": {
+      "started_at": "2026-10-28T20:15:21.328759+00:00",
+      "finished_at": "2026-10-28T21:04:18.588804+00:00",
+      "elapsed_seconds": 2937.2604267999995,
+      "controller_source_commit": "3d62df2d750d24dc522e6d5f2e756985edcfc38e",
+      "controller_sha256": "ef077d15b99fea1bbe4444673547ce2412e2cda13a99c0b391cc1f708587fe4f",
+      "application_image_source_commit": "3d62df2d750d24dc522e6d5f2e756985edcfc38e",
+      "application_image_manifest_digest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852",
+      "runtime_manifest_sha256": "790453f7b23338294c0c14f891d679ec0beadbf9ab7bb43492fcfd94fb8bb7a2",
+      "scope": "Real AWS RDS/PITR and one-off API/worker/receiver tasks; not full production ECS/HTTPS acceptance"
+    }
+  }
+}

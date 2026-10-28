@@ -1,0 +1,55 @@
+{
+  "schema": "cloud-recovery-teardown.v1",
+  "scope": "Independent cleanup of the admission-aborted run; no application task or restore executed",
+  "observed_at": "2026-10-28T19:51:50.327163+00:00",
+  "runtime_active_resources_absent": true,
+  "guard_active_resources_absent": true,
+  "runtime_pending": [
+    {
+      "kind": "secret",
+      "reference": "8a83c622713f6e22b88dccd76337dcb184980725de00dac717d37572814e4053",
+      "state": "pending_deletion"
+    },
+    {
+      "kind": "secret",
+      "reference": "bec19261db05eec24df2b4c61a8523cf847944960fccc3313b022ee0f91fa6c5",
+      "state": "pending_deletion"
+    },
+    {
+      "kind": "secret",
+      "reference": "604e87a46a098083789ed00ddb77c0e9a1ee85412a79dc8ef1c650aae40be515",
+      "state": "pending_deletion"
+    },
+    {
+      "kind": "secret",
+      "reference": "2ac85ed44b9f0bed7bceee529757acf0e9ea699934fcbb02b0b2ea92a6068c0e",
+      "state": "pending_deletion"
+    },
+    {
+      "kind": "secret",
+      "reference": "8d637b432543ecdd29a661be50bcde0547fe11a5f8b1f19af3f2b39293059b17",
+      "state": "pending_deletion"
+    },
+    {
+      "kind": "secret",
+      "reference": "3c2efec0c3fc5f6fc15fa504df872da6391bf720caf82df046bccb07d3c4988a",
+      "state": "pending_deletion"
+    },
+    {
+      "kind": "key",
+      "reference": "130b09b45bdaabadcacbe044e24eab138436dab23ca15db68814025bdd1a3719",
+      "state": "PendingDeletion"
+    }
+  ],
+  "guard_pending": [
+    {
+      "kind": "guard_key",
+      "reference": "ccf43c4204ed900c45de3ea348a1cba1c2915b520e725e5b5100b42f4c53c6a9",
+      "state": "PendingDeletion"
+    }
+  ],
+  "archive_versions": 28,
+  "every_archive_version_reopened_and_hashed": true,
+  "private_observation_sha256": "a7fbbd3cceea1bdc920b85bb1530ecfecda9c28c0ca18fdbdfa4e823064dce94",
+  "billing_clearance": false
+}

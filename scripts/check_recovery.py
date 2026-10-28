@@ -45,6 +45,86 @@ def check_native_attempt():
     return {"status": result["status"], "restores_recorded": len(restores), "application_acceptance": False}
 
 
+def native_application_verdict(bundle):
+    """Check the recorded run, not AWS access or a new cloud execution."""
+    execution = bundle["execution"]
+    r = execution["result"]
+    if (execution["schema"] != "cloud-recovery-native-application.v1"
+            or r["status"] != "NATIVE_APPLICATION_RECOVERY_ACCEPTANCE_PASSED"
+            or r["synthetic"] is not True or r["full_production_application_acceptance"] is not False
+            or r["maximum_concurrent_instances"] != 2):
+        raise ValueError("native_application_scope_or_verdict_invalid")
+    blocked, resumed, final = r["blocked"], r["resumed"], r["independent_final"]
+    if (blocked["stage"] != "behind_blocked" or blocked["worker_claimed"] is not False
+            or blocked["verification"]["local_intents"] != 3
+            or blocked["verification"]["remote_effects"] != 5
+            or blocked["verification"]["safe_to_resume"] is not False
+            or [f["reason"] for f in blocked["verification"]["findings"]].count("remote_ahead_missing_intent") != 2):
+        raise ValueError("native_blocked_recovery_observation_invalid")
+    if (resumed["stage"] != "matching_resumed"
+            or resumed["stale_approval_refusal"] != "recovery_evidence_changed"
+            or resumed["old_completion_accepted"] is not False
+            or type(resumed["duplicate_business_effects"]) is not int
+            or resumed["duplicate_business_effects"] != 0
+            or resumed["independent_database_identity_unchanged"] is not True
+            or resumed["revoked_action"]["decision"] != "deny"
+            or resumed["revoked_action"]["reason"] != "consent_missing_or_revoked"
+            or final["local_intents"] != 6 or final["remote_effects"] != 6
+            or final["safe_to_resume"] is not True or final["findings"] or final["write_denials"] != 2):
+        raise ValueError("native_safe_resumption_observation_invalid")
+    tasks = [v for v in r["records"] if "result" in v]
+    if [(t["task"], t["exit_code"]) for t in tasks] != [
+        ("bootstrap", 0), ("receipt", 0), ("baseline", 0), ("control", 0), ("verify", 0),
+        ("receipt", 0), ("verify", 2), ("receipt", 0), ("verify", 0),
+    ] or len({t["task_reference"] for t in tasks}) != 9:
+        raise ValueError("native_single_experiment_task_sequence_invalid")
+    preflight = tasks[1]["result"]
+    if (preflight["stage"] != "source_preflight_passed"
+            or preflight["recovery_operations_rolled_back"] is not True
+            or preflight["write_denials"] != 2
+            or preflight["comparison"]["local_intents"] != 0
+            or preflight["comparison"]["remote_effects"] != 0):
+        raise ValueError("native_source_preflight_invalid")
+    binding, image = r["execution_binding"], bundle["image-verification"]
+    if (not re.fullmatch("[a-f0-9]{40}", binding["controller_source_commit"])
+            or binding["controller_source_commit"] != image["source_commit"]
+            or binding["application_image_source_commit"] != image["source_commit"]
+            or binding["application_image_manifest_digest"] != image["image_manifest_digest"]
+            or image["all_oci_blobs_verified"] is not True
+            or bundle["image-upload"]["registry_exact_manifest_readback"] is not True
+            or bundle["image-upload"]["ecr_describe_digest_verified"] is not True):
+        raise ValueError("native_application_image_binding_invalid")
+    stopped = [t["task_observation"] for t in r["records"]
+               if t.get("task_observation", {}).get("last_status") == "STOPPED"]
+    if len(stopped) != 9 or {t["task_reference"] for t in stopped} != {t["task_reference"] for t in tasks}:
+        raise ValueError("native_stopped_task_observations_incomplete")
+    for t in stopped:
+        if (len(t["containers"]) != 1 or t["containers"][0]["exitCode"] != t["expected_exit"]
+                or t["containers"][0]["imageDigest"] != image["image_manifest_digest"]
+                or t["log_read_error"] or t["logs_truncated"]):
+            raise ValueError("native_stopped_task_image_or_exit_invalid")
+    api = bundle["aws-request-receipts"]
+    restores = [a for a in api if a["operation"] == "RestoreDBInstanceToPointInTime"]
+    available = [c for c in bundle["checkpoints"] if c["phase"].endswith("rds-available")]
+    if (len(restores) != 2 or len(available) != 2
+            or any(a["http_status"] != 200 or not a["request_id"] for a in restores)
+            or {a["request_id"] for a in restores} != {a["request_id"] for a in available}
+            or {a["restore_point"] for a in available} != {r["first_recovery_point"], r["matching_recovery_point"]}):
+        raise ValueError("native_two_restore_request_bindings_invalid")
+    refs = bundle["database-generations"]["references"]
+    if len(refs) != 4 or len(set(refs.values())) != 4:
+        raise ValueError("native_database_generations_not_distinct")
+    for observation in bundle["database-generations"]["observations"]:
+        receipt = [d for d in observation["instances"] if d["role"] == "independent_receipts"]
+        if (observation["concurrent_instances"] != 2 or len(receipt) != 1
+                or receipt[0]["physical_reference_sha256"] != refs["independent_receipts"]):
+            raise ValueError("native_independent_receipt_generation_changed")
+    if {a["database_generation_reference"] for a in available} != {refs["behind_control"], refs["matching_control"]}:
+        raise ValueError("native_restore_generation_binding_invalid")
+    return {"application_acceptance": True, "restores_recorded": 2, "tasks_recorded": 9,
+            "controller_commit": binding["controller_source_commit"], "controller_sha256": binding["controller_sha256"]}
+
+
 def check():
     manifest = json.loads((PACKAGE / "artifact-manifest.json").read_bytes())
     actual_files = {
@@ -118,6 +198,22 @@ def check():
                 raise ValueError("historical_diagnostic_source_binding_failure")
             source_bindings += 1
     native = check_native_attempt()
+    latest = None
+    folder = PACKAGE / "native-application-2026-10-28"
+    if folder.exists():
+        bundle = {p.stem: json.loads(p.read_bytes()) for p in folder.glob("*.json")}
+        latest = native_application_verdict(bundle)
+        teardown = bundle.get("teardown", {})
+        if (teardown.get("runtime_active_resources_absent") is not True
+                or teardown.get("guard_active_resources_absent") is not True
+                or teardown.get("billing_clearance") is not False):
+            raise ValueError("native_application_cleanup_observation_required")
+        source = subprocess.check_output(
+            ["git", "show", latest["controller_commit"] + ":src/controlplane/native_application.py"], cwd=ROOT
+        )
+        if hashlib.sha256(source).hexdigest() != latest["controller_sha256"]:
+            raise ValueError("native_application_controller_source_binding_failure")
+        source_bindings += 1
     return {
         "status": "passed",
         "artifact_hashes": len(manifest["files"]),
@@ -127,8 +223,10 @@ def check():
         "source_commit": commit,
         "local_scenarios": 8,
         "native_execution_recorded": True,
-        "native_acceptance_passed": native["application_acceptance"],
-        "native_restores_recorded": native["restores_recorded"],
+        "native_acceptance_passed": bool(latest and latest["application_acceptance"]),
+        "native_restores_recorded": latest["restores_recorded"] if latest else native["restores_recorded"],
+        "historical_native_attempt_acceptance_passed": native["application_acceptance"],
+        "historical_native_attempt_restores_recorded": native["restores_recorded"],
     }
 
 

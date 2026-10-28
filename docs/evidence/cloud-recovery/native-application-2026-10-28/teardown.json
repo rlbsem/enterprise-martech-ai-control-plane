@@ -1,0 +1,128 @@
+{
+  "schema": "cloud-recovery-teardown.v1",
+  "observed_at": "2026-10-28T21:21:51.168460+00:00",
+  "scope": "Independent exact-run metadata reads after operator teardown and guard retirement; scheduled watchdog mutation not claimed",
+  "runtime_active_resources_absent": true,
+  "guard_active_resources_absent": true,
+  "all_resources_absent": false,
+  "absence_checks": {
+    "database": true,
+    "backup": true,
+    "snapshot": true,
+    "task": true,
+    "cluster": true,
+    "repository": true,
+    "endpoint": true,
+    "eni": true,
+    "route_table": true,
+    "security_group": true,
+    "subnet": true,
+    "vpc": true,
+    "db_subnet_group": true,
+    "db_parameter_group": true,
+    "role": true,
+    "log_group": true
+  },
+  "pending": [
+    {
+      "kind": "task_definition",
+      "reference": "b7a1bb0f5ffe15bb87bc7e7ceeec678a2ebd73649b8026aa326d079a4dccb497",
+      "state": "DELETE_IN_PROGRESS"
+    },
+    {
+      "kind": "task_definition",
+      "reference": "d79a46a9829979a77aab026502f54f6dcff3331aa2f0dc66733998b55302870d",
+      "state": "DELETE_IN_PROGRESS"
+    },
+    {
+      "kind": "task_definition",
+      "reference": "7756a336bcdbcee32c406edc456d512dc1a3ad2929daf4bd0046e5d263e76e52",
+      "state": "DELETE_IN_PROGRESS"
+    },
+    {
+      "kind": "task_definition",
+      "reference": "d3636cf8bfc440962f9583ead1752265969e9e16c0cc778c546196ab0db65f70",
+      "state": "DELETE_IN_PROGRESS"
+    },
+    {
+      "kind": "task_definition",
+      "reference": "9d7abee12686440ab8c67e3010e199236163ece213f6391bbc5b4a52f685c863",
+      "state": "DELETE_IN_PROGRESS"
+    },
+    {
+      "kind": "secret",
+      "reference": "a5343c3856928b1ef6e2eeef7cc922e94a4cd7bb802c01b9ffc1f509d1197d47",
+      "state": "pending_deletion",
+      "recovery_window_requested_days": 7,
+      "permanent_deletion_verified": false
+    },
+    {
+      "kind": "secret",
+      "reference": "8d2e5d66137c1df78cbdebb7faa0bd29a73425c435767eb18295702885aa42a1",
+      "state": "pending_deletion",
+      "recovery_window_requested_days": 7,
+      "permanent_deletion_verified": false
+    },
+    {
+      "kind": "secret",
+      "reference": "b33d8351d13145b1757c82858e9edaa1a34ec952ea3991bbbd0f0f65184accd7",
+      "state": "pending_deletion",
+      "recovery_window_requested_days": 7,
+      "permanent_deletion_verified": false
+    },
+    {
+      "kind": "secret",
+      "reference": "d9cbf7fbe8b6dbbdafecd90259dd5a26ccd451512e1f6390996127e9c5abac59",
+      "state": "pending_deletion",
+      "recovery_window_requested_days": 7,
+      "permanent_deletion_verified": false
+    },
+    {
+      "kind": "secret",
+      "reference": "bc3b63c3151d4f0f043eb1bbfaae383107e792979b4a5f559d69c8e61a23a228",
+      "state": "pending_deletion",
+      "recovery_window_requested_days": 7,
+      "permanent_deletion_verified": false
+    },
+    {
+      "kind": "secret",
+      "reference": "63a24ee0591f80ee2eacbd5199716bf01b4823dc9aa0749aa135a1c80a8ca8e4",
+      "state": "pending_deletion",
+      "recovery_window_requested_days": 7,
+      "permanent_deletion_verified": false
+    },
+    {
+      "kind": "key",
+      "reference": "47ae6e0f739dd51de21d7c4ccb33faa6285789f91d8a9227d0293cbbaa14dfc6",
+      "state": "PendingDeletion",
+      "scheduled_deletion_at": "2026-11-04T16:10:36.048000-05:00"
+    },
+    {
+      "kind": "guard_key",
+      "reference": "bf5754ce7cc476d8cd681778089085fd62eee4fd28e33f31bef0627577d0b66f",
+      "state": "PendingDeletion",
+      "scheduled_deletion_at": "2026-11-04T16:20:29.671000-05:00"
+    }
+  ],
+  "account_plan": "FREE",
+  "account_state": "ACTIVE",
+  "credit_headroom_above_20_verified": true,
+  "credit_reporting": "No account-level decrease reported between the fresh runtime gate and this observation; delayed reporting does not establish zero cost or experiment attribution",
+  "nonchargeable_free_tier_usage_rows": 0,
+  "billing_clearance": false,
+  "archive": {
+    "object_versions": 73,
+    "delete_markers": 2,
+    "bytes": 1553914,
+    "every_version_reopened_and_hashed": true,
+    "private_index_sha256": "0c78fa51ac40575f759b5f8ce101135838fdc83a08daf3955690c6fdcc907771"
+  },
+  "private_originals_sha256": {
+    "post-teardown-private-01.json": "ba1d4a864ecccaa28123742f933506f840bd02a0c183bff68cf6fdccd0289103",
+    "post-teardown-sanitized-01.json": "35dbf5fbe197c6f257f74f3534405b28c30a374b0d341d320a6f5d3ac6922d1d",
+    "operator-cleanup-result.json": "41a0bd6b41b6b57c795c70a676acbd6d1fc501313c7845e98b0c01ab7af4d8b9",
+    "guard-retirement.log": "b757e93420ff3266238939275d9e5eb247d27fe6ca8acfa2c9f0354a9d23dcf2",
+    "final-operator-evidence-readbacks.json": "4d2b408472c277c2282b26ab9e60ba8f0a5d99ccc4afe10e4e2dbc08d44eb817"
+  },
+  "automatic_experiments_or_recurring_account_monitoring": false
+}

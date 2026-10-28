@@ -1,0 +1,102 @@
+{
+  "at": "2026-10-28T20:05:28.514733+00:00",
+  "image_manifest_digest": "sha256:e36740e6f386f4a22eeaa4c8d25426590c1364137388bf0d1982cd6272948852",
+  "source_commit": "3d62df2d750d24dc522e6d5f2e756985edcfc38e",
+  "registry_exact_manifest_readback": true,
+  "ecr_describe_digest_verified": true,
+  "blob_count": 18,
+  "blobs": [
+    {
+      "digest": "sha256:33993f14015d7c72e59e677be712a0b2bca7ed811505671eb6745363874890ab",
+      "bytes": 9429,
+      "state": "uploaded"
+    },
+    {
+      "digest": "sha256:6b37362b3da78869050b894b799ad4df04f1f3b52774087db0d81151570244c8",
+      "bytes": 29830418,
+      "state": "uploaded"
+    },
+    {
+      "digest": "sha256:3764a9a7d1e8a98213ab2201a41dbf3da9c60240ea35a5ea96ab994555070a70",
+      "bytes": 1294121,
+      "state": "uploaded"
+    },
+    {
+      "digest": "sha256:b0dc7f87bef15c2536cb182d6c48b52f90a0522884ec9eb222f833fa97ffebf0",
+      "bytes": 12116303,
+      "state": "uploaded"
+    },
+    {
+      "digest": "sha256:06ad939ed42b51caafb25b14810875d14e0ee0c441d3e2e5e46475fb8c150bca",
+      "bytes": 249,
+      "state": "uploaded"
+    },
+    {
+      "digest": "sha256:dee0deabba4c8d9500397a60daf4d2228f8afe38fd0a6eb462eb0b8e2f8e4109",
+      "bytes": 89,
+      "state": "uploaded"
+    },
+    {
+      "digest": "sha256:3ece0f88627884c823bf6398da6680950c5e7e7611f02f266763fdfb234c4278",
+      "bytes": 883,
+      "state": "uploaded"
+    },
+    {
+      "digest": "sha256:a497985a5a0db1100fcddebe71118510d6579a0e457d7afc998aa24ac4644b53",
+      "bytes": 50073935,
+      "state": "uploaded"
+    },
+    {
+      "digest": "sha256:fdf908b38823dfed6a71974f44bc3ffb47d7297bb41c264e7afc4fe1506033fa",
+      "bytes": 73011,
+      "state": "uploaded"
+    },
+    {
+      "digest": "sha256:046cce6c420abf5a8efed2cc2f1db8a31efe802e63a13a6e43454ae06fca9a62",
+      "bytes": 80028,
+      "state": "uploaded"
+    },
+    {
+      "digest": "sha256:90b81869fd3c9e47e341f03a29dbb04010956677f2ea755beabeed078aed8761",
+      "bytes": 322464,
+      "state": "uploaded"
+    },
+    {
+      "digest": "sha256:c13344c6a42a890ada811e535c7faf292ca5aecfa5d36b03050a743a2cc0c38f",
+      "bytes": 49546,
+      "state": "uploaded"
+    },
+    {
+      "digest": "sha256:fc3f7a532dad1dd3af49c4bdc7cdb6a23e8a907bae703c349e2223e1f616f4bd",
+      "bytes": 34127,
+      "state": "uploaded"
+    },
+    {
+      "digest": "sha256:7f1aec1e4d5557595a45732159b8063dcbddf4a6361f42f7448d0c77cdeea481",
+      "bytes": 9429444,
+      "state": "uploaded"
+    },
+    {
+      "digest": "sha256:eedcee1e6b454d7a9a182081aaf993b85a27de710b7b913aafc435e1fd6f6398",
+      "bytes": 3108,
+      "state": "uploaded"
+    },
+    {
+      "digest": "sha256:d8287904d92913a7294ecc7141448b5bc044f03db97e658dd62774de6a482035",
+      "bytes": 24175,
+      "state": "uploaded"
+    },
+    {
+      "digest": "sha256:4eead73c857383da4e3af20148d2a5e04aa30eb18b5cf5f0b41aeafcb0a1b05d",
+      "bytes": 1443,
+      "state": "uploaded"
+    },
+    {
+      "digest": "sha256:3a2bbe31d52356f9ae2ecc772b1d63f85a65522b61f1fce4024341bbc524502e",
+      "bytes": 9770077,
+      "state": "uploaded"
+    }
+  ],
+  "aws_request_id": "a0181967-7224-4af6-97b1-b248f34c071b",
+  "rds_execution": "application_sql_not_executed_by_image_upload"
+}
