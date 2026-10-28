@@ -315,6 +315,7 @@ resource "aws_ecs_task_definition" "native" {
 output "manifest" {
   value = { account = var.account_id, region = "us-east-2", run = var.run_id, cleanup_at = var.cleanup_at, backup_retention_days = 1, database_name = "csaacceptance",
     acceptance_workflow   = var.acceptance_workflow,
+    application_protocol  = local.application ? "source-preflight-v2" : null,
     image                 = "${aws_ecr_repository.image.repository_url}@${var.image_digest}", commit = var.source_commit,
     tasks                 = { for k, t in aws_ecs_task_definition.native : k => t.arn }, cluster = aws_ecs_cluster.runtime.arn,
     control_db            = aws_db_instance.store["control"].identifier, downstream_db = aws_db_instance.store["receipts"].identifier,

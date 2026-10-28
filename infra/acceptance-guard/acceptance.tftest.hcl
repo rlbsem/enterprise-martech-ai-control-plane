@@ -25,6 +25,15 @@ run "independent_guard" {
     error_message = "Bounded guard and private independent evidence required."
   }
 }
+run "deregister_uses_supported_regional_authorization" {
+  command = plan
+  assert {
+    condition = anytrue([for statement in jsondecode(aws_iam_role_policy.cleanup.policy).Statement :
+      try(statement.Action == "ecs:DeregisterTaskDefinition" && statement.Resource == "*" && statement.Condition.StringEquals["aws:RequestedRegion"] == "us-east-2", false)
+    ])
+    error_message = "DeregisterTaskDefinition requires its own wildcard-resource action restricted to Ohio."
+  }
+}
 run "encrypted_repository_cleanup_grants" {
   command = plan
   assert {

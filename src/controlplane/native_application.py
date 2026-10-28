@@ -6,12 +6,25 @@ availability nor a task's assertion without independent read-only reconciliation
 
 import json
 import time
+import hashlib
 from datetime import UTC, datetime, timedelta
 
 from .native_retained import RetainedRecovery
 
 
 class ApplicationRecovery(RetainedRecovery):
+    def claim_execution(self):
+        """An interrupted controller cannot silently restart this run from seed."""
+        raw = json.dumps({"run": self.m["run"], "cleanup_at": self.m["cleanup_at"],
+                          "image": self.m["image"], "commit": self.m["commit"]}, sort_keys=True).encode()
+        key = "execution/application-start.json"
+        self.c["s3"].put_object(Bucket=self.m["guard_bucket"], Key=key, Body=raw, IfNoneMatch="*",
+                               ServerSideEncryption="aws:kms", SSEKMSKeyId=self.m["guard_key"])
+        with self.c["s3"].get_object(Bucket=self.m["guard_bucket"], Key=key)["Body"] as body:
+            if body.read(len(raw) + 1) != raw:
+                raise RuntimeError("Application execution claim readback failed")
+        self.checkpoint("application-execution-claimed", {"claim_sha256": hashlib.sha256(raw).hexdigest()})
+
     def select_quiescent_point(self, observed_at, label):
         """Choose actual restorable time after commits, not a pre-backup timestamp.
 
@@ -247,12 +260,19 @@ class ApplicationRecovery(RetainedRecovery):
         if not self.r.allow_source_deletion or not self.r.checkpoint_dir:
             raise RuntimeError("Approved disposable source deletion and durable checkpoints required")
         self.require_headroom(9000)
+        self.claim_execution()
         self.r.drained()
         self.instances({self.control, self.remote})
         source, remote = self.r.database(self.control), self.r.database(self.remote)
         if any(not row.get("MasterUserSecret", {}).get("SecretArn") for row in (source, remote)):
             raise RuntimeError("Both initial managed owner-secret identities required")
         self.r.task("bootstrap")
+        preflight = self.r.task("receipt", extra={"RECOVERY_PHASE": "source-preflight"})
+        if (preflight.get("stage") != "source_preflight_passed"
+                or preflight.get("recovery_operations_rolled_back") is not True
+                or preflight.get("write_denials") != 2):
+            raise RuntimeError("Source-side recovery permission preflight required before PITR")
+        self.checkpoint("source-recovery-permissions-verified", {"preflight": preflight})
         first = self.r.task("baseline")
         first_observed = datetime.fromisoformat(first["recovery_point"])
         if first.get("terminated_worker") is not True or first["comparison"]["remote_effects"] != 3:

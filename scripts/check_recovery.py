@@ -110,12 +110,13 @@ def check():
     regression = json.loads((PACKAGE / "regression-2026-10-27/verification.json").read_bytes())
     if regression["tests"] != 368 or any(regression[k] for k in ("failures", "errors", "skipped")):
         raise ValueError("complete_regression_record_required")
-    archive = json.loads((PACKAGE / "diagnostic-source-archive/manifest.json").read_bytes())
-    for name, entry in archive["files"].items():
-        source = subprocess.check_output(["git", "show", archive["source_revision"] + ":" + name], cwd=ROOT)
-        if hashlib.sha256(source).hexdigest() != entry["sha256"] or (ROOT / entry["path"]).read_bytes() != source:
-            raise ValueError("historical_diagnostic_source_binding_failure")
-        source_bindings += 1
+    for folder in ("diagnostic-source-archive", "native-controller-source-archive"):
+        archive = json.loads((PACKAGE / folder / "manifest.json").read_bytes())
+        for name, entry in archive["files"].items():
+            source = subprocess.check_output(["git", "show", archive["source_revision"] + ":" + name], cwd=ROOT)
+            if hashlib.sha256(source).hexdigest() != entry["sha256"] or (ROOT / entry["path"]).read_bytes() != source:
+                raise ValueError("historical_diagnostic_source_binding_failure")
+            source_bindings += 1
     native = check_native_attempt()
     return {
         "status": "passed",

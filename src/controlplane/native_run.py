@@ -21,6 +21,8 @@ def validate_manifest(m):
         raise ValueError("Application recovery requires the retained two-instance strategy")
     if m.get("acceptance_workflow") == "application-recovery-v1" and not re.fullmatch("[a-f0-9]{40}", m.get("commit", "")):
         raise ValueError("Application recovery requires an exact source commit")
+    if m.get("acceptance_workflow") == "application-recovery-v1" and m.get("application_protocol") != "source-preflight-v2":
+        raise ValueError("Current source-preflight-v2 application protocol required")
     if m["region"] != "us-east-2" or not re.fullmatch("[a-z0-9]{8,16}", m["run"]):
         raise ValueError("Ohio acceptance run required")
     if not re.fullmatch("[0-9]{12}", m["account"]):
@@ -95,7 +97,8 @@ class NativeRun:
             ):
                 raise RuntimeError("Write-capable tasks are not quiescent")
 
-    def preserve_task_observation(self, name, arn, task, events, log_error=None):
+    def preserve_task_observation(self, name, arn, task, events, log_error=None, *, expected_exit=0,
+                                  request_receipts=None, phase="stopped"):
         """Persist private diagnostics before accepting or rejecting a stopped task.
 
         Raw task metadata/logs stay in the private checkpoint and encrypted guard
@@ -106,18 +109,27 @@ class NativeRun:
             "task": name,
             "task_reference": hashlib.sha256(arn.encode()).hexdigest(),
             "last_status": task.get("lastStatus"),
+            "phase": phase,
             "stop_code": task.get("stopCode"),
+            "expected_exit": expected_exit,
+            "expected_image_digest": self.m["image"].split("@")[-1],
             "containers": [
                 {k: container.get(k) for k in ("name", "exitCode", "imageDigest")}
                 for container in task.get("containers", [])
             ],
             "log_read_error": log_error,
+            "logs_truncated": len(events) >= 1000,
         }
         self.records.append({"task_observation": observation})
         if self.checkpoint_dir is None:
             return
         raw = json.dumps(
-            {"observed_at": datetime.now(UTC).isoformat(), "task": task, "events": events},
+            {"observed_at": datetime.now(UTC).isoformat(), "task": task, "events": events,
+             "expectations": {"task_arn": arn, "task_definition": self.m["tasks"][name],
+                              "expected_exit": expected_exit, "image": self.m["image"]},
+             "execution_binding": {"runtime_manifest": self.m,
+                 "controller_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()},
+             "aws_request_receipts": request_receipts or {}},
             sort_keys=True,
             default=str,
         ).encode()
@@ -141,6 +153,7 @@ class NativeRun:
 
     def task(self, name, *, extra=None, expected_exit=0):
         application = self.m.get("acceptance_workflow") == "application-recovery-v1"
+        preflight = application and name == "receipt" and extra == {"RECOVERY_PHASE": "source-preflight"}
         maintenance = (
             application
             and name == "receipt"
@@ -177,15 +190,15 @@ class NativeRun:
                 else set()
             )
             if name == "receipt" and (
-                not maintenance
+                not preflight and (not maintenance
                 or extra["RECOVERY_PHASE"] not in {"behind", "matching"}
-                or not re.fullmatch("[a-f0-9]{64}", extra["SOURCE_DATABASE"])
+                or not re.fullmatch("[a-f0-9]{64}", extra["SOURCE_DATABASE"]))
             ):
                 raise ValueError("Exact application recovery maintenance binding required")
             if extra and "RESTORED_HOST" in extra:
                 if self.database(self.prefix + "-restore")["Endpoint"]["Address"] != extra["RESTORED_HOST"]:
                     raise ValueError("Restored endpoint differs from independently observed RDS target")
-            if name == "receipt":
+            if name == "receipt" and not preflight:
                 point = datetime.fromisoformat(extra["RECOVERY_POINT"])
                 if point.tzinfo is None or point > datetime.now(UTC):
                     raise ValueError("Aware historical recovery point required")
@@ -211,44 +224,83 @@ class NativeRun:
                     {"name": name, "environment": [{"name": k, "value": v} for k, v in extra.items()]}
                 ]
             }
-        launched = ecs.run_task(**kwargs)
+        kwargs["clientToken"] = hashlib.sha256(json.dumps(
+            {"run": self.m["run"], "task": name, "definition": self.m["tasks"][name],
+             "extra": extra, "expected_exit": expected_exit}, sort_keys=True).encode()).hexdigest()
+        kwargs["startedBy"] = self.prefix
+        try:
+            launched = ecs.run_task(**kwargs)
+        except Exception as exc:
+            response = getattr(exc, "response", {})
+            self.preserve_task_observation(name, "unconfirmed-" + kwargs["clientToken"], {}, [],
+                {"error_type": type(exc).__name__, "aws_code": response.get("Error", {}).get("Code")},
+                expected_exit=expected_exit, phase="launch_failed",
+                request_receipts={"RunTask": response.get("ResponseMetadata", {})})
+            raise
         tasks = launched.get("tasks", [])
         if launched.get("failures") or len(tasks) != 1:
+            self.preserve_task_observation(name, "unconfirmed-" + kwargs["clientToken"],
+                {"tasks": tasks, "launch_failures": launched.get("failures", [])}, [],
+                expected_exit=expected_exit, phase="launch_incomplete",
+                request_receipts={"RunTask": launched.get("ResponseMetadata", {})})
             for task in tasks:
                 ecs.stop_task(
                     cluster=self.m["cluster"], task=task["taskArn"], reason="Partial native launch rejected"
                 )
             raise RuntimeError("Native launch incomplete")
         arn = tasks[0]["taskArn"]
+        self.preserve_task_observation(name, arn, tasks[0], [], expected_exit=expected_exit,
+                                      request_receipts={"RunTask": launched.get("ResponseMetadata", {})},
+                                      phase="launched")
         try:
             ecs.get_waiter("tasks_stopped").wait(
                 cluster=self.m["cluster"], tasks=[arn], WaiterConfig={"Delay": 10, "MaxAttempts": 60}
             )
-        except Exception:
-            ecs.stop_task(cluster=self.m["cluster"], task=arn, reason="Bounded native task wait expired")
+        except Exception as exc:
+            try:
+                stopped = ecs.stop_task(cluster=self.m["cluster"], task=arn, reason="Bounded native task wait expired")
+            except Exception as stop_error:
+                response = getattr(stop_error, "response", {})
+                self.preserve_task_observation(name, arn, tasks[0], [],
+                    {"error_type": type(stop_error).__name__, "aws_code": response.get("Error", {}).get("Code")},
+                    expected_exit=expected_exit, phase="wait_failed_stop_failed",
+                    request_receipts={"StopTask": response.get("ResponseMetadata", {})})
+                raise
+            self.preserve_task_observation(name, arn, stopped.get("task", {}), [],
+                {"error_type": type(exc).__name__, "aws_code": getattr(exc, "response", {}).get("Error", {}).get("Code")},
+                expected_exit=expected_exit, phase="wait_failed_stop_requested",
+                request_receipts={"StopTask": stopped.get("ResponseMetadata", {})})
             raise RuntimeError("Task stop requested; independently confirm termination") from None
-        task = ecs.describe_tasks(cluster=self.m["cluster"], tasks=[arn])["tasks"][0]
-        events, log_error = [], None
+        described = ecs.describe_tasks(cluster=self.m["cluster"], tasks=[arn])
+        tasks = described.get("tasks", [])
+        task = tasks[0] if len(tasks) == 1 else {"containers": [], "describe_failures": described.get("failures", [])}
+        events, log_error, log_receipt = [], None, {}
         try:
-            events = self.c["logs"].get_log_events(
+            logged = self.c["logs"].get_log_events(
                 logGroupName=f"/csa-native/{self.m['run']}/{name}",
                 logStreamName=f"task/{name}/" + arn.rsplit("/", 1)[-1],
                 startFromHead=True,
                 limit=1000,
-            )["events"]
+            )
+            events, log_receipt = logged["events"], logged.get("ResponseMetadata", {})
         except Exception as exc:
             log_error = {
                 "error_type": type(exc).__name__,
                 "aws_code": getattr(exc, "response", {}).get("Error", {}).get("Code"),
+                "request_id": getattr(exc, "response", {}).get("ResponseMetadata", {}).get("RequestId"),
             }
-        self.preserve_task_observation(name, arn, task, events, log_error)
+        self.preserve_task_observation(name, arn, task, events, log_error, expected_exit=expected_exit,
+            request_receipts={"RunTask": launched.get("ResponseMetadata", {}),
+                              "DescribeTasks": described.get("ResponseMetadata", {}),
+                              "GetLogEvents": log_receipt})
+        self.gate()  # A completed task cannot revive an expired execution window.
         if (
-            task["taskArn"] != arn
-            or task["lastStatus"] != "STOPPED"
-            or task["taskDefinitionArn"] != self.m["tasks"][name]
+            task.get("taskArn") != arn
+            or task.get("lastStatus") != "STOPPED"
+            or task.get("taskDefinitionArn") != self.m["tasks"][name]
             or len(task["containers"]) != 1
-            or task["containers"][0]["exitCode"] != expected_exit
-            or task["containers"][0]["imageDigest"] != self.m["image"].split("@")[1]
+            or task["containers"][0].get("exitCode") != expected_exit
+            or task["containers"][0].get("imageDigest") != self.m["image"].split("@")[1]
         ):
             raise RuntimeError("Stopped task identity/image/exit mismatch")
         if log_error:

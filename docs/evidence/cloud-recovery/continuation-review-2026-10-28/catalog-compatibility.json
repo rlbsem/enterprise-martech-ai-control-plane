@@ -1,0 +1,15 @@
+{
+  "local_only": true,
+  "reproduced": true,
+  "error_type": "DataError",
+  "error": "timestamp too large (after year 10K): 'infinity'",
+  "historical_aws_cause_established": false,
+  "schema": "cloud-recovery-local-compatibility.v1",
+  "scope": "Actual isolated local PostgreSQL role catalog read; no AWS database queried",
+  "correction": "Cast rolvaliduntil to text before psycopg decoding; preserve its exact catalog representation in the fingerprint",
+  "regression_expiries": [
+    "infinity",
+    "-infinity",
+    "2030-01-01 00:00:00+00"
+  ]
+}

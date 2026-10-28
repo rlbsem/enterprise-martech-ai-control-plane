@@ -4,13 +4,15 @@ This package separates new recovery verification from historical AWS observation
 
 The recovery harness executes all eight scenarios against real PostgreSQL databases and independent HTTP/worker processes. The versioned native application tasks also execute against local database restores. AWS controller tests use service contracts/mocks; they are not native cloud results. The [October 28 native application attempt](native-2026-10-28/README.md) reached an available PITR restore but failed the next task's acceptance check. Infrastructure availability is never substituted for application recovery.
 
-**Latest local regression: 385 passed, zero failures/errors/skips.** This includes private diagnostic archival, archive-readback failures, cleanup error reporting and rejection of attempts to relabel failed native evidence.
+**Latest local regression: 397 passed, zero failures/errors/skips.** This includes legal PostgreSQL role expiries, rollback-only source preflight, interrupted waits, expired authority, durable restart rejection, bounded diagnostic redaction and preservation of failed native evidence.
 
 | Record | Executed scope |
 |---|---|
+| [Failure investigation and continuation checks](continuation-review-2026-10-28/README.md) | Actual local PostgreSQL compatibility reproduction and read-only AWS/CloudTrail observations; historical task cause still unresolved; no replacement runtime provisioned |
 | [Native application attempt and cleanup](native-2026-10-28/README.md) | Actual AWS source application: five intents/effects and two reader write denials; one retained-backup restore observed available; post-restore acceptance failed, second restore unexecuted; independent cleanup and pending deletions recorded |
-| [Latest diagnostic regression](diagnostic-regression-2026-10-28/verification.json) | 385 tests, actual PostgreSQL/HTTP plus offline AWS contracts; earlier 368/370-test records preserved |
-| [Latest infrastructure checks](diagnostic-infrastructure-2026-10-28/verification.json) | 14 successful commands, including bounded watchdog log-archive permissions and the independent checker's unchanged authority; mocked/static verification only |
+| [Latest continuation regression](continuation-regression-2026-10-28/verification.json) | 397 tests, actual PostgreSQL/HTTP plus offline AWS contracts; earlier 368/370/385-test records preserved |
+| [Latest infrastructure checks](continuation-infrastructure-2026-10-28/verification.json) | 14 successful commands, including the Ohio-only deregistration exception and source-preflight protocol; mocked/static verification only |
+| [Earlier diagnostic regression](diagnostic-regression-2026-10-28/verification.json) | Original 385-test record, unchanged |
 | [Structured recovery proof](local-2026-10-27/acceptance.json) | Eight actual local snapshot/HTTP/process scenarios; exact source `5720f56276b208c823e1e7383b1a74c468c6c8e8`; five original effects, two missing early-restored intents, six effects after one new authorized action |
 | [Standalone operator report](local-2026-10-27/operator-report-v2.html) | Download/open as HTML; read-only expandable evidence, not a live cloud deployment |
 | [Current desktop/mobile captures](local-2026-10-27/browser-03/provenance.json) | Actual Chromium 156 rendering, both widths, evidence drilldowns and keyboard access; no external requests or page errors; earlier rendering retained unchanged |

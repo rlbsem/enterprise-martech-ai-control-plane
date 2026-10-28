@@ -13,17 +13,81 @@ import sys
 import time
 import traceback
 from pathlib import Path
+from uuid import uuid4
 
 import boto3
 from botocore.exceptions import ClientError
 from psycopg.conninfo import make_conninfo
+from psycopg.types.json import Jsonb
 
 from . import cloud, db, operations, recovery
 from .native_tasks import permission_denials, receipt_fingerprint, safe_failure
+from .native_diagnostics import process_observation
 from .policy import digest
 from .recovery_lab import Runtime, expect_rejected, refresh, rows
 
 WORKFLOW = "application-recovery-v1"
+
+
+def stop_runtime(runtime):
+    failed = sys.exc_info()[0] is not None
+    try:
+        runtime.stop()
+    finally:
+        if failed or sys.exc_info()[0] is not None:
+            try:
+                observation = process_observation(runtime)
+            except (OSError, ValueError) as exc:
+                observation = {"capture_error_type": type(exc).__name__, "raw_logs_published": False}
+            print(json.dumps({"native_process_diagnostics": observation}), flush=True)
+
+
+def preflight(dsns, folder):
+    """Exercise real source roles and rollback recovery writes before any PITR.
+
+    This is not a restore or permission grant. The operational probe is rolled
+    back, both business ledgers must be empty, and API/receiver/worker processes
+    use the same scoped logins as later application recovery.
+    """
+    initial = operations.recovery_snapshot(dsns["reader"], dsns["remote_reader"])
+    if initial["local_intents"] or initial["remote_effects"] or not initial["safe_to_resume"]:
+        raise ValueError("source_preflight_requires_empty_ledgers")
+    with db.connect(dsns["coordinator"]) as c:
+        before = recovery.fingerprint(c)
+        gate = c.execute("SELECT * FROM cp.recovery_gate WHERE singleton FOR UPDATE").fetchone()
+        if gate["mode"] != "open":
+            raise ValueError("source_preflight_requires_open_initial_gate")
+        session, proof = uuid4(), uuid4()
+        binding = {"diagnostic": "source_permission_probe_rolled_back"}
+        c.execute("INSERT INTO cp.recovery_sessions(id,binding,binding_hash,status) VALUES (%s,%s,%s,'closed')",
+                  (session, Jsonb(binding), digest(binding)))
+        c.execute("UPDATE cp.recovery_gate SET mode='closed',epoch=epoch+1,session_id=%s WHERE singleton", (session,))
+        c.execute("INSERT INTO cp.recovery_proofs(id,session_id,report,report_hash) VALUES (%s,%s,%s,%s)",
+                  (proof, session, Jsonb(binding), digest(binding)))
+        c.execute("UPDATE cp.recovery_gate SET approved_proof=%s,approved_at=clock_timestamp() WHERE singleton", (proof,))
+        c.execute("UPDATE cp.recovery_sessions SET status='approved' WHERE id=%s", (session,))
+        c.rollback()
+        after_gate = c.execute("SELECT * FROM cp.recovery_gate WHERE singleton").fetchone()
+        if after_gate != gate or recovery.fingerprint(c) != before:
+            raise RuntimeError("source_preflight_rollback_changed_state")
+        counts = c.execute("SELECT (SELECT count(*) FROM cp.recovery_sessions) AS sessions,"
+                           "(SELECT count(*) FROM cp.recovery_proofs) AS proofs").fetchone()
+        if any(counts.values()):
+            raise RuntimeError("source_preflight_metadata_not_empty_after_rollback")
+    runtime = Runtime(folder, dsns)
+    try:
+        runtime.start("api")
+        runtime.start("remote")
+        if runtime.once() is not False:
+            raise RuntimeError("source_preflight_unexpected_worker_claim")
+    finally:
+        stop_runtime(runtime)
+    final = operations.recovery_snapshot(dsns["reader"], dsns["remote_reader"])
+    if final["snapshot_hash"] != initial["snapshot_hash"]:
+        raise RuntimeError("source_preflight_changed_business_ledgers")
+    return {"workflow": WORKFLOW, "stage": "source_preflight_passed", "comparison": final,
+            "recovery_operations_rolled_back": True, "api_receiver_health_passed": True,
+            "empty_worker_claimed": False, "write_denials": permission_denials(dsns["reader"], dsns["remote_reader"])}
 
 
 def bootstrap(client):
@@ -137,7 +201,7 @@ def seed(dsns, folder, run):
         killed.terminate()
         killed.wait(timeout=10)
     finally:
-        runtime.stop()
+        stop_runtime(runtime)
     comparison = operations.recovery_snapshot(dsns["reader"], dsns["remote_reader"])
     if (
         comparison["local_intents"] != 3
@@ -178,7 +242,7 @@ def advance(dsns, folder):
             assert runtime.once()
             new_keys.append(key)
     finally:
-        runtime.stop()
+        stop_runtime(runtime)
     result = operations.recovery_snapshot(dsns["reader"], dsns["remote_reader"])
     if not result["safe_to_resume"] or result["local_intents"] != 5 or result["remote_effects"] != 5:
         raise RuntimeError("post_checkpoint_effects_not_established")
@@ -265,7 +329,7 @@ def recover(dsns, folder, binding, phase):
         new = runtime.propose(customers[0][1])
         assert new["decision"] == "allow" and runtime.once()
     finally:
-        runtime.stop()
+        stop_runtime(runtime)
     final = operations.runtime_acceptance_snapshot(dsns["reader"], dsns["remote_reader"])
     after = rows(dsns["remote_reader"])
     if (
@@ -306,6 +370,10 @@ def main():
         elif action == "control":
             result = advance(dsns, folder)
         elif action == "receipt":
+            if os.environ["RECOVERY_PHASE"] == "source-preflight":
+                result = preflight(dsns, folder)
+                print(json.dumps({"native_fixture": result}, default=str), flush=True)
+                return 0
             revision = digest(
                 {
                     p.name: p.read_bytes().hex()

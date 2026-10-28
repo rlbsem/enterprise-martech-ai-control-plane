@@ -56,7 +56,8 @@ def fingerprint(c):
         ).fetchall()
         hashes[name] = digest(sorted(digest(r["body"]) for r in rows))
     roles = c.execute(
-        "SELECT rolname,rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolbypassrls,rolcanlogin,rolvaliduntil "
+        "SELECT rolname,rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolbypassrls,rolcanlogin,"
+        "rolvaliduntil::text AS rolvaliduntil "
         "FROM pg_roles WHERE rolname NOT LIKE 'pg_%' "
         "ORDER BY rolname"
     ).fetchall()

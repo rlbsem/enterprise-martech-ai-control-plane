@@ -1,0 +1,190 @@
+{
+  "schema": "cloud-recovery-diagnosis.v1",
+  "observed_at": "2026-10-28T16:55:34.814439+00:00",
+  "region": "us-east-2",
+  "historical_run": "a2610280139d2d8",
+  "native_task_failure_cause_established": false,
+  "queries": [
+    {
+      "operation": "DescribeTasks",
+      "events": 7,
+      "pagination_remaining": false,
+      "response_bodies_available": 0,
+      "receipts": [
+        {
+          "at": "2026-10-28T02:35:57Z",
+          "request_id": "adcfb73e-2849-48a7-83cf-9d9756821579",
+          "error_code": null
+        },
+        {
+          "at": "2026-10-28T02:35:56Z",
+          "request_id": "0b1931a5-c3f3-4ae0-aadb-bdf4cce15791",
+          "error_code": null
+        },
+        {
+          "at": "2026-10-28T02:35:46Z",
+          "request_id": "2c17d322-9faa-4392-8142-4870520cac4e",
+          "error_code": null
+        },
+        {
+          "at": "2026-10-28T02:35:35Z",
+          "request_id": "e5d8c089-84eb-4cfc-9cd1-a60777cee2b1",
+          "error_code": null
+        },
+        {
+          "at": "2026-10-28T02:35:24Z",
+          "request_id": "428ba004-b9d5-495e-b2da-62fc6351d69c",
+          "error_code": null
+        },
+        {
+          "at": "2026-10-28T02:35:14Z",
+          "request_id": "6626bf39-1b11-4f3c-9131-b0f70a1fcc3f",
+          "error_code": null
+        },
+        {
+          "at": "2026-10-28T02:35:03Z",
+          "request_id": "a4c6ec83-9e9a-4a45-8887-be195e0885c6",
+          "error_code": null
+        }
+      ]
+    },
+    {
+      "operation": "DeregisterTaskDefinition",
+      "events": 25,
+      "pagination_remaining": false,
+      "response_bodies_available": 0,
+      "receipts": [
+        {
+          "at": "2026-10-28T04:45:38Z",
+          "request_id": "337c039c-178e-42ab-a2b7-561c92f22c08",
+          "error_code": "AccessDenied"
+        },
+        {
+          "at": "2026-10-28T04:45:38Z",
+          "request_id": "3ab572d9-7a09-4663-8635-abf84eb456c5",
+          "error_code": "AccessDenied"
+        },
+        {
+          "at": "2026-10-28T04:45:37Z",
+          "request_id": "3500aba7-2d93-4a83-9826-1f4a411332de",
+          "error_code": "AccessDenied"
+        },
+        {
+          "at": "2026-10-28T04:45:37Z",
+          "request_id": "043b7732-ac54-4fef-bae4-0e81f8482cc4",
+          "error_code": "AccessDenied"
+        },
+        {
+          "at": "2026-10-28T04:45:37Z",
+          "request_id": "d3830e24-69a3-42bf-b3c9-71e860eac693",
+          "error_code": "AccessDenied"
+        },
+        {
+          "at": "2026-10-28T04:45:26Z",
+          "request_id": "33cd9fe1-1bc1-484f-9d62-10446c801ec8",
+          "error_code": "AccessDenied"
+        },
+        {
+          "at": "2026-10-28T04:45:26Z",
+          "request_id": "b941817a-cdbd-4044-b038-fe8300146365",
+          "error_code": "AccessDenied"
+        },
+        {
+          "at": "2026-10-28T04:45:26Z",
+          "request_id": "1e164e88-a1d1-4305-92a2-9321b44a7a2a",
+          "error_code": "AccessDenied"
+        },
+        {
+          "at": "2026-10-28T04:45:26Z",
+          "request_id": "d92d4008-eb0d-4dd1-ae7b-1d9dd539464d",
+          "error_code": "AccessDenied"
+        },
+        {
+          "at": "2026-10-28T04:45:26Z",
+          "request_id": "820b74e6-d396-48b7-a6f0-f16d3a4d0e76",
+          "error_code": "AccessDenied"
+        },
+        {
+          "at": "2026-10-28T04:44:44Z",
+          "request_id": "2a03812e-cad0-49d4-9b96-96dd0f54c846",
+          "error_code": "AccessDenied"
+        },
+        {
+          "at": "2026-10-28T04:44:44Z",
+          "request_id": "11aa3512-fa48-40b9-89c1-0c32e9a9ec88",
+          "error_code": "AccessDenied"
+        },
+        {
+          "at": "2026-10-28T04:44:44Z",
+          "request_id": "f176063a-3368-42f3-b5be-d960d9428665",
+          "error_code": "AccessDenied"
+        },
+        {
+          "at": "2026-10-28T04:44:44Z",
+          "request_id": "1a8a25e6-1cd2-4b86-b4ee-d43f9bd2ee67",
+          "error_code": "AccessDenied"
+        },
+        {
+          "at": "2026-10-28T04:44:44Z",
+          "request_id": "5f4a5ff5-fcd3-4ec9-add4-9f3f5d346a66",
+          "error_code": "AccessDenied"
+        },
+        {
+          "at": "2026-10-28T04:44:26Z",
+          "request_id": "a52a88b8-f024-4bd1-8551-9207cc7aaf9e",
+          "error_code": "AccessDenied"
+        },
+        {
+          "at": "2026-10-28T04:44:26Z",
+          "request_id": "564424cd-01fd-4e3c-80dc-e3dce4da22d8",
+          "error_code": "AccessDenied"
+        },
+        {
+          "at": "2026-10-28T04:44:26Z",
+          "request_id": "f20bd2b6-900a-43ad-a6ed-167d058a9b12",
+          "error_code": "AccessDenied"
+        },
+        {
+          "at": "2026-10-28T04:44:26Z",
+          "request_id": "7c525c23-1d86-47d9-aaff-af9b3dc11cc6",
+          "error_code": "AccessDenied"
+        },
+        {
+          "at": "2026-10-28T04:44:26Z",
+          "request_id": "039128af-c3c6-4c2a-8092-bdb97851ed2c",
+          "error_code": "AccessDenied"
+        },
+        {
+          "at": "2026-10-28T04:43:29Z",
+          "request_id": "a511e6f7-5b84-44c0-9279-582d0c3bb0df",
+          "error_code": "AccessDenied"
+        },
+        {
+          "at": "2026-10-28T04:43:29Z",
+          "request_id": "bfd0e1e7-9edb-4052-80d7-794658717427",
+          "error_code": "AccessDenied"
+        },
+        {
+          "at": "2026-10-28T04:43:29Z",
+          "request_id": "1c1d187d-c0a2-4bf3-a406-0c6deaa73501",
+          "error_code": "AccessDenied"
+        },
+        {
+          "at": "2026-10-28T04:43:29Z",
+          "request_id": "7c77dc4d-5a3b-4523-b023-7ac14f122f4a",
+          "error_code": "AccessDenied"
+        },
+        {
+          "at": "2026-10-28T04:43:28Z",
+          "request_id": "c02497ee-f7a2-457b-be70-cecac9e9a2be",
+          "error_code": "AccessDenied"
+        }
+      ]
+    }
+  ],
+  "conclusions": {
+    "task": "Seven successful DescribeTasks calls have null response bodies in CloudTrail. Neither exit code nor image comparison can be reconstructed from them. The controller recorded its explicit rejection and subsequent failure archive readback; interruption alone is not an established cause.",
+    "cleanup": "All 25 recorded DeregisterTaskDefinition attempts were denied by identity policy. AWS evaluated this action on resource *, while the old policy allowed only task-definition ARNs. DeleteTaskDefinitions remains ARN-scoped.",
+    "remediation_not_native_acceptance": "New regional wildcard for deregistration requires fresh owner review. No replacement guard has been deployed."
+  }
+}

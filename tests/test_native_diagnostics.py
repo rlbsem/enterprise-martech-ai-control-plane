@@ -15,20 +15,20 @@ from scripts import check_recovery
 from test_native_acceptance import manifest
 
 
-def runner(tmp_path):
+def runner(tmp_path, name="baseline"):
     m = manifest()
     m.update(guard_bucket="private-test-bucket", guard_key="private-test-key",
-             task_subnet="private-subnet", task_groups={"baseline": "private-group"})
+             task_subnet="private-subnet", task_groups={name: "private-group"})
     clients = {name: MagicMock() for name in ("ecs", "logs", "s3")}
     r = NativeRun(m, clients, checkpoint_dir=tmp_path)
     r.gate = r.drained = lambda: None
     arn = "arn:aws:ecs:us-east-2:123456789012:task/csa-native-test2026/owned"
-    task = {"taskArn": arn, "lastStatus": "STOPPED", "taskDefinitionArn": m["tasks"]["baseline"],
+    task = {"taskArn": arn, "lastStatus": "STOPPED", "taskDefinitionArn": m["tasks"][name],
             "stopCode": "EssentialContainerExited", "stoppedReason": "private-stop-sentinel",
-            "containers": [{"name": "baseline", "exitCode": 0, "imageDigest": "sha256:" + "a" * 64}]}
+            "containers": [{"name": name, "exitCode": 0, "imageDigest": "sha256:" + "a" * 64}]}
     clients["ecs"].describe_task_definition.return_value = {"taskDefinition": {
-        "containerDefinitions": [{"name": "baseline", "image": m["image"],
-                                  "command": ["python", "-m", "controlplane.native_tasks", "baseline"]}]}}
+        "containerDefinitions": [{"name": name, "image": m["image"],
+                                  "command": ["python", "-m", "controlplane.native_tasks", name]}]}}
     clients["ecs"].run_task.return_value = {"tasks": [{"taskArn": arn}]}
     clients["ecs"].describe_tasks.return_value = {"tasks": [task]}
     clients["logs"].get_log_events.return_value = {"events": [
@@ -54,11 +54,11 @@ def test_stopped_task_diagnostics_precede_rejection(tmp_path, fault):
             "GetLogEvents")
     with pytest.raises(RuntimeError, match="mismatch|logs unavailable"):
         r.task("baseline")
-    assert len(objects) == len(list(tmp_path.glob("task-observation-*.json"))) == 1
-    assert clients["s3"].get_object.call_count == 1
+    assert len(objects) == len(list(tmp_path.glob("task-observation-*.json"))) == 2
+    assert clients["s3"].get_object.call_count == 2
     public = json.dumps(r.records)
     assert all(s not in public for s in ("private-stop-sentinel", "private-error-sentinel", "log-sentinel"))
-    assert r.records[0]["task_observation"]["private_archive_sha256"]
+    assert r.records[-1]["task_observation"]["private_archive_sha256"]
     assert not any("result" in row for row in r.records)
 
 
@@ -73,7 +73,7 @@ def test_diagnostic_readback_failure_cannot_accept_an_otherwise_successful_task(
 def test_successful_task_diagnostics_are_also_preserved(tmp_path):
     r, _, _, objects = runner(tmp_path)
     assert r.task("baseline") == {"accepted": True}
-    assert len(objects) == 1 and r.records[-1]["result"] == {"accepted": True}
+    assert len(objects) == 2 and r.records[-1]["result"] == {"accepted": True}
 
 
 def log_clients():
@@ -145,7 +145,7 @@ def test_recorded_native_failure_cannot_be_promoted_by_editing_evidence(tmp_path
     folder = tmp_path / "native-2026-10-28"
     shutil.copytree(check_recovery.PACKAGE / folder.name, folder)
     monkeypatch.setattr(check_recovery, "PACKAGE", tmp_path)
-    source = (check_recovery.ROOT / "src/controlplane/native_application.py").read_bytes()
+    source = (check_recovery.ROOT / "docs/evidence/cloud-recovery/native-controller-source-archive/native_application.py").read_bytes()
     monkeypatch.setattr(check_recovery.subprocess, "check_output", lambda *a, **kw: source)
     if fault == "availability_relabel":
         path = folder / "checkpoints.json"
@@ -164,7 +164,7 @@ def test_recorded_native_failure_cannot_be_promoted_by_editing_evidence(tmp_path
 
 
 def test_recorded_failed_native_attempt_stays_distinct_from_local_acceptance(monkeypatch):
-    source = (check_recovery.ROOT / "src/controlplane/native_application.py").read_bytes()
+    source = (check_recovery.ROOT / "docs/evidence/cloud-recovery/native-controller-source-archive/native_application.py").read_bytes()
     monkeypatch.setattr(check_recovery.subprocess, "check_output", lambda *a, **kw: source)
     result = check_recovery.check_native_attempt()
     assert result == {"status": "FAILED_NATIVE_APPLICATION_ACCEPTANCE", "restores_recorded": 1,

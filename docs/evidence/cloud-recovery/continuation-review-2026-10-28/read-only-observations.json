@@ -1,0 +1,91 @@
+{
+  "schema": "cloud-recovery-continuation-observation.v1",
+  "observed_at": "2026-10-28T17:08:45.407619+00:00",
+  "region": "us-east-2",
+  "auth": "Short-lived CLI/SDK and separate AWS Core read-only access verified; no long-lived keys created",
+  "plan": {
+    "type": "FREE",
+    "status": "ACTIVE",
+    "remaining_credits": {
+      "amount": 139.52,
+      "unit": "USD"
+    },
+    "request_id": "8584c250-8aaa-4cef-a81e-62d5ce173658"
+  },
+  "previous_runtime": {
+    "observed_at": "2026-10-28T17:08:45.408622+00:00",
+    "scope": "isolated_runtime_inventory_not_billing_bill",
+    "active_resources_absent": true,
+    "all_resources_absent": false,
+    "residuals": [
+      {
+        "kind": "secret",
+        "reference": "49b8d9d04f46732aa8b9f59c59e72c47b6406b4c5ea5bd40c551bac0b78da255",
+        "state": "pending_deletion"
+      },
+      {
+        "kind": "secret",
+        "reference": "2b5ad00ed5876130a39ddbf392d71c559d01c2e9de9917bc8f550127f571db75",
+        "state": "pending_deletion"
+      },
+      {
+        "kind": "secret",
+        "reference": "401c5530f06e0e3ebcb5af8dbbd218cd1044e6967e3a24ebf5658ef1e1187268",
+        "state": "pending_deletion"
+      },
+      {
+        "kind": "secret",
+        "reference": "72b32a03a65a292b23060d8d71b5ced677e73f5a776c1978448e592544bec40e",
+        "state": "pending_deletion"
+      },
+      {
+        "kind": "secret",
+        "reference": "cad3dc17bfe27c7df3199bf64e8cdf086d5f388227381360ddf84903db0659ba",
+        "state": "pending_deletion"
+      },
+      {
+        "kind": "secret",
+        "reference": "686d04d17a9d85f29e1d82ab3834b89f3c7d8e7f649d48ab1d717ec4538c4e43",
+        "state": "pending_deletion"
+      },
+      {
+        "kind": "key",
+        "reference": "24e01d6352131ea7eaed003a5a57c76141a62f64cbe6300ed58a9f6f2ce6b9b7",
+        "state": "PendingDeletion"
+      }
+    ],
+    "billing_clearance": "requires_delayed_usage_and_guard_inventory_review"
+  },
+  "previous_task_definition_residuals": 0,
+  "pending_secrets": 6,
+  "pending_runtime_keys": 1,
+  "separate_guard_key": "Pending deletion in independent AWS Core observation; not included in runtime-only inventory",
+  "billing_clearance": false,
+  "new_provisioning": false,
+  "fargate_quotas": [
+    {
+      "name": "Fargate Spot Sustained Launch Rate",
+      "value": 20.0
+    },
+    {
+      "name": "Fargate On-Demand Burst Launch Rate",
+      "value": 100.0
+    },
+    {
+      "name": "Fargate Spot Burst Launch Rate",
+      "value": 100.0
+    },
+    {
+      "name": "Fargate On-Demand Sustained Launch Rate",
+      "value": 20.0
+    },
+    {
+      "name": "Fargate On-Demand vCPU resource count",
+      "value": 12.0
+    },
+    {
+      "name": "Fargate Spot vCPU resource count",
+      "value": 12.0
+    }
+  ]
+}

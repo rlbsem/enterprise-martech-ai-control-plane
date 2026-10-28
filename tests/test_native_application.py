@@ -107,6 +107,8 @@ def application_fixture(tmp_path, monkeypatch):
     m, rds = f.runner.m, f.rds
     m.update(
         acceptance_workflow="application-recovery-v1",
+        commit="a" * 40,
+        application_protocol="source-preflight-v2",
         cleanup_at=(datetime.now(UTC) + timedelta(hours=2, minutes=59)).isoformat(),
     )
     f.source["MasterUserSecret"] = {"SecretArn": "source-managed"}
@@ -179,6 +181,9 @@ def application_fixture(tmp_path, monkeypatch):
                 "comparison": {"remote_effects": 3 if name == "baseline" else 5},
                 "remote_ledger_sha256": "a" * 64,
             }
+        elif name == "receipt" and kw["extra"]["RECOVERY_PHASE"] == "source-preflight":
+            result = {"stage": "source_preflight_passed", "recovery_operations_rolled_back": True,
+                      "write_denials": 2}
         elif name == "receipt":
             phase = kw["extra"]["RECOVERY_PHASE"]
             result = (

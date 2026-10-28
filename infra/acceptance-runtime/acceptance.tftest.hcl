@@ -67,6 +67,10 @@ run "application_recovery_permissions_and_scratch" {
   command = plan
   variables { acceptance_workflow = "application-recovery-v1" }
   assert {
+    condition     = output.manifest.application_protocol == "source-preflight-v2"
+    error_message = "Application manifests must require the rollback-only source preflight protocol."
+  }
+  assert {
     condition     = length(aws_secretsmanager_secret.runtime) == 6 && alltrue([for t in aws_ecs_task_definition.native : t.cpu == "512" && t.memory == "1024" && jsondecode(t.container_definitions)[0].readonlyRootFilesystem && jsondecode(t.container_definitions)[0].command[2] == "controlplane.native_app_tasks" && jsondecode(t.container_definitions)[0].mountPoints[0].containerPath == "/recovery-work"])
     error_message = "Application tasks need a bounded non-root scratch volume while preserving a read-only root."
   }
