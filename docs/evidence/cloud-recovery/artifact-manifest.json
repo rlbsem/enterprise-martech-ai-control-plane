@@ -50,6 +50,8 @@
     "native-2026-10-28/image-verification.json": "047433e8967bca91ce65976f9c122ae1e616a203a9eda5bd7a492d0d0756fb67",
     "native-2026-10-28/README.md": "8aef020be764e961585b2079e14348bdcfc9233770800ef8c32f9dd7df33dfbc",
     "native-2026-10-28/teardown.json": "ee67d9356ccce3ce30ac2b28f643fe6fc340d2835af5da9f4eddac0d20b1cee8",
+    "native-admission-2026-10-28/execution.json": "973a2ac213c5a55def0a214ddd7052ab85932becbac3cf26e9a04152548808a6",
+    "native-admission-2026-10-28/README.md": "c8e4ed5c9145d7ef808a027e632519833036d0956b2a93d39c1c14f136605170",
     "native-controller-source-archive/manifest.json": "3489d3945a96c72aff176a7ff1491fbc344adade2a3058766095e33fc6be57d7",
     "native-controller-source-archive/native_application.py": "fa6dff1613242b8f778296e9e75b218ac6f8b9aae3a6702f2a267df5ec0eaff3",
     "native-plan-2026-10-27/cost-plan.json": "995de187b03dc0ec1bdfb180c3f34d4cb630e6889f7d2fcd188bae81279391e3",
@@ -67,7 +69,7 @@
     "prior-runtime/README.md": "6a676dcb9f1a1bd2d41e57c6b12b6b98d9f69da32b29757fb9d7456e26d11a6c",
     "prior-runtime/service.py": "cd9efa1dcd2f1d4c816c49f89a4fbc7cbe7b839f6675faf93b3d81f153151eed",
     "prior-runtime/worker.py": "bf9d75172b80f56dc0dd409c359e1124453581fa2e2d7ec1263b4bd55584a56c",
-    "README.md": "220e99c1b6e650503b4959d2ca4317c9133e2b5b2ccf62b9e214842074fcbf35",
+    "README.md": "d13e5772dab9128ee02a2faf4298ed2ea6f76c26a0301f2f5fac237e6abb3b64",
     "regression-2026-10-27/bound-worker-death.json": "329532f69a6442a7cd94dcb086754d673e7c9a8a5fe6abd4378d0c962d251821",
     "regression-2026-10-27/cloud-recovery.json": "fef52bc6a69c523b968bedc47a0e6b84b76bf6fae2187dac7bb67e1614949060",
     "regression-2026-10-27/competing-workers.json": "a34b3af0d09c699a2c7a2c14a87b228fced2d8e1f3230d572683d42f1b228274",
@@ -85,6 +87,10 @@
     "regression-2026-10-28/execution-binding.json": "83b67c14e4a97ef357855954d08c7499e7bc2f89dc89cb9b75242a6732b95403",
     "regression-2026-10-28/report.md": "a47f3bd00e27c8c8dc843f2da2d0a53146d1921ff162b15f24b6593fd81b73e6",
     "regression-2026-10-28/tests.xml": "f85c85de01d0db2241eb1f0a99aee8929da2ce5e1da3467f8ca08a9521342a5a",
-    "regression-2026-10-28/verification.json": "e6051d1518efe93f4e6950154851bc4891bbc9d694e12fc69b29fd901be1c9fc"
+    "regression-2026-10-28/verification.json": "e6051d1518efe93f4e6950154851bc4891bbc9d694e12fc69b29fd901be1c9fc",
+    "timing-admission-regression-2026-10-28/cloud-recovery.json": "d40006596e9b50c500c875c8cc31c3cb0a8d0485ae5adbac8a34fe1e17820b56",
+    "timing-admission-regression-2026-10-28/report.md": "85d8b5e0736a5b3dfdad067302e506f15327455bf59c9ea9f8f043d2d940939e",
+    "timing-admission-regression-2026-10-28/tests.xml": "50841eff00bf796976e0cff135e7bdf4c2817b3beacfca19918934abbc345d19",
+    "timing-admission-regression-2026-10-28/verification.json": "d2ff21339d6d1903c273e5c01ee3b904e76810dcf9bc71efb8391d1ef7d7f51a"
   }
 }

@@ -11,6 +11,8 @@ from datetime import UTC, datetime, timedelta
 
 from .native_retained import RetainedRecovery
 
+APPLICATION_START_HEADROOM_SECONDS = 9000
+
 
 class ApplicationRecovery(RetainedRecovery):
     def claim_execution(self):
@@ -259,7 +261,7 @@ class ApplicationRecovery(RetainedRecovery):
     def execute(self):
         if not self.r.allow_source_deletion or not self.r.checkpoint_dir:
             raise RuntimeError("Approved disposable source deletion and durable checkpoints required")
-        self.require_headroom(9000)
+        self.require_headroom(APPLICATION_START_HEADROOM_SECONDS)
         self.claim_execution()
         self.r.drained()
         self.instances({self.control, self.remote})

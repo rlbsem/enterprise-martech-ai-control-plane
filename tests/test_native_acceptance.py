@@ -610,6 +610,35 @@ def test_explicit_old_deadline_still_expires():
         )
 
 
+@pytest.mark.parametrize("seconds", [0, 7920, 9899])
+def test_application_runtime_approval_without_provisioning_headroom_is_rejected(seconds):
+    module = script("native_deploy")
+    now = datetime.now(UTC)
+    document = {"variables": {"acceptance_workflow": {"value": "application-recovery-v1"}}}
+    with pytest.raises(ValueError, match="before provisioning"):
+        module.runtime_deadline_gate(document, {"cleanup_at": (now + timedelta(seconds=seconds)).isoformat()}, now=now)
+
+
+def test_application_runtime_admission_reserves_unchanged_execution_window():
+    from controlplane.native_application import APPLICATION_START_HEADROOM_SECONDS
+
+    module = script("native_deploy")
+    assert APPLICATION_START_HEADROOM_SECONDS == 9000
+    assert module.APPLICATION_PROVISIONING_ALLOWANCE_SECONDS == 900
+    now = datetime.now(UTC)
+    deadline = (now + timedelta(seconds=9900)).isoformat()
+    module.runtime_deadline_gate(
+        {"variables": {"acceptance_workflow": {"value": "application-recovery-v1"}}},
+        {"cleanup_at": deadline}, now=now,
+    )
+    with pytest.raises(ValueError, match="Aware"):
+        module.runtime_deadline_gate(
+            {"variables": {"acceptance_workflow": {"value": "application-recovery-v1"}}},
+            {"cleanup_at": "2026-10-28T20:29:00"}, now=now,
+        )
+    module.runtime_deadline_gate({"variables": {}}, {"cleanup_at": "2000-01-01T00:00:00Z"}, now=now)
+
+
 def registry_session(monkeypatch, rows):
     import io
     module = script("native_initialize_registry")
