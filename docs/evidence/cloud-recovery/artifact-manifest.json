@@ -2,10 +2,12 @@
   "schema": "cloud-recovery-artifacts.v1",
   "hash_format": "SHA-256 of exact bytes; manifest itself excluded",
   "files": {
+    "diagnostic-infrastructure-2026-10-28/execution-binding.json": "1730bd4a979976d96f402d594ae7c41d7bdd8822f992ea382abb8ff23392976a",
     "diagnostic-infrastructure-2026-10-28/secrets.json": "174490c0725c94257e71a0a602cd3dcad580c896ac4de1c3a2999bf57a4853af",
     "diagnostic-infrastructure-2026-10-28/security.json": "c081264287def253e11b86cadf8a5548737b94171796e4ed05abb59a103366a3",
     "diagnostic-infrastructure-2026-10-28/verification.json": "4317b7429e93c4bbf4cfb27fc169ff55dd7ebb26fe18caa873009e83537c2723",
     "diagnostic-regression-2026-10-28/cloud-recovery.json": "4300aecda37f3a791eec33db31c470277760acd9b0436986b4df64ce7997fe53",
+    "diagnostic-regression-2026-10-28/execution-binding.json": "e83702c27494ad323ad0e7fcba69b8a10077043bc851aff0d7c2a88770e62546",
     "diagnostic-regression-2026-10-28/report.md": "edbb23ae79b86a06f1bd2466aba5fcde323220745b189c38173daa3cda882cfd",
     "diagnostic-regression-2026-10-28/tests.xml": "3cd2117c5de2bbc6833c96fb2fe7130a1bd3fb0e9d2f754d13ca12c122ad1edb",
     "diagnostic-regression-2026-10-28/verification.json": "62c7e302c900edb96e53c61ef61b6d65e466afc5736260c2a89b55163367f523",
