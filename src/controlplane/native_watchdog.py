@@ -1,17 +1,62 @@
 """Cloud-side bounded cleanup passes. Never accept a caller-supplied resource target."""
 
 from datetime import UTC, datetime
+import hashlib
 import json
 import os
 
 import boto3
+from botocore.exceptions import ClientError
 
 from .native_inventory import Inventory, public_report
 
 
-def cleanup_pass(inventory, clients):
+def archive_logs(logs, storage, group, bucket, key):
+    """Read back a bounded private archive before deleting a run-owned log group."""
+    streams = []
+    for page in logs.get_paginator("describe_log_streams").paginate(logGroupName=group):
+        streams.extend(page["logStreams"])
+        if len(streams) > 20:
+            raise RuntimeError("Private log stream archive budget exceeded")
+    captured, used = [], 0
+    for stream in streams:
+        events, token = [], None
+        for _ in range(100):
+            response = logs.get_log_events(
+                logGroupName=group, logStreamName=stream["logStreamName"], startFromHead=True,
+                **({"nextToken": token} if token else {}),
+            )
+            used += len(json.dumps(response["events"]).encode())
+            if used > 2_000_000:
+                raise RuntimeError("Private log byte archive budget exceeded")
+            events.extend(response["events"])
+            next_token = response["nextForwardToken"]
+            if next_token == token:
+                break
+            token = next_token
+        else:
+            raise RuntimeError("Private log page archive budget exceeded")
+        captured.append({"stream": stream["logStreamName"], "events": events})
+    raw = json.dumps({"group": group, "streams": captured}, sort_keys=True).encode()
+    if len(raw) > 2_000_000:
+        raise RuntimeError("Private log byte archive budget exceeded")
+    digest = hashlib.sha256(raw).hexdigest()
+    target = "task-logs/" + digest + ".json"
+    try:
+        storage.put_object(Bucket=bucket, Key=target, Body=raw, IfNoneMatch="*",
+                           ServerSideEncryption="aws:kms", SSEKMSKeyId=key)
+    except ClientError as exc:
+        if exc.response["Error"]["Code"] != "PreconditionFailed":
+            raise
+    with storage.get_object(Bucket=bucket, Key=target)["Body"] as body:
+        if body.read(len(raw) + 1) != raw:
+            raise RuntimeError("Private log archive readback failed")
+    return digest
+
+
+def cleanup_pass(inventory, clients, archive_log_group=None):
     rows = inventory.collect()  # Complete independent discovery precedes every mutation pass.
-    actions, failures = [], []
+    actions, failures, failure_details = [], [], []
     kinds = {r["kind"] for r in rows}
     for row in rows:
         kind, identifier = row["kind"], row["id"]
@@ -44,6 +89,8 @@ def cleanup_pass(inventory, clients):
             elif kind == "secret" and row["state"] == "active" and not row.get("managed"):
                 clients["secretsmanager"].delete_secret(SecretId=identifier, RecoveryWindowInDays=7)
             elif kind == "log_group" and "database" not in kinds:
+                if archive_log_group is not None:
+                    archive_log_group(identifier)
                 clients["logs"].delete_log_group(logGroupName=identifier)
             elif kind == "endpoint":
                 response = clients["ec2"].delete_vpc_endpoints(VpcEndpointIds=[identifier])
@@ -104,10 +151,19 @@ def cleanup_pass(inventory, clients):
             else:
                 continue
             actions.append(kind)
-        except Exception:
+        except Exception as exc:
             # Dependency races are retried by subsequent scheduled passes; a denied read never becomes absence.
             failures.append(kind)
-    return {"attempted_kinds": actions, "failed_kinds": failures, "before": public_report(rows)}
+            failure_details.append({
+                "kind": kind,
+                "resource_reference": hashlib.sha256(identifier.encode()).hexdigest(),
+                "error_type": type(exc).__name__,
+                "aws_code": getattr(exc, "response", {}).get("Error", {}).get("Code"),
+                "request_id": getattr(exc, "response", {}).get("ResponseMetadata", {}).get("RequestId"),
+                "operation": getattr(exc, "operation_name", None),
+            })
+    return {"attempted_kinds": actions, "failed_kinds": failures,
+            "failure_details": failure_details, "before": public_report(rows)}
 
 
 def handler(event, context):
@@ -146,7 +202,9 @@ def handler(event, context):
         ServerSideEncryption="aws:kms",
         SSEKMSKeyId=os.environ["GUARD_KEY_ARN"],
     )
-    result = cleanup_pass(inventory, clients)
+    result = cleanup_pass(inventory, clients, lambda group: archive_logs(
+        clients["logs"], s3, group, os.environ["GUARD_BUCKET"], os.environ["GUARD_KEY_ARN"]
+    ))
     s3.put_object(
         Bucket=os.environ["GUARD_BUCKET"],
         Key="cleanup/" + datetime.now(UTC).isoformat() + ".json",

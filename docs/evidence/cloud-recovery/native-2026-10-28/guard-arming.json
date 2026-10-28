@@ -1,0 +1,41 @@
+{
+  "at": "2026-10-28T01:44:53.353967+00:00",
+  "arming": {
+    "free_plan": true,
+    "account_pin": true,
+    "watchdog_armed": true,
+    "scope": "read_only_metadata_not_execution_or_permission_simulation"
+  },
+  "registry": {
+    "status": "EMPTY_REGISTRY_INITIALIZED",
+    "inventory": {
+      "observed_at": "2026-10-28T01:45:20.130962+00:00",
+      "scope": "isolated_runtime_inventory_not_billing_bill",
+      "active_resources_absent": true,
+      "all_resources_absent": true,
+      "residuals": [],
+      "billing_clearance": "requires_delayed_usage_and_guard_inventory_review"
+    }
+  },
+  "deployment_started_at": "2026-10-28T01:43:01Z",
+  "cleanup_at": "2026-10-28T04:43:01Z",
+  "checker": {
+    "request_id": "08ebfe5a-bd9c-4b00-a56a-623937ca5322",
+    "result": {
+      "observed_at": "2026-10-28T01:45:24.680708+00:00",
+      "scope": "isolated_runtime_inventory_not_billing_bill",
+      "active_resources_absent": true,
+      "all_resources_absent": true,
+      "residuals": [],
+      "billing_clearance": "requires_delayed_usage_and_guard_inventory_review"
+    }
+  },
+  "watchdog": {
+    "request_id": "ea1b1e4b-efa2-4b29-a59e-b520196c2509",
+    "result": {
+      "status": "ARMED_NO_MUTATION",
+      "run": "a2610280139d2d8"
+    }
+  },
+  "status": "NATIVE_GUARD_ARMING_PASSED"
+}

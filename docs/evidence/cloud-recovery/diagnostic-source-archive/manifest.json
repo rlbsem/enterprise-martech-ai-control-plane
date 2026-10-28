@@ -1,0 +1,10 @@
+{
+  "source_revision": "0f934d6b14f2cb23fc88f4c33a65ba3034133847",
+  "scope": "Additional exact source archive; existing workload records and prior nine-file archive unchanged",
+  "files": {
+    "src/controlplane/native_watchdog.py": {
+      "path": "docs/evidence/cloud-recovery/diagnostic-source-archive/native_watchdog.py",
+      "sha256": "d3113228f236283bd79dfd928e2be4add696260271453f9db712a0db33750e4d"
+    }
+  }
+}

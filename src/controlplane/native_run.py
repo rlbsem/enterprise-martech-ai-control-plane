@@ -95,6 +95,50 @@ class NativeRun:
             ):
                 raise RuntimeError("Write-capable tasks are not quiescent")
 
+    def preserve_task_observation(self, name, arn, task, events, log_error=None):
+        """Persist private diagnostics before accepting or rejecting a stopped task.
+
+        Raw task metadata/logs stay in the private checkpoint and encrypted guard
+        archive. Public result records contain only hashes and finite status data.
+        A failed archive cannot turn a failed task into successful acceptance.
+        """
+        observation = {
+            "task": name,
+            "task_reference": hashlib.sha256(arn.encode()).hexdigest(),
+            "last_status": task.get("lastStatus"),
+            "stop_code": task.get("stopCode"),
+            "containers": [
+                {k: container.get(k) for k in ("name", "exitCode", "imageDigest")}
+                for container in task.get("containers", [])
+            ],
+            "log_read_error": log_error,
+        }
+        self.records.append({"task_observation": observation})
+        if self.checkpoint_dir is None:
+            return
+        raw = json.dumps(
+            {"observed_at": datetime.now(UTC).isoformat(), "task": task, "events": events},
+            sort_keys=True,
+            default=str,
+        ).encode()
+        sha = hashlib.sha256(raw).hexdigest()
+        directory = Path(self.checkpoint_dir)
+        directory.mkdir(parents=True, exist_ok=True)
+        target = directory / ("task-observation-" + sha + ".json")
+        with target.open("xb") as stream:
+            stream.write(raw)
+        if target.read_bytes() != raw:
+            raise RuntimeError("Task diagnostic private readback failed")
+        key = "task-observations/" + sha + ".json"
+        self.c["s3"].put_object(
+            Bucket=self.m["guard_bucket"], Key=key, Body=raw, IfNoneMatch="*",
+            ServerSideEncryption="aws:kms", SSEKMSKeyId=self.m["guard_key"],
+        )
+        with self.c["s3"].get_object(Bucket=self.m["guard_bucket"], Key=key)["Body"] as stream:
+            if stream.read(len(raw) + 1) != raw:
+                raise RuntimeError("Task diagnostic cloud readback failed")
+        observation["private_archive_sha256"] = sha
+
     def task(self, name, *, extra=None, expected_exit=0):
         application = self.m.get("acceptance_workflow") == "application-recovery-v1"
         maintenance = (
@@ -184,6 +228,20 @@ class NativeRun:
             ecs.stop_task(cluster=self.m["cluster"], task=arn, reason="Bounded native task wait expired")
             raise RuntimeError("Task stop requested; independently confirm termination") from None
         task = ecs.describe_tasks(cluster=self.m["cluster"], tasks=[arn])["tasks"][0]
+        events, log_error = [], None
+        try:
+            events = self.c["logs"].get_log_events(
+                logGroupName=f"/csa-native/{self.m['run']}/{name}",
+                logStreamName=f"task/{name}/" + arn.rsplit("/", 1)[-1],
+                startFromHead=True,
+                limit=1000,
+            )["events"]
+        except Exception as exc:
+            log_error = {
+                "error_type": type(exc).__name__,
+                "aws_code": getattr(exc, "response", {}).get("Error", {}).get("Code"),
+            }
+        self.preserve_task_observation(name, arn, task, events, log_error)
         if (
             task["taskArn"] != arn
             or task["lastStatus"] != "STOPPED"
@@ -193,12 +251,8 @@ class NativeRun:
             or task["containers"][0]["imageDigest"] != self.m["image"].split("@")[1]
         ):
             raise RuntimeError("Stopped task identity/image/exit mismatch")
-        events = self.c["logs"].get_log_events(
-            logGroupName=f"/csa-native/{self.m['run']}/{name}",
-            logStreamName=f"task/{name}/" + arn.rsplit("/", 1)[-1],
-            startFromHead=True,
-            limit=1000,
-        )["events"]
+        if log_error:
+            raise RuntimeError("Stopped task logs unavailable; acceptance refused")
         results = []
         for event in events:
             try:

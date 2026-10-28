@@ -1,0 +1,66 @@
+[
+  {
+    "phase": "application-before-source-deletion",
+    "at": "2026-10-28T02:20:05.634999+00:00",
+    "original_sha256": "1eeea4a92000046b30a3a76e016d93d5bcace8ade78b13977633778e9ca2a64b",
+    "independent_comparison": {
+      "execution_gate": {
+        "epoch": 0,
+        "mode": "open",
+        "session_id": null
+      },
+      "findings": [],
+      "local_intents": 5,
+      "observed_at": "2026-10-28T02:19:23.333279+00:00",
+      "remote_effects": 5,
+      "remote_ledger_sha256": "a4ea51adeab71b420126505b3c8f015d3a34460ac0d058aa63af1345a8d78da8",
+      "safe_to_resume": true,
+      "scope": "quiesced databases; no changes or replay performed",
+      "snapshot_hash": "7e09587eb4075fade5a5867157a8c8d80bddfd4cf97be6d19bf3a3dacd64abff",
+      "write_denials": 2
+    }
+  },
+  {
+    "phase": "behind-quiescent-point-selected",
+    "at": "2026-10-28T02:15:03.143776+00:00",
+    "original_sha256": "2e92889ea418285928fefa5ce0b789c9f2627c53b1bae3bb09e0a86bc2aeda17",
+    "application_observed_at": "2026-10-28T02:10:40.981328+00:00",
+    "selected_point": "2026-10-28T02:10:42+00:00",
+    "backup_window": {
+      "EarliestTime": "2026-10-28 02:03:43.382000+00:00",
+      "LatestTime": "2026-10-28 02:11:01+00:00"
+    },
+    "backup_request_id": "db259c18-e18f-4de5-bd4c-14427d138fa4",
+    "quiescent": true,
+    "time_selection": "whole-second point after commit observation and earliest usable backup"
+  },
+  {
+    "phase": "behind-rds-available",
+    "at": "2026-10-28T02:34:58.457081+00:00",
+    "original_sha256": "adf12b44a98df8c002a8a8cf4fb8d6d20f9a4b98a9a0b151c24d3dbe9044179c",
+    "restore_point": "2026-10-28T02:10:42+00:00",
+    "request_id": "d0103bee-3063-4530-9e49-a7d6ea78530c",
+    "database_restore_seconds": 773.1181131999983,
+    "application_recovery": "not_yet_verified",
+    "physical_database_reference": "[private-reference-sha256:ad2f1ce33711385a2b40622a83c37fd3ebd777870a4877cc9e3266c9d3fd556b]"
+  },
+  {
+    "phase": "delete-intent-[private-reference-sha256:675950a62d3f4dcfee010ddbba607a7e71d8d05e5a08bdc64e42fd64c63690fc]",
+    "at": "2026-10-28T02:20:13.973617+00:00",
+    "original_sha256": "cf15354dbb345ceca94d59dae9c1921a656e9aef67ed4bc5cf8ac7459e487a5e"
+  },
+  {
+    "phase": "matching-quiescent-point-selected",
+    "at": "2026-10-28T02:18:58.910235+00:00",
+    "original_sha256": "d0adde46c23f4726c28b008ef61a01411e855b33514e201191d751064432e739",
+    "application_observed_at": "2026-10-28T02:15:40.878343+00:00",
+    "selected_point": "2026-10-28T02:15:42+00:00",
+    "backup_window": {
+      "EarliestTime": "2026-10-28 02:03:43.382000+00:00",
+      "LatestTime": "2026-10-28 02:16:01+00:00"
+    },
+    "backup_request_id": "6708e833-48ed-4530-ba50-8b0a890660e8",
+    "quiescent": true,
+    "time_selection": "whole-second point after commit observation and earliest usable backup"
+  }
+]

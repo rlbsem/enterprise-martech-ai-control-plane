@@ -36,6 +36,17 @@ run "encrypted_repository_cleanup_grants" {
     error_message = "Encrypted ECR cleanup requires RetireGrant on this run's tagged runtime keys only."
   }
 }
+run "private_logs_are_archived_without_expanding_checker_authority" {
+  command = plan
+  assert {
+    condition = anytrue([for statement in jsondecode(aws_iam_role_policy.cleanup.policy).Statement :
+      try(contains(statement.Action, "logs:GetLogEvents"), false) &&
+      try(contains(statement.Resource, "arn:aws:logs:us-east-2:${var.account_id}:log-group:/csa-native/${var.run_id}/*:*"), false) &&
+      !try(contains(statement.Resource, "*"), false)
+    ]) && strcontains(aws_iam_role_policy.function["watchdog"].policy, "/task-logs/*") && !strcontains(aws_iam_role_policy.function["checker"].policy, "/task-logs/*")
+    error_message = "Only the watchdog may archive exact-run logs; the independent checker stays read-only."
+  }
+}
 run "identity_rejected" {
   command = plan
   variables { run_id = "bad" }

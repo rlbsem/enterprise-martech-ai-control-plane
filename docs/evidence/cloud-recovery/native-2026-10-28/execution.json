@@ -1,0 +1,128 @@
+{
+  "schema": "cloud-recovery-native.v1",
+  "scope": "Actual AWS one-off application/PITR lane; synthetic business effects; not full production ECS/HTTPS acceptance",
+  "private_original_sha256": "3fa2940bf1ecb2cad46b0386ef596ae689b41f772759379223251a64387769eb",
+  "redactions": "Account identifiers, ARNs and private endpoints replaced by hashes; result counts, findings, receipts, API request IDs and source versions preserved",
+  "result": {
+    "status": "FAILED_NATIVE_APPLICATION_ACCEPTANCE",
+    "error_type": "RuntimeError",
+    "runtime_reason": "Stopped task identity/image/exit mismatch",
+    "aws_code": null,
+    "locations": [
+      {
+        "file": "execute-application-native.py",
+        "function": "<module>",
+        "line": 27
+      },
+      {
+        "file": "native_run.py",
+        "function": "run",
+        "line": 275
+      },
+      {
+        "file": "native_application.py",
+        "function": "execute",
+        "line": 343
+      },
+      {
+        "file": "native_run.py",
+        "function": "task",
+        "line": 195
+      }
+    ],
+    "records": [
+      {
+        "task": "bootstrap",
+        "task_reference": "c98035fe3f42cb3ff592857b19af0c20a3d686f5c81a033e8bf0bc3491385359",
+        "exit_code": 0,
+        "result": {
+          "bootstrap": "complete",
+          "workflow": "application-recovery-v1",
+          "owner_credentials_in_runtime_children": false
+        }
+      },
+      {
+        "task": "baseline",
+        "task_reference": "5a9c0633026c9d90a774ef3f57cb83c3dee168ddbc2ba5e4ebb0b51b4afb9b73",
+        "exit_code": 0,
+        "result": {
+          "workflow": "application-recovery-v1",
+          "stage": "three_effects",
+          "comparison": {
+            "safe_to_resume": true,
+            "local_intents": 3,
+            "remote_effects": 3,
+            "findings": [],
+            "snapshot_hash": "785924d1444aa71f5d9e51db0a7d0c00b2d4c13cac033859e958ae3a6afe53f2",
+            "observed_at": "2026-10-28T02:10:40.923985+00:00",
+            "scope": "quiesced databases; no changes or replay performed"
+          },
+          "recovery_point": "2026-10-28T02:10:40.981328+00:00",
+          "source_database": "a000034d6fb60f34c66e00dec6ebeedaed703d06128b5f40399ac6b88137d111",
+          "terminated_worker": true,
+          "normal_key": "3d45ee57-dbda-4c28-b2a9-418656a13280",
+          "lost_ack_key": "c4b49f30-0df7-4548-935f-45614e6f9096",
+          "killed_key": "cb62c0df-8416-4600-aa9a-217b6985ee08",
+          "remote_ledger_sha256": "91b3f8be0ff452f7eeded071b7ddcf188febd77e0a600871cf1e1e88830cd11d"
+        }
+      },
+      {
+        "task": "control",
+        "task_reference": "1c03692ceda9c741ea5e2bfad714194a04352b41dfb35cec1c1f816a0446d728",
+        "exit_code": 0,
+        "result": {
+          "workflow": "application-recovery-v1",
+          "stage": "five_effects",
+          "comparison": {
+            "safe_to_resume": true,
+            "local_intents": 5,
+            "remote_effects": 5,
+            "findings": [],
+            "snapshot_hash": "7e09587eb4075fade5a5867157a8c8d80bddfd4cf97be6d19bf3a3dacd64abff",
+            "observed_at": "2026-10-28T02:15:40.818441+00:00",
+            "scope": "quiesced databases; no changes or replay performed"
+          },
+          "new_keys": [
+            "1a687634-6c72-4d55-89c6-f6d9d5781f94",
+            "3035e958-66ba-4a0f-8c14-2a43cbd05e52"
+          ],
+          "recovery_point": "2026-10-28T02:15:40.878343+00:00",
+          "remote_ledger_sha256": "a4ea51adeab71b420126505b3c8f015d3a34460ac0d058aa63af1345a8d78da8"
+        }
+      },
+      {
+        "task": "verify",
+        "task_reference": "2392b23a41099b1736c013e95be18c73cee04691cd3049a533d53d91534119e6",
+        "exit_code": 0,
+        "result": {
+          "safe_to_resume": true,
+          "local_intents": 5,
+          "remote_effects": 5,
+          "findings": [],
+          "snapshot_hash": "7e09587eb4075fade5a5867157a8c8d80bddfd4cf97be6d19bf3a3dacd64abff",
+          "observed_at": "2026-10-28T02:19:23.333279+00:00",
+          "scope": "quiesced databases; no changes or replay performed",
+          "execution_gate": {
+            "mode": "open",
+            "epoch": 0,
+            "session_id": null
+          },
+          "write_denials": 2,
+          "remote_ledger_sha256": "a4ea51adeab71b420126505b3c8f015d3a34460ac0d058aa63af1345a8d78da8"
+        }
+      }
+    ],
+    "cleanup": "required; do not restart workflow from the beginning",
+    "execution_binding": {
+      "started_at": "2026-10-28T02:08:50.897496+00:00",
+      "finished_at": "2026-10-28T02:35:59.157943+00:00",
+      "elapsed_seconds": 1628.2603668999982,
+      "controller_source_commit": "58fc9837e3fd05e0d0fab2a1029b31d56c842e4d",
+      "controller_sha256": "fa6dff1613242b8f778296e9e75b218ac6f8b9aae3a6702f2a267df5ec0eaff3",
+      "application_image_source_commit": "413f8d9a3559bfcddf903985ff0166071871e865",
+      "application_image_manifest_digest": "sha256:286b7a73e50605ee02e02a1311078066d7bd35d9b89d5c570e32840f63ce863b",
+      "runtime_manifest_sha256": "dc7272fc6d0796d13db11c1e1e6c85792c1228d0140ca6e2c6a59e32254e8829",
+      "scope": "Real AWS RDS/PITR and one-off API/worker/receiver tasks; not full production ECS/HTTPS acceptance"
+    }
+  }
+}
