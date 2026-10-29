@@ -61,6 +61,14 @@ Delivery is **at least once with idempotent effects under the downstream adapter
 
 **Native AWS application acceptance:** A [completed, source-bound experiment](docs/evidence/cloud-recovery/native-application-2026-10-28/README.md) executed two sequential retained-backup RDS restores with at most two concurrent instances. A separate read-only task verified the early 3/5 mismatch and closed gate. The matching generation rejected stale approval, enforced current consent, reconciled uncertain work and reached a separately verified **6/6 with zero duplicate effects**. These are synthetic one-off API/worker/receiver tasks, not full production ECS/HTTPS/Multi-AZ acceptance.
 
+### Executed AWS recovery: two restores, two safety decisions
+
+[![Executed AWS RDS recovery showing the first 3-intent versus 5-receipt mismatch blocked without replay, then later proof, authorization checks and independent 6-of-6 reconciliation with no duplicates.](docs/evidence/cloud-recovery/native-application-2026-10-28/recovery-overview.svg)](docs/evidence/cloud-recovery/native-application-2026-10-28/README.md)
+
+[Full-size recovery diagram](docs/evidence/cloud-recovery/native-application-2026-10-28/recovery-overview.svg) · [Executed acceptance and source-bound evidence](docs/evidence/cloud-recovery/native-application-2026-10-28/README.md)
+
+*This figure reports the bounded, actual AWS RDS recovery experiment with synthetic application tasks; it is distinct from the broader reference cloud architecture shown below.*
+
 **Preserved earlier evidence:** The [first SQL run](docs/evidence/aws-readiness/native-sql/README.md) verified independent PostgreSQL receipts, duplicate safety and read-only permission denials. A third concurrent RDS instance was denied by the Free-plan quota. A [second run](docs/evidence/aws-readiness/retained-two-instance/native-outcome/README.md) used retained backups to stay within two instances: its restored replacement reached `available`, but that run did not record the final post-restore comparison.
 
 An [earlier October 28 application attempt](docs/evidence/cloud-recovery/native-2026-10-28/README.md) reached an available restore after 773.118 seconds, then failed its post-restore task check. A [separate admission abort](docs/evidence/cloud-recovery/native-admission-2026-10-28/README.md) exposed a missing pre-provisioning time gate, which was corrected before the successful run. Their original bytes and verdicts remain unchanged. Cleanup, pending deletion and delayed billing observations are separate from each application verdict.
@@ -68,6 +76,10 @@ An [earlier October 28 application attempt](docs/evidence/cloud-recovery/native-
 The [historical October 19 proof](docs/evidence/aws-readiness/retained-two-instance/README.md) remains tied to its original revision. The [production architecture](docs/cloud-operations.md), including separate ECS services, HTTPS ingress and Multi-AZ recovery, was not deployed by either isolated experiment.
 
 Earlier stages: [Ohio preflight](docs/evidence/aws-readiness/ohio/README.md), [guard and image checks](docs/evidence/aws-readiness/guard-native/README.md), [RDS bootstrap](docs/evidence/aws-readiness/rds-bootstrap/README.md).
+
+### Reference AWS runtime architecture
+
+The diagram below describes the broader AWS service and network design. The isolated native recovery experiment above did **not** deploy the complete ECS-services/HTTPS/Multi-AZ topology.
 
 ![Private AWS runtime](docs/diagrams/02-aws-runtime.svg)
 
