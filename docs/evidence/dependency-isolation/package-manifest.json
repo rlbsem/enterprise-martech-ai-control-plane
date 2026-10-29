@@ -9,7 +9,7 @@
     ".github/workflows/validate.yml": "e465ae0bd5514dae33643ccc59f28964c5c481f15e285994ca71bc3297786d0f",
     ".gitignore": "dc4f752978927f64aa57eedf016d35570ed3eb9db501820da76f55039b7f6564",
     "Dockerfile": "f1877dac2c32e40b2792969b0416cc82b55fe42e8983629d545add56338a8ed3",
-    "LICENSE": "bfa35d897efdd7b0c543024c4d8a4d39feb8d9132f5432c1644f7f74443b4c13",
+    "LICENSE": "1819462f2e141f8a0f1371c5191ad9ceffe1455611b2d2359674485cb7c3a8c5",
     "README.md": "12e3b7b3db1f9baff9600449a738a0d9fd67460317d05f87548278a8383cbdc8",
     "certs/README.md": "736e11119763bca2908f64f4c51047aebeceeb0e41d18a8bf447b20530c0e341",
     "certs/rds-global-bundle.pem": "fe45bbebf92ad3e27a583bbb2ddd1553c521ed4d49af5514dc0a40372ea5395c",
