@@ -2,6 +2,8 @@
 
 Two Terraform roots keep durable foundation ownership separate from application releases. `foundation` creates encrypted/versioned remote state and the account OIDC provider. `aws` creates the private runtime. No resources are created by the validation commands or ordinary push/PR workflows.
 
+**Full-runtime acceptance:** [AWS deployment acceptance and go/no-go gates](../docs/aws-deployment-acceptance.md) records what must be independently verified before claiming persistent ECS services, private HTTPS, release/rollback and Multi-AZ recovery. The November 12 read-only discovery found no runtime resources in the connected Ohio session and explicit organization-policy denials for the Canada target region. No cloud deployment is authorized by this document.
+
 ## Prerequisites and ownership
 
 - An authorized infrastructure administrator with short-lived credentials for the target account. The restricted GitHub **release** role intentionally cannot create IAM, networks, databases or Terraform state. Infrastructure changes require that administrator's reviewed Terraform plan/apply.
