@@ -18,6 +18,8 @@ A connected AWS session was used for **read-only** inventory. No AWS mutation, d
 - **ca-central-1:** ECS, RDS, ECR, ACM and VPC read requests returned an **explicit organization service-control-policy deny**. Canada was the earlier Terraform target but is no longer the selected deployment region; these denials are retained as historical read-only observations.
 - The connected principal and project/account ownership have **not** been established as the intended deployment identity. Do not infer that an authenticated role grants permission to deploy, that the earlier experiment's account is currently connected, or that a region's lack of observed resources authorizes provisioning.
 
+**Additional Ohio dependency preflight (read-only, November 12):** Three availability zones reported available. RDS returned orderable PostgreSQL 17.11 / `db.t4g.medium` combinations, including Multi-AZ capability. ACM returned **zero certificates**, and SNS returned **zero topics**. An IAM OIDC-provider inventory request returned AccessDenied; its state is unknown. These results describe only the connected session, not an established match to the original account. No AWS write occurred.
+
 **Disposition: BLOCKED BEFORE CLOUD WRITE.** Ohio is now the explicit code target, but the connected principal has not been independently tied to the original test account and no approved infrastructure owner, complete dependency inventory or deployment budget has been established. The read-only Ohio inventory contained no persistent runtime. Review account identity, authority and cost/teardown before even requesting a Terraform apply.
 
 ## Ohio implementation status
