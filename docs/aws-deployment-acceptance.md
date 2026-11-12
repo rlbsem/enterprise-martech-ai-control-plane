@@ -8,23 +8,27 @@ Demonstrate that an **approved, privately routed** Control Plane can be deployed
 
 Use only synthetic, non-contacting customer records. Do not substitute a publicly accessible demo, public credentials, an ALB screenshot, a green Terraform plan, or a successful database restore for the end-to-end acceptance.
 
-The existing infrastructure root is explicitly restricted to **ca-central-1**. The previously executed recovery experiment was in **us-east-2** and used a different, reduced topology. Do not change the region validation merely to bypass an account restriction.
+The complete full-runtime Terraform and protected release tooling are now pinned to **us-east-2 (Ohio)**, matching the previously executed recovery experiment's region. That earlier run remains a separate, reduced topology. This region selection does not establish account identity, approve resource creation, or convert the recovery experiment into full-service deployment proof.
 
 ## Read-only discovery: November 12, 2026
 
 A connected AWS session was used for **read-only** inventory. No AWS mutation, deployment, billing change or cost approval occurred.
 
 - **us-east-2:** ECS returned zero clusters; RDS returned zero DB instances; ECR returned zero repositories; ACM returned zero certificates; EC2 returned one default VPC. These are observations in the **connected session**, not a claim about every account or the historical test.
-- **ca-central-1:** ECS, RDS, ECR, ACM and VPC read requests returned an **explicit organization service-control-policy deny**. There is no reliable infrastructure inventory for the Terraform target region.
+- **ca-central-1:** ECS, RDS, ECR, ACM and VPC read requests returned an **explicit organization service-control-policy deny**. Canada was the earlier Terraform target but is no longer the selected deployment region; these denials are retained as historical read-only observations.
 - The connected principal and project/account ownership have **not** been established as the intended deployment identity. Do not infer that an authenticated role grants permission to deploy, that the earlier experiment's account is currently connected, or that a region's lack of observed resources authorizes provisioning.
 
-**Disposition: BLOCKED BEFORE CLOUD WRITE.** Establish the approved target account, authorization, allowed region, infrastructure ownership and budget before requesting even a Terraform apply.
+**Disposition: BLOCKED BEFORE CLOUD WRITE.** Ohio is now the explicit code target, but the connected principal has not been independently tied to the original test account and no approved infrastructure owner, complete dependency inventory or deployment budget has been established. The read-only Ohio inventory contained no persistent runtime. Review account identity, authority and cost/teardown before even requesting a Terraform apply.
+
+## Ohio implementation status
+
+The implementation branch pins `infra/foundation`, `infra/aws`, the protected GitHub release workflow, digest-qualified ECR manifest validation, the mocked Terraform region fixtures and the release regression suite to `us-east-2`. It **rejects** a `ca-central-1` release manifest or ECR image and retains the existing explicit production isolation controls. This is a source/configuration change only. GitHub CI and independent account authorization are separate gates.
 
 ## Release prerequisites and hard stops
 
 | Gate | Required independent evidence | Stop if |
 |---|---|---|
-| Account and region | Approved account/region, matching assumed-role identity, permitted API reads, environment ownership | Target identity is ambiguous; SCP denies inventory or deployment |
+| Account and region | Explicitly approved Ohio account, independently matched to the historical owner, authorized identity, permitted API reads and environment ownership | Target account is ambiguous, original account is not verified, or required access is denied |
 | Spending | Written finite test budget, expected charge-bearing resources, designated owner, alerts, cleanup/retention liability | No explicit approval or claimed hard USD cap based only on a budget alert |
 | Dependencies | Existing or explicitly provisioned private DNS, trusted ACM certificate for both names, VPN/peering/TGW route, on-call SNS subscriptions, RDS 17 patch/class availability and quotas | Certificate, route, DNS, subscription or quota not verified |
 | Source binding | Exact clean source SHA, pinned dependency tests, Linux/AMD64 OCI image, ECR digest readback, matching task revision and SOURCE_COMMIT | Mutable tag, missing digest, conflicting task definition |
