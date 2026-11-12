@@ -3,7 +3,7 @@ variable "region" {
   default = "us-east-2"
   validation {
     condition     = var.region == "us-east-2"
-    error_message = "This deployment boundary is reviewed for us-east-2. Review networking, pricing and IAM before another region."
+    error_message = "Only us-east-2 (Ohio) is permitted. Live account access, pricing, networking and IAM require separate acceptance."
   }
 }
 variable "environment" {
