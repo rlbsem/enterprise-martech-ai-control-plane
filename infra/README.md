@@ -2,15 +2,21 @@
 
 Two Terraform roots keep durable foundation ownership separate from application releases. `foundation` creates encrypted/versioned remote state and the account OIDC provider. `aws` creates the private runtime. No resources are created by the validation commands or ordinary push/PR workflows.
 
-**Full-runtime acceptance:** [AWS deployment acceptance and go/no-go gates](../docs/aws-deployment-acceptance.md) records what must be independently verified before claiming persistent ECS services, private HTTPS, release/rollback and Multi-AZ recovery. The November 12 read-only discovery found no runtime resources in the connected Ohio session and explicit organization-policy denials for the Canada target region. No cloud deployment is authorized by this document.
+**Full-runtime acceptance:** [AWS deployment acceptance and go/no-go gates](../docs/aws-deployment-acceptance.md) records what must be independently verified before claiming persistent ECS services, private HTTPS, release/rollback and Multi-AZ recovery. The November 12 read-only discovery found no Control Plane runtime resources in the connected Ohio session. The full-runtime deployment target is now pinned to Ohio (`us-east-2`); account ownership, environment prerequisites and cost authorization must still be independently established. No cloud deployment is authorized by this document.
 
 ## Prerequisites and ownership
 
 - An authorized infrastructure administrator with short-lived credentials for the target account. The restricted GitHub **release** role intentionally cannot create IAM, networks, databases or Terraform state. Infrastructure changes require that administrator's reviewed Terraform plan/apply.
 - A dedicated environment/account, non-overlapping VPC CIDR and routed enterprise connectivity (VPN, peering or transit gateway). Route attachment and corporate DNS forwarding belong to the enterprise network owner; supplying a client CIDR alone does not establish a route.
-- An existing ACM certificate in `ca-central-1` covering `api.<internal_domain>` and `effects.<internal_domain>`, trusted by the runtime's public CA bundle. Public ACM DNS validation can be performed in the enterprise-owned public zone while application records remain private. Private-PKI use requires adding its approved root to the image and configuring the HTTP client trust store; do not disable certificate verification.
+- An existing ACM certificate in `us-east-2` covering `api.<internal_domain>` and `effects.<internal_domain>`, trusted by the runtime's public CA bundle. Public ACM DNS validation can be performed in the enterprise-owned public zone while application records remain private. Private-PKI use requires adding its approved root to the image and configuring the HTTP client trust store; do not disable certificate verification.
 - An existing SNS on-call topic with confirmed subscriptions, budget ownership, and an approved AWS PostgreSQL 17 engine patch/class combination for the region.
 - GitHub environment `aws-release`, restricted to `main`, with required independent reviewers and prevention of self-review where the account supports it. Verify the actual repository OIDC subject (including any customized repository-ID claims); pass that exact subject to Terraform. Wildcards and other repositories are rejected.
+
+## Ohio region scope
+
+The complete Terraform runtime, foundation, protected release workflow, manifest validator and security test fixtures now target `us-east-2`. This preserves a **single-region allowlist**; choosing Ohio does not relax public-access, source-digest, release-identity or database recovery gates. The earlier executed Ohio application-recovery experiment remains a **separate reduced-topology test**. This full service architecture has not been deployed or verified in the connected environment.
+
+The historical experiment was torn down. Do not reuse old state identifiers, expected resource names, old ECR digests or archived credentials as live deployment inputs. Before initial foundation creation, the approved account must be compared to the intended original account, and an infrastructure owner must explicitly authorize a region-specific remote state bucket and encrypted backend. No existing state or provider is migrated automatically.
 
 ## Foundation and remote state
 
@@ -23,7 +29,7 @@ terraform -chdir=infra/foundation apply foundation.tfplan
 terraform -chdir=infra/aws init \
   -backend-config='bucket=<foundation-output>' \
   -backend-config='key=stage/control/terraform.tfstate' \
-  -backend-config='region=ca-central-1' \
+  -backend-config='region=us-east-2' \
   -backend-config='encrypt=true' \
   -backend-config='use_lockfile=true'
 ```
@@ -44,7 +50,7 @@ Provide environment values through a private `*.tfvars` file or `TF_VAR_*`. Requ
 For example, after the repository exists:
 
 ```bash
-aws ecr get-login-password --region ca-central-1 | docker login --username AWS --password-stdin <registry>
+aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin <registry>
 docker build --platform linux/amd64 --label org.opencontainers.image.revision=<commit> -t <repository>:<commit> .
 docker push <repository>:<commit>
 aws ecr describe-images --repository-name control-stage --image-ids imageTag=<commit> --query 'imageDetails[0].imageDigest'
