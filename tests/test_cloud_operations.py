@@ -22,7 +22,7 @@ from conftest import customer, effects, job, propose
 
 
 def secrets_client():
-    return boto3.client('secretsmanager', region_name='ca-central-1',
+    return boto3.client('secretsmanager', region_name='us-east-2',
                         aws_access_key_id='mock', aws_secret_access_key='mock')
 
 
@@ -152,10 +152,22 @@ def test_emf_dimensions_are_bounded_and_queue_age_is_measured(api):
 
 def manifest():
     names = ['api', 'worker', 'remote', 'observer']
-    return {'commit': 'a' * 40, 'image': '123456789012.dkr.ecr.ca-central-1.amazonaws.com/control-stage@sha256:' + 'a'*64,
+    return {'commit': 'a' * 40, 'image': '123456789012.dkr.ecr.us-east-2.amazonaws.com/control-stage@sha256:' + 'a'*64,
             'cluster': 'mock-cluster', 'services': {n: n for n in names}, 'replicas': {n: 1 for n in names},
-            'tasks': {n: n+'-task' for n in names+['migration', 'verifier']}, 'region': 'ca-central-1',
+            'tasks': {n: n+'-task' for n in names+['migration', 'verifier']}, 'region': 'us-east-2',
             'groups': {'verifier': 'mock-sg'}, 'subnets': ['mock-subnet']}
+
+
+def test_release_rejects_other_region_and_cross_region_image():
+    other = deepcopy(manifest())
+    other['region'] = 'ca-central-1'
+    with pytest.raises(ValueError, match='Unexpected region'):
+        Release(other, Mock())
+
+    wrong_image = deepcopy(manifest())
+    wrong_image['image'] = wrong_image['image'].replace('us-east-2', 'ca-central-1')
+    with pytest.raises(ValueError, match='digest'):
+        Release(wrong_image, Mock())
 
 
 def test_resume_never_opens_services_when_verifier_fails():
