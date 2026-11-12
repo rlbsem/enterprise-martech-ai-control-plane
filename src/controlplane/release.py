@@ -13,7 +13,7 @@ import boto3
 def validate_manifest(manifest):
     if not re.fullmatch(r'[a-f0-9]{40}', manifest['commit']):
         raise ValueError('Invalid source commit')
-    if not re.fullmatch(r'[0-9]{12}\.dkr\.ecr\.ca-central-1\.amazonaws\.com/[a-z0-9-]+@sha256:[a-f0-9]{64}',
+    if not re.fullmatch(r'[0-9]{12}\.dkr\.ecr\.us-east-2\.amazonaws\.com/[a-z0-9-]+@sha256:[a-f0-9]{64}',
                         manifest['image']):
         raise ValueError('A digest-qualified private ECR image is required')
     expected = {'api', 'remote', 'worker', 'observer'}
@@ -23,7 +23,7 @@ def validate_manifest(manifest):
         raise ValueError('Unexpected task topology')
     if any(type(n) is not int or n < 1 or n > 8 for n in manifest['replicas'].values()):
         raise ValueError('Replica counts must be bounded 1..8')
-    if manifest['region'] != 'ca-central-1':
+    if manifest['region'] != 'us-east-2':
         raise ValueError('Unexpected region')
     return manifest
 
