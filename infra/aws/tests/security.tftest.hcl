@@ -44,6 +44,12 @@ run "reject_mutable_image" {
   variables { image_digest = "latest" }
   expect_failures = [var.image_digest]
 }
+run "reject_non_ohio_region" {
+  command = plan
+  variables { region = "ca-central-1" }
+  expect_failures = [var.region]
+}
+
 run "reject_untrusted_oidc" {
   command = plan
   variables { github_oidc_subject = "repo:other/repo:environment:aws-release" }
