@@ -1,9 +1,9 @@
 variable "region" {
   type    = string
-  default = "ca-central-1"
+  default = "us-east-2"
   validation {
-    condition     = var.region == "ca-central-1"
-    error_message = "This deployment boundary is reviewed for ca-central-1. Review networking, pricing and IAM before another region."
+    condition     = var.region == "us-east-2"
+    error_message = "Only us-east-2 (Ohio) is permitted. Live account access, pricing, networking and IAM require separate acceptance."
   }
 }
 variable "environment" {
@@ -31,7 +31,7 @@ variable "certificate_arn" {
   type        = string
   description = "Existing ACM certificate for api.<domain> and effects.<domain>, trusted by clients and the worker."
   validation {
-    condition     = can(regex("^arn:aws:acm:ca-central-1:[0-9]{12}:certificate/", var.certificate_arn))
+    condition     = can(regex("^arn:aws:acm:us-east-2:[0-9]{12}:certificate/", var.certificate_arn))
     error_message = "Supply a certificate in the deployment region."
   }
 }

@@ -1,6 +1,6 @@
 mock_provider "aws" {
   mock_data "aws_availability_zones" {
-    defaults = { names = ["ca-central-1a", "ca-central-1b"] }
+    defaults = { names = ["us-east-2a", "us-east-2b"] }
   }
   mock_data "aws_caller_identity" {
     defaults = { account_id = "123456789012", arn = "arn:aws:iam::123456789012:root", user_id = "mock" }
@@ -13,10 +13,10 @@ variables {
   environment              = "stage"
   source_commit            = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
   image_digest             = "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-  certificate_arn          = "arn:aws:acm:ca-central-1:123456789012:certificate/mock-only"
+  certificate_arn          = "arn:aws:acm:us-east-2:123456789012:certificate/mock-only"
   internal_domain          = "control.example.test"
   client_cidrs             = ["10.50.0.0/16"]
-  alarm_topic_arn          = "arn:aws:sns:ca-central-1:123456789012:mock-only"
+  alarm_topic_arn          = "arn:aws:sns:us-east-2:123456789012:mock-only"
   github_oidc_provider_arn = "arn:aws:iam::123456789012:oidc-provider/token.actions.githubusercontent.com"
   github_oidc_subject      = "repo:rlbsem/enterprise-martech-ai-control-plane:environment:aws-release"
 }
@@ -44,6 +44,12 @@ run "reject_mutable_image" {
   variables { image_digest = "latest" }
   expect_failures = [var.image_digest]
 }
+run "reject_non_ohio_region" {
+  command = plan
+  variables { region = "ca-central-1" }
+  expect_failures = [var.region]
+}
+
 run "reject_untrusted_oidc" {
   command = plan
   variables { github_oidc_subject = "repo:other/repo:environment:aws-release" }
@@ -73,8 +79,8 @@ run "reject_public_restore_binding" {
       vpc_security_groups     = ["sg-other"]
       db_parameter_groups     = ["wrong-parameters"]
       master_user_secret = [{
-        kms_key_id    = "arn:aws:kms:ca-central-1:123456789012:key/mock"
-        secret_arn    = "arn:aws:secretsmanager:ca-central-1:123456789012:secret:mock"
+        kms_key_id    = "arn:aws:kms:us-east-2:123456789012:key/mock"
+        secret_arn    = "arn:aws:secretsmanager:us-east-2:123456789012:secret:mock"
         secret_status = "active"
       }]
     }
@@ -99,8 +105,8 @@ run "reject_wrong_restore_binding" {
       vpc_security_groups     = ["sg-other"]
       db_parameter_groups     = ["wrong-parameters"]
       master_user_secret = [{
-        kms_key_id    = "arn:aws:kms:ca-central-1:123456789012:key/mock"
-        secret_arn    = "arn:aws:secretsmanager:ca-central-1:123456789012:secret:mock"
+        kms_key_id    = "arn:aws:kms:us-east-2:123456789012:key/mock"
+        secret_arn    = "arn:aws:secretsmanager:us-east-2:123456789012:secret:mock"
         secret_status = "active"
       }]
     }
@@ -108,7 +114,7 @@ run "reject_wrong_restore_binding" {
   override_resource {
     target          = aws_kms_key.data
     override_during = plan
-    values          = { arn = "arn:aws:kms:ca-central-1:123456789012:key/mock" }
+    values          = { arn = "arn:aws:kms:us-east-2:123456789012:key/mock" }
   }
   override_resource {
     target          = aws_security_group.database["control"]

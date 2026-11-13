@@ -4,7 +4,7 @@ terraform {
     aws = { source = "hashicorp/aws", version = "= 6.15.0" }
   }
 }
-provider "aws" { region = "ca-central-1" }
+provider "aws" { region = "us-east-2" }
 variable "state_bucket_name" {
   type = string
   validation {
