@@ -16,7 +16,7 @@ An unresolved original event remains unresolved in the immutable ledger after li
 |---|---|---|
 | email, phone, owner | CRM | Closed formats; newer accepted sequence for that field |
 | lifecycle | CRM | Lead < MQL < SQL < Opportunity < Customer; cannot move backward |
-| score | scoring | Strict integer 0–100; may increase or decrease |
+| score | scoring | Strict integer from 0 to 100; may increase or decrease |
 | consent | consent | Strict boolean; no consent means no marketing permission |
 | suppressed | privacy | Strict boolean; unknown or true blocks marketing |
 
